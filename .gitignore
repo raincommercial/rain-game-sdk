@@ -1,0 +1,14 @@
+*.log
+.DS_Store
+node_modules
+dist
+
+## IDE
+.idea
+.vscode
+
+## Generated
+artifacts
+cache
+/contracts
+/typechain

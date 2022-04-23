@@ -1,0 +1,84 @@
+{
+  "version": "0.0.1-alpha.1",
+  "license": "CAL",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=12"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "nix-build": "nix-shell --run yarn build",
+    "test": "npx hardhat test",
+    "lint": "tsdx lint src",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why",
+    "generate-docs": "yarn build && api-extractor run --local && api-documenter markdown -i docs/input -o docs/markdown"
+  },
+  "peerDependencies": {},
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "name": "rain-game-sdk",
+  "author": "Beehive Innovation",
+  "module": "dist/rain-game-sdk.esm.js",
+  "size-limit": [
+    {
+      "path": "dist/rain-game-sdk.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/rain-game-sdk.esm.js",
+      "limit": "10 KB"
+    }
+  ],
+  "devDependencies": {
+    "@beehive-innovation/rain-game-engine": "git+https://github.com/beehive-innovation/rain-game-engine.git#e8bd62ac52aa87d022db28627c25849dea8e215d",
+    "@microsoft/api-documenter": "^7.17.9",
+    "@microsoft/api-extractor": "^7.22.2",
+    "@nomiclabs/hardhat-ethers": "^2.0.3",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@size-limit/preset-small-lib": "^6.0.4",
+    "@typechain/ethers-v5": "^8.0.5",
+    "@typechain/hardhat": "^3.0.0",
+    "@types/chai": "^4.2.22",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.11.11",
+    "chai": "^4.3.4",
+    "ethereum-waffle": "^3.4.0",
+    "hardhat": "^2.7.0",
+    "husky": "^7.0.4",
+    "rain-sdk": "^0.0.1-alpha.7",
+    "size-limit": "^6.0.4",
+    "standardx": "3.0.0",
+    "ts-node": "^10.4.0",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.3.1",
+    "typechain": "^6.0.2",
+    "typescript": "^4.5.2"
+  },
+  "dependencies": {
+    "ethers": "^5.5.2"
+  },
+  "resolutions": {
+    "**/@typescript-eslint/eslint-plugin": "^5.4.0",
+    "**/@typescript-eslint/parser": "^5.4.0",
+    "**/jest": "^27.3.1",
+    "**/ts-jest": "^27.0.7",
+    "**/typescript": "^4.4.4"
+  }
+}
