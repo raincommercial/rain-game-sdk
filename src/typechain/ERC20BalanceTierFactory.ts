@@ -12,10 +12,10 @@ import {
   PopulatedTransaction,
   Signer,
   utils,
-} from 'ethers';
-import { FunctionFragment, Result, EventFragment } from '@ethersproject/abi';
-import { Listener, Provider } from '@ethersproject/providers';
-import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from './common';
+} from "ethers";
+import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
+import { Listener, Provider } from "@ethersproject/providers";
+import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export type ERC20BalanceTierConfigStruct = {
   erc20: string;
@@ -29,47 +29,47 @@ export type ERC20BalanceTierConfigStructOutput = [string, BigNumber[]] & {
 
 export interface ERC20BalanceTierFactoryInterface extends utils.Interface {
   functions: {
-    'createChild(bytes)': FunctionFragment;
-    'createChildTyped((address,uint256[8]))': FunctionFragment;
-    'implementation()': FunctionFragment;
-    'isChild(address)': FunctionFragment;
+    "createChild(bytes)": FunctionFragment;
+    "createChildTyped((address,uint256[8]))": FunctionFragment;
+    "implementation()": FunctionFragment;
+    "isChild(address)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: 'createChild',
+    functionFragment: "createChild",
     values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'createChildTyped',
+    functionFragment: "createChildTyped",
     values: [ERC20BalanceTierConfigStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: 'implementation',
+    functionFragment: "implementation",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: 'isChild', values: [string]): string;
+  encodeFunctionData(functionFragment: "isChild", values: [string]): string;
 
   decodeFunctionResult(
-    functionFragment: 'createChild',
+    functionFragment: "createChild",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'createChildTyped',
+    functionFragment: "createChildTyped",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'implementation',
+    functionFragment: "implementation",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'isChild', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "isChild", data: BytesLike): Result;
 
   events: {
-    'Implementation(address,address)': EventFragment;
-    'NewChild(address,address)': EventFragment;
+    "Implementation(address,address)": EventFragment;
+    "NewChild(address,address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: 'Implementation'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'NewChild'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Implementation"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NewChild"): EventFragment;
 }
 
 export type ImplementationEvent = TypedEvent<
@@ -156,7 +156,7 @@ export interface ERC20BalanceTierFactory extends BaseContract {
   };
 
   filters: {
-    'Implementation(address,address)'(
+    "Implementation(address,address)"(
       sender?: null,
       implementation?: null
     ): ImplementationEventFilter;
@@ -165,7 +165,7 @@ export interface ERC20BalanceTierFactory extends BaseContract {
       implementation?: null
     ): ImplementationEventFilter;
 
-    'NewChild(address,address)'(
+    "NewChild(address,address)"(
       sender?: null,
       child?: null
     ): NewChildEventFilter;

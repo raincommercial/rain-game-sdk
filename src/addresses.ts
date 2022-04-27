@@ -2,14 +2,14 @@ const addressBook = [
   {
     chainId: 80001,
     addresses: {
-      gameAssetsFactory: 'deploy pending',
+      gameAssetsFactory: '0xc782cF76e5827B3c2563a06EbA7B400deEe119a7',
     },
   },
   {
     // These addresess are deployed in HH Network (test)
     chainId: 31337,
     addresses: {
-      gameAssetsFactory: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+      gameAssetsFactory: '0x610178dA211FEF7D417bC0e6FeD39F05609AD788',
     },
   },
 ];

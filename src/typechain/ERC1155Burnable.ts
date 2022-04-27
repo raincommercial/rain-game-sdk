@@ -12,103 +12,103 @@ import {
   PopulatedTransaction,
   Signer,
   utils,
-} from 'ethers';
-import { FunctionFragment, Result, EventFragment } from '@ethersproject/abi';
-import { Listener, Provider } from '@ethersproject/providers';
-import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from './common';
+} from "ethers";
+import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
+import { Listener, Provider } from "@ethersproject/providers";
+import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface ERC1155BurnableInterface extends utils.Interface {
   functions: {
-    'balanceOf(address,uint256)': FunctionFragment;
-    'balanceOfBatch(address[],uint256[])': FunctionFragment;
-    'burn(address,uint256,uint256)': FunctionFragment;
-    'burnBatch(address,uint256[],uint256[])': FunctionFragment;
-    'isApprovedForAll(address,address)': FunctionFragment;
-    'safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)': FunctionFragment;
-    'safeTransferFrom(address,address,uint256,uint256,bytes)': FunctionFragment;
-    'setApprovalForAll(address,bool)': FunctionFragment;
-    'supportsInterface(bytes4)': FunctionFragment;
-    'uri(uint256)': FunctionFragment;
+    "balanceOf(address,uint256)": FunctionFragment;
+    "balanceOfBatch(address[],uint256[])": FunctionFragment;
+    "burn(address,uint256,uint256)": FunctionFragment;
+    "burnBatch(address,uint256[],uint256[])": FunctionFragment;
+    "isApprovedForAll(address,address)": FunctionFragment;
+    "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)": FunctionFragment;
+    "safeTransferFrom(address,address,uint256,uint256,bytes)": FunctionFragment;
+    "setApprovalForAll(address,bool)": FunctionFragment;
+    "supportsInterface(bytes4)": FunctionFragment;
+    "uri(uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: 'balanceOf',
+    functionFragment: "balanceOf",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'balanceOfBatch',
+    functionFragment: "balanceOfBatch",
     values: [string[], BigNumberish[]]
   ): string;
   encodeFunctionData(
-    functionFragment: 'burn',
+    functionFragment: "burn",
     values: [string, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'burnBatch',
+    functionFragment: "burnBatch",
     values: [string, BigNumberish[], BigNumberish[]]
   ): string;
   encodeFunctionData(
-    functionFragment: 'isApprovedForAll',
+    functionFragment: "isApprovedForAll",
     values: [string, string]
   ): string;
   encodeFunctionData(
-    functionFragment: 'safeBatchTransferFrom',
+    functionFragment: "safeBatchTransferFrom",
     values: [string, string, BigNumberish[], BigNumberish[], BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'safeTransferFrom',
+    functionFragment: "safeTransferFrom",
     values: [string, string, BigNumberish, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'setApprovalForAll',
+    functionFragment: "setApprovalForAll",
     values: [string, boolean]
   ): string;
   encodeFunctionData(
-    functionFragment: 'supportsInterface',
+    functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: 'uri', values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: "uri", values: [BigNumberish]): string;
 
-  decodeFunctionResult(functionFragment: 'balanceOf', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'balanceOfBatch',
+    functionFragment: "balanceOfBatch",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'burn', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'burnBatch', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "burnBatch", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'isApprovedForAll',
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: 'safeBatchTransferFrom',
+    functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'safeTransferFrom',
+    functionFragment: "safeBatchTransferFrom",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'setApprovalForAll',
+    functionFragment: "safeTransferFrom",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'supportsInterface',
+    functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'uri', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "supportsInterface",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "uri", data: BytesLike): Result;
 
   events: {
-    'ApprovalForAll(address,address,bool)': EventFragment;
-    'TransferBatch(address,address,address,uint256[],uint256[])': EventFragment;
-    'TransferSingle(address,address,address,uint256,uint256)': EventFragment;
-    'URI(string,uint256)': EventFragment;
+    "ApprovalForAll(address,address,bool)": EventFragment;
+    "TransferBatch(address,address,address,uint256[],uint256[])": EventFragment;
+    "TransferSingle(address,address,address,uint256,uint256)": EventFragment;
+    "URI(string,uint256)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: 'ApprovalForAll'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'TransferBatch'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'TransferSingle'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'URI'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TransferBatch"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TransferSingle"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "URI"): EventFragment;
 }
 
 export type ApprovalForAllEvent = TypedEvent<
@@ -371,7 +371,7 @@ export interface ERC1155Burnable extends BaseContract {
   };
 
   filters: {
-    'ApprovalForAll(address,address,bool)'(
+    "ApprovalForAll(address,address,bool)"(
       account?: string | null,
       operator?: string | null,
       approved?: null
@@ -382,7 +382,7 @@ export interface ERC1155Burnable extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
-    'TransferBatch(address,address,address,uint256[],uint256[])'(
+    "TransferBatch(address,address,address,uint256[],uint256[])"(
       operator?: string | null,
       from?: string | null,
       to?: string | null,
@@ -397,7 +397,7 @@ export interface ERC1155Burnable extends BaseContract {
       values?: null
     ): TransferBatchEventFilter;
 
-    'TransferSingle(address,address,address,uint256,uint256)'(
+    "TransferSingle(address,address,address,uint256,uint256)"(
       operator?: string | null,
       from?: string | null,
       to?: string | null,
@@ -412,7 +412,7 @@ export interface ERC1155Burnable extends BaseContract {
       value?: null
     ): TransferSingleEventFilter;
 
-    'URI(string,uint256)'(
+    "URI(string,uint256)"(
       value?: null,
       id?: BigNumberish | null
     ): URIEventFilter;

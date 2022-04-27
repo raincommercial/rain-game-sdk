@@ -8,10 +8,10 @@ import {
   BytesLike,
   Signer,
   utils,
-} from 'ethers';
-import { EventFragment } from '@ethersproject/abi';
-import { Listener, Provider } from '@ethersproject/providers';
-import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from './common';
+} from "ethers";
+import { EventFragment } from "@ethersproject/abi";
+import { Listener, Provider } from "@ethersproject/providers";
+import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export type StateStruct = {
   stackIndex: BigNumberish;
@@ -39,10 +39,10 @@ export interface VMStateInterface extends utils.Interface {
   functions: {};
 
   events: {
-    'Snapshot(address,address,tuple)': EventFragment;
+    "Snapshot(address,address,tuple)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: 'Snapshot'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Snapshot"): EventFragment;
 }
 
 export type SnapshotEvent = TypedEvent<
@@ -83,7 +83,7 @@ export interface VMState extends BaseContract {
   callStatic: {};
 
   filters: {
-    'Snapshot(address,address,tuple)'(
+    "Snapshot(address,address,tuple)"(
       sender?: null,
       pointer?: null,
       state?: null

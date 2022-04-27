@@ -71,9 +71,6 @@ describe('Rain Game SDK - Test', () => {
 
       const gameAssets = await GameAssets.deploy(owner, gameAssetsConfig);
 
-      console.log(await gameAssets.Admin());
-      console.log(await gameAssets.Admin2());
-
       expect(await GameAssets.isChild(signer, gameAssets.address)).to.be.true;
     });
   });

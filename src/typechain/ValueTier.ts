@@ -9,28 +9,28 @@ import {
   PopulatedTransaction,
   Signer,
   utils,
-} from 'ethers';
-import { FunctionFragment, Result, EventFragment } from '@ethersproject/abi';
-import { Listener, Provider } from '@ethersproject/providers';
-import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from './common';
+} from "ethers";
+import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
+import { Listener, Provider } from "@ethersproject/providers";
+import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface ValueTierInterface extends utils.Interface {
   functions: {
-    'tierValues()': FunctionFragment;
+    "tierValues()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: 'tierValues',
+    functionFragment: "tierValues",
     values?: undefined
   ): string;
 
-  decodeFunctionResult(functionFragment: 'tierValues', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "tierValues", data: BytesLike): Result;
 
   events: {
-    'InitializeValueTier(address,address)': EventFragment;
+    "InitializeValueTier(address,address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: 'InitializeValueTier'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "InitializeValueTier"): EventFragment;
 }
 
 export type InitializeValueTierEvent = TypedEvent<
@@ -38,9 +38,8 @@ export type InitializeValueTierEvent = TypedEvent<
   { sender: string; pointer: string }
 >;
 
-export type InitializeValueTierEventFilter = TypedEventFilter<
-  InitializeValueTierEvent
->;
+export type InitializeValueTierEventFilter =
+  TypedEventFilter<InitializeValueTierEvent>;
 
 export interface ValueTier extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -81,7 +80,7 @@ export interface ValueTier extends BaseContract {
   };
 
   filters: {
-    'InitializeValueTier(address,address)'(
+    "InitializeValueTier(address,address)"(
       sender?: null,
       pointer?: null
     ): InitializeValueTierEventFilter;

@@ -12,10 +12,10 @@ import {
   PopulatedTransaction,
   Signer,
   utils,
-} from 'ethers';
-import { FunctionFragment, Result, EventFragment } from '@ethersproject/abi';
-import { Listener, Provider } from '@ethersproject/providers';
-import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from './common';
+} from "ethers";
+import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
+import { Listener, Provider } from "@ethersproject/providers";
+import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export type ERC20BalanceTierConfigStruct = {
   erc20: string;
@@ -29,40 +29,40 @@ export type ERC20BalanceTierConfigStructOutput = [string, BigNumber[]] & {
 
 export interface ERC20BalanceTierInterface extends utils.Interface {
   functions: {
-    'initialize((address,uint256[8]))': FunctionFragment;
-    'report(address)': FunctionFragment;
-    'setTier(address,uint256,bytes)': FunctionFragment;
-    'tierValues()': FunctionFragment;
+    "initialize((address,uint256[8]))": FunctionFragment;
+    "report(address)": FunctionFragment;
+    "setTier(address,uint256,bytes)": FunctionFragment;
+    "tierValues()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: 'initialize',
+    functionFragment: "initialize",
     values: [ERC20BalanceTierConfigStruct]
   ): string;
-  encodeFunctionData(functionFragment: 'report', values: [string]): string;
+  encodeFunctionData(functionFragment: "report", values: [string]): string;
   encodeFunctionData(
-    functionFragment: 'setTier',
+    functionFragment: "setTier",
     values: [string, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'tierValues',
+    functionFragment: "tierValues",
     values?: undefined
   ): string;
 
-  decodeFunctionResult(functionFragment: 'initialize', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'report', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'setTier', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'tierValues', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "report", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "setTier", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "tierValues", data: BytesLike): Result;
 
   events: {
-    'Initialize(address,address)': EventFragment;
-    'InitializeValueTier(address,address)': EventFragment;
-    'TierChange(address,address,uint256,uint256,bytes)': EventFragment;
+    "Initialize(address,address)": EventFragment;
+    "InitializeValueTier(address,address)": EventFragment;
+    "TierChange(address,address,uint256,uint256,bytes)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: 'Initialize'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'InitializeValueTier'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'TierChange'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Initialize"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "InitializeValueTier"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TierChange"): EventFragment;
 }
 
 export type InitializeEvent = TypedEvent<
@@ -77,9 +77,8 @@ export type InitializeValueTierEvent = TypedEvent<
   { sender: string; pointer: string }
 >;
 
-export type InitializeValueTierEventFilter = TypedEventFilter<
-  InitializeValueTierEvent
->;
+export type InitializeValueTierEventFilter =
+  TypedEventFilter<InitializeValueTierEvent>;
 
 export type TierChangeEvent = TypedEvent<
   [string, string, BigNumber, BigNumber, string],
@@ -175,13 +174,13 @@ export interface ERC20BalanceTier extends BaseContract {
   };
 
   filters: {
-    'Initialize(address,address)'(
+    "Initialize(address,address)"(
       sender?: null,
       erc20?: null
     ): InitializeEventFilter;
     Initialize(sender?: null, erc20?: null): InitializeEventFilter;
 
-    'InitializeValueTier(address,address)'(
+    "InitializeValueTier(address,address)"(
       sender?: null,
       pointer?: null
     ): InitializeValueTierEventFilter;
@@ -190,7 +189,7 @@ export interface ERC20BalanceTier extends BaseContract {
       pointer?: null
     ): InitializeValueTierEventFilter;
 
-    'TierChange(address,address,uint256,uint256,bytes)'(
+    "TierChange(address,address,uint256,uint256,bytes)"(
       sender?: null,
       account?: null,
       startTier?: null,

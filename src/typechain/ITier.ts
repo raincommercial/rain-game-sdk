@@ -12,31 +12,31 @@ import {
   PopulatedTransaction,
   Signer,
   utils,
-} from 'ethers';
-import { FunctionFragment, Result, EventFragment } from '@ethersproject/abi';
-import { Listener, Provider } from '@ethersproject/providers';
-import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from './common';
+} from "ethers";
+import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
+import { Listener, Provider } from "@ethersproject/providers";
+import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface ITierInterface extends utils.Interface {
   functions: {
-    'report(address)': FunctionFragment;
-    'setTier(address,uint256,bytes)': FunctionFragment;
+    "report(address)": FunctionFragment;
+    "setTier(address,uint256,bytes)": FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: 'report', values: [string]): string;
+  encodeFunctionData(functionFragment: "report", values: [string]): string;
   encodeFunctionData(
-    functionFragment: 'setTier',
+    functionFragment: "setTier",
     values: [string, BigNumberish, BytesLike]
   ): string;
 
-  decodeFunctionResult(functionFragment: 'report', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'setTier', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "report", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "setTier", data: BytesLike): Result;
 
   events: {
-    'TierChange(address,address,uint256,uint256,bytes)': EventFragment;
+    "TierChange(address,address,uint256,uint256,bytes)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: 'TierChange'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TierChange"): EventFragment;
 }
 
 export type TierChangeEvent = TypedEvent<
@@ -110,7 +110,7 @@ export interface ITier extends BaseContract {
   };
 
   filters: {
-    'TierChange(address,address,uint256,uint256,bytes)'(
+    "TierChange(address,address,uint256,uint256,bytes)"(
       sender?: null,
       account?: null,
       startTier?: null,

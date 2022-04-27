@@ -11,10 +11,10 @@ import {
   PopulatedTransaction,
   Signer,
   utils,
-} from 'ethers';
-import { FunctionFragment, Result, EventFragment } from '@ethersproject/abi';
-import { Listener, Provider } from '@ethersproject/providers';
-import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from './common';
+} from "ethers";
+import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
+import { Listener, Provider } from "@ethersproject/providers";
+import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export type GameAssetsConfigStruct = { _creator: string; _baseURI: string };
 
@@ -25,38 +25,38 @@ export type GameAssetsConfigStructOutput = [string, string] & {
 
 export interface GameAssetsFactoryInterface extends utils.Interface {
   functions: {
-    'createChild(bytes)': FunctionFragment;
-    'createChildTyped((address,string))': FunctionFragment;
-    'isChild(address)': FunctionFragment;
+    "createChild(bytes)": FunctionFragment;
+    "createChildTyped((address,string))": FunctionFragment;
+    "isChild(address)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: 'createChild',
+    functionFragment: "createChild",
     values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'createChildTyped',
+    functionFragment: "createChildTyped",
     values: [GameAssetsConfigStruct]
   ): string;
-  encodeFunctionData(functionFragment: 'isChild', values: [string]): string;
+  encodeFunctionData(functionFragment: "isChild", values: [string]): string;
 
   decodeFunctionResult(
-    functionFragment: 'createChild',
+    functionFragment: "createChild",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'createChildTyped',
+    functionFragment: "createChildTyped",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'isChild', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "isChild", data: BytesLike): Result;
 
   events: {
-    'Implementation(address,address)': EventFragment;
-    'NewChild(address,address)': EventFragment;
+    "Implementation(address,address)": EventFragment;
+    "NewChild(address,address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: 'Implementation'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'NewChild'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Implementation"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NewChild"): EventFragment;
 }
 
 export type ImplementationEvent = TypedEvent<
@@ -137,7 +137,7 @@ export interface GameAssetsFactory extends BaseContract {
   };
 
   filters: {
-    'Implementation(address,address)'(
+    "Implementation(address,address)"(
       sender?: null,
       implementation?: null
     ): ImplementationEventFilter;
@@ -146,7 +146,7 @@ export interface GameAssetsFactory extends BaseContract {
       implementation?: null
     ): ImplementationEventFilter;
 
-    'NewChild(address,address)'(
+    "NewChild(address,address)"(
       sender?: null,
       child?: null
     ): NewChildEventFilter;

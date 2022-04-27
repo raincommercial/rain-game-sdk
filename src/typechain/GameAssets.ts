@@ -12,10 +12,10 @@ import {
   PopulatedTransaction,
   Signer,
   utils,
-} from 'ethers';
-import { FunctionFragment, Result, EventFragment } from '@ethersproject/abi';
-import { Listener, Provider } from '@ethersproject/providers';
-import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from './common';
+} from "ethers";
+import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
+import { Listener, Provider } from "@ethersproject/providers";
+import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export type StateStruct = {
   stackIndex: BigNumberish;
@@ -57,7 +57,7 @@ export type AssetDetailsStructOutput = [
   StateStructOutput,
   string[],
   BigNumber,
-  number,
+  BigNumber,
   string
 ] & {
   lootBoxId: BigNumber;
@@ -66,7 +66,7 @@ export type AssetDetailsStructOutput = [
   canMintConfig: StateStructOutput;
   currencies: string[];
   assetClass: BigNumber;
-  rarity: number;
+  rarity: BigNumber;
   creator: string;
 };
 
@@ -105,6 +105,7 @@ export type AssetConfigStruct = {
   currencies: string[];
   assetClass: BigNumberish;
   rarity: BigNumberish;
+  creator: string;
 };
 
 export type AssetConfigStructOutput = [
@@ -115,7 +116,8 @@ export type AssetConfigStructOutput = [
   StateConfigStructOutput,
   string[],
   BigNumber,
-  number
+  BigNumber,
+  string
 ] & {
   name: string;
   description: string;
@@ -124,264 +126,174 @@ export type AssetConfigStructOutput = [
   canMintConfig: StateConfigStructOutput;
   currencies: string[];
   assetClass: BigNumber;
-  rarity: number;
+  rarity: BigNumber;
+  creator: string;
 };
 
 export interface GameAssetsInterface extends utils.Interface {
   functions: {
-    'Admin()': FunctionFragment;
-    'RemoveCreator(address)': FunctionFragment;
-    'addCreator(address)': FunctionFragment;
-    'assets(uint256)': FunctionFragment;
-    'balanceOf(address,uint256)': FunctionFragment;
-    'balanceOfBatch(address[],uint256[])': FunctionFragment;
-    'createClass(string,string,string[])': FunctionFragment;
-    'createNewAsset((string,string,uint256,(bytes[],uint256[],uint256,uint256),(bytes[],uint256[],uint256,uint256),address[],uint256,uint8))': FunctionFragment;
-    'getAssetPrice(uint256,address,uint256)': FunctionFragment;
-    'getClasses()': FunctionFragment;
-    'getCreators()': FunctionFragment;
-    'initialize((address,string))': FunctionFragment;
-    'isApprovedForAll(address,address)': FunctionFragment;
-    'mintAssets(uint256,uint256)': FunctionFragment;
-    'onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)': FunctionFragment;
-    'onERC1155Received(address,address,uint256,uint256,bytes)': FunctionFragment;
-    'owner()': FunctionFragment;
-    'renounceOwnership()': FunctionFragment;
-    'safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)': FunctionFragment;
-    'safeTransferFrom(address,address,uint256,uint256,bytes)': FunctionFragment;
-    'setAdmin(address)': FunctionFragment;
-    'setApprovalForAll(address,bool)': FunctionFragment;
-    'setBaseURI(string)': FunctionFragment;
-    'supportsInterface(bytes4)': FunctionFragment;
-    'totalAssets()': FunctionFragment;
-    'transferOwnership(address)': FunctionFragment;
-    'updateAsset(uint256,uint256,(bytes[],uint256[],uint256,uint256))': FunctionFragment;
-    'uri(uint256)': FunctionFragment;
-    'withdraw(address[])': FunctionFragment;
-    'withdrawERC1155(address[],uint256[])': FunctionFragment;
+    "assets(uint256)": FunctionFragment;
+    "balanceOf(address,uint256)": FunctionFragment;
+    "balanceOfBatch(address[],uint256[])": FunctionFragment;
+    "canMint(uint256)": FunctionFragment;
+    "createClass(string[])": FunctionFragment;
+    "createNewAsset((string,string,uint256,(bytes[],uint256[],uint256,uint256),(bytes[],uint256[],uint256,uint256),address[],uint256,uint256,address))": FunctionFragment;
+    "exists(uint256)": FunctionFragment;
+    "getAssetPrice(uint256,address,uint256)": FunctionFragment;
+    "initialize((address,string))": FunctionFragment;
+    "isApprovedForAll(address,address)": FunctionFragment;
+    "mintAssets(uint256,uint256)": FunctionFragment;
+    "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)": FunctionFragment;
+    "safeTransferFrom(address,address,uint256,uint256,bytes)": FunctionFragment;
+    "setApprovalForAll(address,bool)": FunctionFragment;
+    "supportsInterface(bytes4)": FunctionFragment;
+    "totalAssets()": FunctionFragment;
+    "totalSupply(uint256)": FunctionFragment;
+    "uri(uint256)": FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: 'Admin', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: 'RemoveCreator',
-    values: [string]
-  ): string;
-  encodeFunctionData(functionFragment: 'addCreator', values: [string]): string;
-  encodeFunctionData(
-    functionFragment: 'assets',
+    functionFragment: "assets",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'balanceOf',
+    functionFragment: "balanceOf",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'balanceOfBatch',
+    functionFragment: "balanceOfBatch",
     values: [string[], BigNumberish[]]
   ): string;
   encodeFunctionData(
-    functionFragment: 'createClass',
-    values: [string, string, string[]]
+    functionFragment: "canMint",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'createNewAsset',
+    functionFragment: "createClass",
+    values: [string[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "createNewAsset",
     values: [AssetConfigStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: 'getAssetPrice',
+    functionFragment: "exists",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getAssetPrice",
     values: [BigNumberish, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'getClasses',
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: 'getCreators',
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: 'initialize',
+    functionFragment: "initialize",
     values: [GameAssetsConfigStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: 'isApprovedForAll',
+    functionFragment: "isApprovedForAll",
     values: [string, string]
   ): string;
   encodeFunctionData(
-    functionFragment: 'mintAssets',
+    functionFragment: "mintAssets",
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'onERC1155BatchReceived',
+    functionFragment: "safeBatchTransferFrom",
     values: [string, string, BigNumberish[], BigNumberish[], BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'onERC1155Received',
+    functionFragment: "safeTransferFrom",
     values: [string, string, BigNumberish, BigNumberish, BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: 'owner', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: 'renounceOwnership',
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: 'safeBatchTransferFrom',
-    values: [string, string, BigNumberish[], BigNumberish[], BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: 'safeTransferFrom',
-    values: [string, string, BigNumberish, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(functionFragment: 'setAdmin', values: [string]): string;
-  encodeFunctionData(
-    functionFragment: 'setApprovalForAll',
+    functionFragment: "setApprovalForAll",
     values: [string, boolean]
   ): string;
-  encodeFunctionData(functionFragment: 'setBaseURI', values: [string]): string;
   encodeFunctionData(
-    functionFragment: 'supportsInterface',
+    functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'totalAssets',
+    functionFragment: "totalAssets",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'transferOwnership',
-    values: [string]
+    functionFragment: "totalSupply",
+    values: [BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: 'updateAsset',
-    values: [BigNumberish, BigNumberish, StateConfigStruct]
-  ): string;
-  encodeFunctionData(functionFragment: 'uri', values: [BigNumberish]): string;
-  encodeFunctionData(functionFragment: 'withdraw', values: [string[]]): string;
-  encodeFunctionData(
-    functionFragment: 'withdrawERC1155',
-    values: [string[], BigNumberish[]]
-  ): string;
+  encodeFunctionData(functionFragment: "uri", values: [BigNumberish]): string;
 
-  decodeFunctionResult(functionFragment: 'Admin', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "assets", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'RemoveCreator',
+    functionFragment: "balanceOfBatch",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'addCreator', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'assets', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'balanceOf', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "canMint", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'balanceOfBatch',
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: 'createClass',
+    functionFragment: "createClass",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'createNewAsset',
+    functionFragment: "createNewAsset",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "exists", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getAssetPrice",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "isApprovedForAll",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "mintAssets", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "safeBatchTransferFrom",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'getAssetPrice',
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: 'getClasses', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: 'getCreators',
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: 'initialize', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: 'isApprovedForAll',
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: 'mintAssets', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: 'onERC1155BatchReceived',
+    functionFragment: "safeTransferFrom",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'onERC1155Received',
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: 'owner', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: 'renounceOwnership',
+    functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'safeBatchTransferFrom',
+    functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'safeTransferFrom',
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: 'setAdmin', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: 'setApprovalForAll',
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: 'setBaseURI', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: 'supportsInterface',
+    functionFragment: "totalAssets",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'totalAssets',
+    functionFragment: "totalSupply",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: 'transferOwnership',
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: 'updateAsset',
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: 'uri', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'withdraw', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: 'withdrawERC1155',
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "uri", data: BytesLike): Result;
 
   events: {
-    'AdminChanged(address)': EventFragment;
-    'ApprovalForAll(address,address,bool)': EventFragment;
-    'AssetCreated(uint256,tuple,tuple,tuple,string,string)': EventFragment;
-    'AssetUpdated(uint256,tuple,tuple)': EventFragment;
-    'BaseURIChanged(string)': EventFragment;
-    'ClassCreated(uint256,string[],string,string)': EventFragment;
-    'CreatorAdded(address)': EventFragment;
-    'CreatorRemoved(address)': EventFragment;
-    'Initialize(tuple)': EventFragment;
-    'OwnershipTransferred(address,address)': EventFragment;
-    'Snapshot(address,address,tuple)': EventFragment;
-    'TransferBatch(address,address,address,uint256[],uint256[])': EventFragment;
-    'TransferSingle(address,address,address,uint256,uint256)': EventFragment;
-    'URI(string,uint256)': EventFragment;
+    "ApprovalForAll(address,address,bool)": EventFragment;
+    "AssetCreated(uint256,tuple,tuple,tuple,string,string)": EventFragment;
+    "ClassCreated(string[])": EventFragment;
+    "Initialize(tuple)": EventFragment;
+    "Snapshot(address,address,tuple)": EventFragment;
+    "TransferBatch(address,address,address,uint256[],uint256[])": EventFragment;
+    "TransferSingle(address,address,address,uint256,uint256)": EventFragment;
+    "URI(string,uint256)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: 'AdminChanged'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'ApprovalForAll'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'AssetCreated'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'AssetUpdated'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'BaseURIChanged'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'ClassCreated'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'CreatorAdded'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'CreatorRemoved'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'Initialize'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'OwnershipTransferred'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'Snapshot'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'TransferBatch'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'TransferSingle'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'URI'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "AssetCreated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ClassCreated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Initialize"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Snapshot"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TransferBatch"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TransferSingle"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "URI"): EventFragment;
 }
-
-export type AdminChangedEvent = TypedEvent<[string], { _admin: string }>;
-
-export type AdminChangedEventFilter = TypedEventFilter<AdminChangedEvent>;
 
 export type ApprovalForAllEvent = TypedEvent<
   [string, string, boolean],
@@ -411,43 +323,12 @@ export type AssetCreatedEvent = TypedEvent<
 
 export type AssetCreatedEventFilter = TypedEventFilter<AssetCreatedEvent>;
 
-export type AssetUpdatedEvent = TypedEvent<
-  [BigNumber, AssetDetailsStructOutput, StateConfigStructOutput],
-  {
-    _assetId: BigNumber;
-    _asset: AssetDetailsStructOutput;
-    _canMintConfig: StateConfigStructOutput;
-  }
->;
-
-export type AssetUpdatedEventFilter = TypedEventFilter<AssetUpdatedEvent>;
-
-export type BaseURIChangedEvent = TypedEvent<[string], { _baseURI: string }>;
-
-export type BaseURIChangedEventFilter = TypedEventFilter<BaseURIChangedEvent>;
-
 export type ClassCreatedEvent = TypedEvent<
-  [BigNumber, string[], string, string],
-  {
-    _classId: BigNumber;
-    _attributes: string[];
-    _name: string;
-    _description: string;
-  }
+  [string[]],
+  { _classData: string[] }
 >;
 
 export type ClassCreatedEventFilter = TypedEventFilter<ClassCreatedEvent>;
-
-export type CreatorAddedEvent = TypedEvent<[string], { _addedCreator: string }>;
-
-export type CreatorAddedEventFilter = TypedEventFilter<CreatorAddedEvent>;
-
-export type CreatorRemovedEvent = TypedEvent<
-  [string],
-  { _removedCreator: string }
->;
-
-export type CreatorRemovedEventFilter = TypedEventFilter<CreatorRemovedEvent>;
 
 export type InitializeEvent = TypedEvent<
   [GameAssetsConfigStructOutput],
@@ -455,15 +336,6 @@ export type InitializeEvent = TypedEvent<
 >;
 
 export type InitializeEventFilter = TypedEventFilter<InitializeEvent>;
-
-export type OwnershipTransferredEvent = TypedEvent<
-  [string, string],
-  { previousOwner: string; newOwner: string }
->;
-
-export type OwnershipTransferredEventFilter = TypedEventFilter<
-  OwnershipTransferredEvent
->;
 
 export type SnapshotEvent = TypedEvent<
   [string, string, StateStructOutput],
@@ -532,18 +404,6 @@ export interface GameAssets extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    Admin(overrides?: CallOverrides): Promise<[string]>;
-
-    RemoveCreator(
-      _creator: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    addCreator(
-      _creator: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     assets(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -554,7 +414,7 @@ export interface GameAssets extends BaseContract {
         StateStructOutput,
         StateStructOutput,
         BigNumber,
-        number,
+        BigNumber,
         string
       ] & {
         lootBoxId: BigNumber;
@@ -562,7 +422,7 @@ export interface GameAssets extends BaseContract {
         priceConfig: StateStructOutput;
         canMintConfig: StateStructOutput;
         assetClass: BigNumber;
-        rarity: number;
+        rarity: BigNumber;
         creator: string;
       }
     >;
@@ -579,10 +439,13 @@ export interface GameAssets extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber[]]>;
 
+    canMint(
+      _assetId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     createClass(
-      _name: string,
-      _description: string,
-      _attributes: string[],
+      _classData: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -591,16 +454,14 @@ export interface GameAssets extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    exists(id: BigNumberish, overrides?: CallOverrides): Promise<[boolean]>;
+
     getAssetPrice(
       _assetId: BigNumberish,
       _paymentToken: string,
       _units: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber[]]>;
-
-    getClasses(overrides?: CallOverrides): Promise<[BigNumber[]]>;
-
-    getCreators(overrides?: CallOverrides): Promise<[string[]]>;
 
     initialize(
       _config: GameAssetsConfigStruct,
@@ -616,30 +477,6 @@ export interface GameAssets extends BaseContract {
     mintAssets(
       _assetId: BigNumberish,
       _units: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    onERC1155BatchReceived(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish[],
-      arg3: BigNumberish[],
-      arg4: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    onERC1155Received(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BigNumberish,
-      arg4: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    owner(overrides?: CallOverrides): Promise<[string]>;
-
-    renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -661,19 +498,9 @@ export interface GameAssets extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setAdmin(
-      _admin: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     setApprovalForAll(
       operator: string,
       approved: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setBaseURI(
-      _baseURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -684,43 +511,13 @@ export interface GameAssets extends BaseContract {
 
     totalAssets(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    updateAsset(
-      _assetId: BigNumberish,
-      _lootBoxId: BigNumberish,
-      _canMintConfig: StateConfigStruct,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    totalSupply(
+      id: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     uri(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
-
-    withdraw(
-      _tokenAddresses: string[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    withdrawERC1155(
-      _tokenAddresses: string[],
-      _ids: BigNumberish[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
   };
-
-  Admin(overrides?: CallOverrides): Promise<string>;
-
-  RemoveCreator(
-    _creator: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  addCreator(
-    _creator: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   assets(
     arg0: BigNumberish,
@@ -732,7 +529,7 @@ export interface GameAssets extends BaseContract {
       StateStructOutput,
       StateStructOutput,
       BigNumber,
-      number,
+      BigNumber,
       string
     ] & {
       lootBoxId: BigNumber;
@@ -740,7 +537,7 @@ export interface GameAssets extends BaseContract {
       priceConfig: StateStructOutput;
       canMintConfig: StateStructOutput;
       assetClass: BigNumber;
-      rarity: number;
+      rarity: BigNumber;
       creator: string;
     }
   >;
@@ -757,10 +554,13 @@ export interface GameAssets extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
 
+  canMint(
+    _assetId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   createClass(
-    _name: string,
-    _description: string,
-    _attributes: string[],
+    _classData: string[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -769,16 +569,14 @@ export interface GameAssets extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  exists(id: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
+
   getAssetPrice(
     _assetId: BigNumberish,
     _paymentToken: string,
     _units: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
-
-  getClasses(overrides?: CallOverrides): Promise<BigNumber[]>;
-
-  getCreators(overrides?: CallOverrides): Promise<string[]>;
 
   initialize(
     _config: GameAssetsConfigStruct,
@@ -794,30 +592,6 @@ export interface GameAssets extends BaseContract {
   mintAssets(
     _assetId: BigNumberish,
     _units: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  onERC1155BatchReceived(
-    arg0: string,
-    arg1: string,
-    arg2: BigNumberish[],
-    arg3: BigNumberish[],
-    arg4: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  onERC1155Received(
-    arg0: string,
-    arg1: string,
-    arg2: BigNumberish,
-    arg3: BigNumberish,
-    arg4: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  owner(overrides?: CallOverrides): Promise<string>;
-
-  renounceOwnership(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -839,19 +613,9 @@ export interface GameAssets extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setAdmin(
-    _admin: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   setApprovalForAll(
     operator: string,
     approved: boolean,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setBaseURI(
-    _baseURI: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -862,38 +626,11 @@ export interface GameAssets extends BaseContract {
 
   totalAssets(overrides?: CallOverrides): Promise<BigNumber>;
 
-  transferOwnership(
-    newOwner: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  updateAsset(
-    _assetId: BigNumberish,
-    _lootBoxId: BigNumberish,
-    _canMintConfig: StateConfigStruct,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  totalSupply(id: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
   uri(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-  withdraw(
-    _tokenAddresses: string[],
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  withdrawERC1155(
-    _tokenAddresses: string[],
-    _ids: BigNumberish[],
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   callStatic: {
-    Admin(overrides?: CallOverrides): Promise<string>;
-
-    RemoveCreator(_creator: string, overrides?: CallOverrides): Promise<void>;
-
-    addCreator(_creator: string, overrides?: CallOverrides): Promise<void>;
-
     assets(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -904,7 +641,7 @@ export interface GameAssets extends BaseContract {
         StateStructOutput,
         StateStructOutput,
         BigNumber,
-        number,
+        BigNumber,
         string
       ] & {
         lootBoxId: BigNumber;
@@ -912,7 +649,7 @@ export interface GameAssets extends BaseContract {
         priceConfig: StateStructOutput;
         canMintConfig: StateStructOutput;
         assetClass: BigNumber;
-        rarity: number;
+        rarity: BigNumber;
         creator: string;
       }
     >;
@@ -929,17 +666,16 @@ export interface GameAssets extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
 
-    createClass(
-      _name: string,
-      _description: string,
-      _attributes: string[],
-      overrides?: CallOverrides
-    ): Promise<void>;
+    canMint(_assetId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    createClass(_classData: string[], overrides?: CallOverrides): Promise<void>;
 
     createNewAsset(
       _config: AssetConfigStruct,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    exists(id: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
     getAssetPrice(
       _assetId: BigNumberish,
@@ -947,10 +683,6 @@ export interface GameAssets extends BaseContract {
       _units: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
-
-    getClasses(overrides?: CallOverrides): Promise<BigNumber[]>;
-
-    getCreators(overrides?: CallOverrides): Promise<string[]>;
 
     initialize(
       _config: GameAssetsConfigStruct,
@@ -968,28 +700,6 @@ export interface GameAssets extends BaseContract {
       _units: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    onERC1155BatchReceived(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish[],
-      arg3: BigNumberish[],
-      arg4: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    onERC1155Received(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BigNumberish,
-      arg4: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    owner(overrides?: CallOverrides): Promise<string>;
-
-    renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
     safeBatchTransferFrom(
       from: string,
@@ -1009,15 +719,11 @@ export interface GameAssets extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setAdmin(_admin: string, overrides?: CallOverrides): Promise<void>;
-
     setApprovalForAll(
       operator: string,
       approved: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    setBaseURI(_baseURI: string, overrides?: CallOverrides): Promise<void>;
 
     supportsInterface(
       interfaceId: BytesLike,
@@ -1026,37 +732,16 @@ export interface GameAssets extends BaseContract {
 
     totalAssets(overrides?: CallOverrides): Promise<BigNumber>;
 
-    transferOwnership(
-      newOwner: string,
+    totalSupply(
+      id: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
-
-    updateAsset(
-      _assetId: BigNumberish,
-      _lootBoxId: BigNumberish,
-      _canMintConfig: StateConfigStruct,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
     uri(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-    withdraw(
-      _tokenAddresses: string[],
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    withdrawERC1155(
-      _tokenAddresses: string[],
-      _ids: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<void>;
   };
 
   filters: {
-    'AdminChanged(address)'(_admin?: null): AdminChangedEventFilter;
-    AdminChanged(_admin?: null): AdminChangedEventFilter;
-
-    'ApprovalForAll(address,address,bool)'(
+    "ApprovalForAll(address,address,bool)"(
       account?: string | null,
       operator?: string | null,
       approved?: null
@@ -1067,7 +752,7 @@ export interface GameAssets extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
-    'AssetCreated(uint256,tuple,tuple,tuple,string,string)'(
+    "AssetCreated(uint256,tuple,tuple,tuple,string,string)"(
       _assetId?: null,
       _asset?: null,
       _priceConfig?: null,
@@ -1084,61 +769,20 @@ export interface GameAssets extends BaseContract {
       _description?: null
     ): AssetCreatedEventFilter;
 
-    'AssetUpdated(uint256,tuple,tuple)'(
-      _assetId?: null,
-      _asset?: null,
-      _canMintConfig?: null
-    ): AssetUpdatedEventFilter;
-    AssetUpdated(
-      _assetId?: null,
-      _asset?: null,
-      _canMintConfig?: null
-    ): AssetUpdatedEventFilter;
+    "ClassCreated(string[])"(_classData?: null): ClassCreatedEventFilter;
+    ClassCreated(_classData?: null): ClassCreatedEventFilter;
 
-    'BaseURIChanged(string)'(_baseURI?: null): BaseURIChangedEventFilter;
-    BaseURIChanged(_baseURI?: null): BaseURIChangedEventFilter;
-
-    'ClassCreated(uint256,string[],string,string)'(
-      _classId?: null,
-      _attributes?: null,
-      _name?: null,
-      _description?: null
-    ): ClassCreatedEventFilter;
-    ClassCreated(
-      _classId?: null,
-      _attributes?: null,
-      _name?: null,
-      _description?: null
-    ): ClassCreatedEventFilter;
-
-    'CreatorAdded(address)'(_addedCreator?: null): CreatorAddedEventFilter;
-    CreatorAdded(_addedCreator?: null): CreatorAddedEventFilter;
-
-    'CreatorRemoved(address)'(
-      _removedCreator?: null
-    ): CreatorRemovedEventFilter;
-    CreatorRemoved(_removedCreator?: null): CreatorRemovedEventFilter;
-
-    'Initialize(tuple)'(config?: null): InitializeEventFilter;
+    "Initialize(tuple)"(config?: null): InitializeEventFilter;
     Initialize(config?: null): InitializeEventFilter;
 
-    'OwnershipTransferred(address,address)'(
-      previousOwner?: string | null,
-      newOwner?: string | null
-    ): OwnershipTransferredEventFilter;
-    OwnershipTransferred(
-      previousOwner?: string | null,
-      newOwner?: string | null
-    ): OwnershipTransferredEventFilter;
-
-    'Snapshot(address,address,tuple)'(
+    "Snapshot(address,address,tuple)"(
       sender?: null,
       pointer?: null,
       state?: null
     ): SnapshotEventFilter;
     Snapshot(sender?: null, pointer?: null, state?: null): SnapshotEventFilter;
 
-    'TransferBatch(address,address,address,uint256[],uint256[])'(
+    "TransferBatch(address,address,address,uint256[],uint256[])"(
       operator?: string | null,
       from?: string | null,
       to?: string | null,
@@ -1153,7 +797,7 @@ export interface GameAssets extends BaseContract {
       values?: null
     ): TransferBatchEventFilter;
 
-    'TransferSingle(address,address,address,uint256,uint256)'(
+    "TransferSingle(address,address,address,uint256,uint256)"(
       operator?: string | null,
       from?: string | null,
       to?: string | null,
@@ -1168,7 +812,7 @@ export interface GameAssets extends BaseContract {
       value?: null
     ): TransferSingleEventFilter;
 
-    'URI(string,uint256)'(
+    "URI(string,uint256)"(
       value?: null,
       id?: BigNumberish | null
     ): URIEventFilter;
@@ -1176,18 +820,6 @@ export interface GameAssets extends BaseContract {
   };
 
   estimateGas: {
-    Admin(overrides?: CallOverrides): Promise<BigNumber>;
-
-    RemoveCreator(
-      _creator: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    addCreator(
-      _creator: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     assets(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
     balanceOf(
@@ -1202,10 +834,13 @@ export interface GameAssets extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    canMint(
+      _assetId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     createClass(
-      _name: string,
-      _description: string,
-      _attributes: string[],
+      _classData: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1214,16 +849,14 @@ export interface GameAssets extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    exists(id: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+
     getAssetPrice(
       _assetId: BigNumberish,
       _paymentToken: string,
       _units: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    getClasses(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getCreators(overrides?: CallOverrides): Promise<BigNumber>;
 
     initialize(
       _config: GameAssetsConfigStruct,
@@ -1239,30 +872,6 @@ export interface GameAssets extends BaseContract {
     mintAssets(
       _assetId: BigNumberish,
       _units: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    onERC1155BatchReceived(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish[],
-      arg3: BigNumberish[],
-      arg4: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    onERC1155Received(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BigNumberish,
-      arg4: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    owner(overrides?: CallOverrides): Promise<BigNumber>;
-
-    renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1284,19 +893,9 @@ export interface GameAssets extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setAdmin(
-      _admin: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     setApprovalForAll(
       operator: string,
       approved: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setBaseURI(
-      _baseURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1307,45 +906,15 @@ export interface GameAssets extends BaseContract {
 
     totalAssets(overrides?: CallOverrides): Promise<BigNumber>;
 
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    updateAsset(
-      _assetId: BigNumberish,
-      _lootBoxId: BigNumberish,
-      _canMintConfig: StateConfigStruct,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    totalSupply(
+      id: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     uri(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
-
-    withdraw(
-      _tokenAddresses: string[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    withdrawERC1155(
-      _tokenAddresses: string[],
-      _ids: BigNumberish[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    Admin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    RemoveCreator(
-      _creator: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    addCreator(
-      _creator: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     assets(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -1363,10 +932,13 @@ export interface GameAssets extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    canMint(
+      _assetId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     createClass(
-      _name: string,
-      _description: string,
-      _attributes: string[],
+      _classData: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1375,16 +947,17 @@ export interface GameAssets extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    exists(
+      id: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getAssetPrice(
       _assetId: BigNumberish,
       _paymentToken: string,
       _units: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    getClasses(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getCreators(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     initialize(
       _config: GameAssetsConfigStruct,
@@ -1400,30 +973,6 @@ export interface GameAssets extends BaseContract {
     mintAssets(
       _assetId: BigNumberish,
       _units: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    onERC1155BatchReceived(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish[],
-      arg3: BigNumberish[],
-      arg4: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    onERC1155Received(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BigNumberish,
-      arg4: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1445,19 +994,9 @@ export interface GameAssets extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setAdmin(
-      _admin: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     setApprovalForAll(
       operator: string,
       approved: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setBaseURI(
-      _baseURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1468,32 +1007,14 @@ export interface GameAssets extends BaseContract {
 
     totalAssets(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    updateAsset(
-      _assetId: BigNumberish,
-      _lootBoxId: BigNumberish,
-      _canMintConfig: StateConfigStruct,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    totalSupply(
+      id: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     uri(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    withdraw(
-      _tokenAddresses: string[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    withdrawERC1155(
-      _tokenAddresses: string[],
-      _ids: BigNumberish[],
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

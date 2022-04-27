@@ -17,16 +17,17 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export interface IERC1155MetadataURIUpgradeableInterface
-  extends utils.Interface {
+export interface ERC1155SupplyUpgradeableInterface extends utils.Interface {
   functions: {
     "balanceOf(address,uint256)": FunctionFragment;
     "balanceOfBatch(address[],uint256[])": FunctionFragment;
+    "exists(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
+    "totalSupply(uint256)": FunctionFragment;
     "uri(uint256)": FunctionFragment;
   };
 
@@ -37,6 +38,10 @@ export interface IERC1155MetadataURIUpgradeableInterface
   encodeFunctionData(
     functionFragment: "balanceOfBatch",
     values: [string[], BigNumberish[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "exists",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
@@ -58,6 +63,10 @@ export interface IERC1155MetadataURIUpgradeableInterface
     functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
+  encodeFunctionData(
+    functionFragment: "totalSupply",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "uri", values: [BigNumberish]): string;
 
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
@@ -65,6 +74,7 @@ export interface IERC1155MetadataURIUpgradeableInterface
     functionFragment: "balanceOfBatch",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "exists", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
     data: BytesLike
@@ -83,6 +93,10 @@ export interface IERC1155MetadataURIUpgradeableInterface
   ): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "totalSupply",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "uri", data: BytesLike): Result;
@@ -140,12 +154,12 @@ export type URIEvent = TypedEvent<
 
 export type URIEventFilter = TypedEventFilter<URIEvent>;
 
-export interface IERC1155MetadataURIUpgradeable extends BaseContract {
+export interface ERC1155SupplyUpgradeable extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: IERC1155MetadataURIUpgradeableInterface;
+  interface: ERC1155SupplyUpgradeableInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -178,6 +192,8 @@ export interface IERC1155MetadataURIUpgradeable extends BaseContract {
       ids: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<[BigNumber[]]>;
+
+    exists(id: BigNumberish, overrides?: CallOverrides): Promise<[boolean]>;
 
     isApprovedForAll(
       account: string,
@@ -214,7 +230,12 @@ export interface IERC1155MetadataURIUpgradeable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    uri(id: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
+    totalSupply(
+      id: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    uri(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
   };
 
   balanceOf(
@@ -228,6 +249,8 @@ export interface IERC1155MetadataURIUpgradeable extends BaseContract {
     ids: BigNumberish[],
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
+
+  exists(id: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
   isApprovedForAll(
     account: string,
@@ -264,7 +287,9 @@ export interface IERC1155MetadataURIUpgradeable extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  uri(id: BigNumberish, overrides?: CallOverrides): Promise<string>;
+  totalSupply(id: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+
+  uri(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
     balanceOf(
@@ -278,6 +303,8 @@ export interface IERC1155MetadataURIUpgradeable extends BaseContract {
       ids: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
+
+    exists(id: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
     isApprovedForAll(
       account: string,
@@ -314,7 +341,12 @@ export interface IERC1155MetadataURIUpgradeable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    uri(id: BigNumberish, overrides?: CallOverrides): Promise<string>;
+    totalSupply(
+      id: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    uri(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
@@ -379,6 +411,8 @@ export interface IERC1155MetadataURIUpgradeable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    exists(id: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+
     isApprovedForAll(
       account: string,
       operator: string,
@@ -414,7 +448,12 @@ export interface IERC1155MetadataURIUpgradeable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    uri(id: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+    totalSupply(
+      id: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    uri(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -430,6 +469,11 @@ export interface IERC1155MetadataURIUpgradeable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    exists(
+      id: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     isApprovedForAll(
       account: string,
       operator: string,
@@ -465,8 +509,13 @@ export interface IERC1155MetadataURIUpgradeable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    uri(
+    totalSupply(
       id: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    uri(
+      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

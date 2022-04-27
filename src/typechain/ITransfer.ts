@@ -17,30 +17,39 @@ import { FunctionFragment, Result } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export interface IERC721ReceiverInterface extends utils.Interface {
+export interface ITransferInterface extends utils.Interface {
   functions: {
-    "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
+    "safeTransferFrom(address,address,uint256,uint256,bytes)": FunctionFragment;
+    "transferFrom(address,address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "onERC721Received",
-    values: [string, string, BigNumberish, BytesLike]
+    functionFragment: "safeTransferFrom",
+    values: [string, string, BigNumberish, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "transferFrom",
+    values: [string, string, BigNumberish]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "onERC721Received",
+    functionFragment: "safeTransferFrom",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
 
   events: {};
 }
 
-export interface IERC721Receiver extends BaseContract {
+export interface ITransfer extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: IERC721ReceiverInterface;
+  interface: ITransferInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -62,51 +71,91 @@ export interface IERC721Receiver extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    onERC721Received(
-      operator: string,
+    safeTransferFrom(
       from: string,
-      tokenId: BigNumberish,
+      to: string,
+      id: BigNumberish,
+      amount: BigNumberish,
       data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    transferFrom(
+      from: string,
+      to: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
-  onERC721Received(
-    operator: string,
+  safeTransferFrom(
     from: string,
-    tokenId: BigNumberish,
+    to: string,
+    id: BigNumberish,
+    amount: BigNumberish,
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  transferFrom(
+    from: string,
+    to: string,
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
-    onERC721Received(
-      operator: string,
+    safeTransferFrom(
       from: string,
-      tokenId: BigNumberish,
+      to: string,
+      id: BigNumberish,
+      amount: BigNumberish,
       data: BytesLike,
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<void>;
+
+    transferFrom(
+      from: string,
+      to: string,
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
   };
 
   filters: {};
 
   estimateGas: {
-    onERC721Received(
-      operator: string,
+    safeTransferFrom(
       from: string,
-      tokenId: BigNumberish,
+      to: string,
+      id: BigNumberish,
+      amount: BigNumberish,
       data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    transferFrom(
+      from: string,
+      to: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    onERC721Received(
-      operator: string,
+    safeTransferFrom(
       from: string,
-      tokenId: BigNumberish,
+      to: string,
+      id: BigNumberish,
+      amount: BigNumberish,
       data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    transferFrom(
+      from: string,
+      to: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

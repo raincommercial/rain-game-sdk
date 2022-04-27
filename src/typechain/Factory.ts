@@ -11,36 +11,36 @@ import {
   PopulatedTransaction,
   Signer,
   utils,
-} from 'ethers';
-import { FunctionFragment, Result, EventFragment } from '@ethersproject/abi';
-import { Listener, Provider } from '@ethersproject/providers';
-import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from './common';
+} from "ethers";
+import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
+import { Listener, Provider } from "@ethersproject/providers";
+import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface FactoryInterface extends utils.Interface {
   functions: {
-    'createChild(bytes)': FunctionFragment;
-    'isChild(address)': FunctionFragment;
+    "createChild(bytes)": FunctionFragment;
+    "isChild(address)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: 'createChild',
+    functionFragment: "createChild",
     values: [BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: 'isChild', values: [string]): string;
+  encodeFunctionData(functionFragment: "isChild", values: [string]): string;
 
   decodeFunctionResult(
-    functionFragment: 'createChild',
+    functionFragment: "createChild",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'isChild', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "isChild", data: BytesLike): Result;
 
   events: {
-    'Implementation(address,address)': EventFragment;
-    'NewChild(address,address)': EventFragment;
+    "Implementation(address,address)": EventFragment;
+    "NewChild(address,address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: 'Implementation'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'NewChild'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Implementation"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NewChild"): EventFragment;
 }
 
 export type ImplementationEvent = TypedEvent<
@@ -106,7 +106,7 @@ export interface Factory extends BaseContract {
   };
 
   filters: {
-    'Implementation(address,address)'(
+    "Implementation(address,address)"(
       sender?: null,
       implementation?: null
     ): ImplementationEventFilter;
@@ -115,7 +115,7 @@ export interface Factory extends BaseContract {
       implementation?: null
     ): ImplementationEventFilter;
 
-    'NewChild(address,address)'(
+    "NewChild(address,address)"(
       sender?: null,
       child?: null
     ): NewChildEventFilter;

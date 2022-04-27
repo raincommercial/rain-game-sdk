@@ -12,41 +12,41 @@ import {
   PopulatedTransaction,
   Signer,
   utils,
-} from 'ethers';
-import { FunctionFragment, Result } from '@ethersproject/abi';
-import { Listener, Provider } from '@ethersproject/providers';
-import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from './common';
+} from "ethers";
+import { FunctionFragment, Result } from "@ethersproject/abi";
+import { Listener, Provider } from "@ethersproject/providers";
+import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface IERC1155ReceiverInterface extends utils.Interface {
   functions: {
-    'onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)': FunctionFragment;
-    'onERC1155Received(address,address,uint256,uint256,bytes)': FunctionFragment;
-    'supportsInterface(bytes4)': FunctionFragment;
+    "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
+    "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
+    "supportsInterface(bytes4)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: 'onERC1155BatchReceived',
+    functionFragment: "onERC1155BatchReceived",
     values: [string, string, BigNumberish[], BigNumberish[], BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'onERC1155Received',
+    functionFragment: "onERC1155Received",
     values: [string, string, BigNumberish, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'supportsInterface',
+    functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: 'onERC1155BatchReceived',
+    functionFragment: "onERC1155BatchReceived",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'onERC1155Received',
+    functionFragment: "onERC1155Received",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'supportsInterface',
+    functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
 

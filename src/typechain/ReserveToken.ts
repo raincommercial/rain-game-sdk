@@ -12,129 +12,129 @@ import {
   PopulatedTransaction,
   Signer,
   utils,
-} from 'ethers';
-import { FunctionFragment, Result, EventFragment } from '@ethersproject/abi';
-import { Listener, Provider } from '@ethersproject/providers';
-import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from './common';
+} from "ethers";
+import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
+import { Listener, Provider } from "@ethersproject/providers";
+import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface ReserveTokenInterface extends utils.Interface {
   functions: {
-    'DECIMALS()': FunctionFragment;
-    'TOTAL_SUPPLY()': FunctionFragment;
-    'addFreezable(address)': FunctionFragment;
-    'allowance(address,address)': FunctionFragment;
-    'approve(address,uint256)': FunctionFragment;
-    'balanceOf(address)': FunctionFragment;
-    'burn(uint256)': FunctionFragment;
-    'burnFrom(address,uint256)': FunctionFragment;
-    'decimals()': FunctionFragment;
-    'decreaseAllowance(address,uint256)': FunctionFragment;
-    'freezables(address)': FunctionFragment;
-    'increaseAllowance(address,uint256)': FunctionFragment;
-    'mintTokens(uint256)': FunctionFragment;
-    'name()': FunctionFragment;
-    'symbol()': FunctionFragment;
-    'totalSupply()': FunctionFragment;
-    'transfer(address,uint256)': FunctionFragment;
-    'transferFrom(address,address,uint256)': FunctionFragment;
+    "DECIMALS()": FunctionFragment;
+    "TOTAL_SUPPLY()": FunctionFragment;
+    "addFreezable(address)": FunctionFragment;
+    "allowance(address,address)": FunctionFragment;
+    "approve(address,uint256)": FunctionFragment;
+    "balanceOf(address)": FunctionFragment;
+    "burn(uint256)": FunctionFragment;
+    "burnFrom(address,uint256)": FunctionFragment;
+    "decimals()": FunctionFragment;
+    "decreaseAllowance(address,uint256)": FunctionFragment;
+    "freezables(address)": FunctionFragment;
+    "increaseAllowance(address,uint256)": FunctionFragment;
+    "mintTokens(uint256)": FunctionFragment;
+    "name()": FunctionFragment;
+    "symbol()": FunctionFragment;
+    "totalSupply()": FunctionFragment;
+    "transfer(address,uint256)": FunctionFragment;
+    "transferFrom(address,address,uint256)": FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: 'DECIMALS', values?: undefined): string;
+  encodeFunctionData(functionFragment: "DECIMALS", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: 'TOTAL_SUPPLY',
+    functionFragment: "TOTAL_SUPPLY",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'addFreezable',
+    functionFragment: "addFreezable",
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: 'allowance',
+    functionFragment: "allowance",
     values: [string, string]
   ): string;
   encodeFunctionData(
-    functionFragment: 'approve',
+    functionFragment: "approve",
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: 'balanceOf', values: [string]): string;
-  encodeFunctionData(functionFragment: 'burn', values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
+  encodeFunctionData(functionFragment: "burn", values: [BigNumberish]): string;
   encodeFunctionData(
-    functionFragment: 'burnFrom',
+    functionFragment: "burnFrom",
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: 'decimals', values?: undefined): string;
+  encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: 'decreaseAllowance',
+    functionFragment: "decreaseAllowance",
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: 'freezables', values: [string]): string;
+  encodeFunctionData(functionFragment: "freezables", values: [string]): string;
   encodeFunctionData(
-    functionFragment: 'increaseAllowance',
+    functionFragment: "increaseAllowance",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'mintTokens',
+    functionFragment: "mintTokens",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: 'name', values?: undefined): string;
-  encodeFunctionData(functionFragment: 'symbol', values?: undefined): string;
+  encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: 'totalSupply',
+    functionFragment: "totalSupply",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'transfer',
+    functionFragment: "transfer",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'transferFrom',
+    functionFragment: "transferFrom",
     values: [string, string, BigNumberish]
   ): string;
 
-  decodeFunctionResult(functionFragment: 'DECIMALS', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "DECIMALS", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'TOTAL_SUPPLY',
+    functionFragment: "TOTAL_SUPPLY",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'addFreezable',
+    functionFragment: "addFreezable",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'allowance', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'approve', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'balanceOf', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'burn', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'burnFrom', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'decimals', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "burnFrom", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'decreaseAllowance',
+    functionFragment: "decreaseAllowance",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'freezables', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "freezables", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'increaseAllowance',
+    functionFragment: "increaseAllowance",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'mintTokens', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'name', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'symbol', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mintTokens", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'totalSupply',
+    functionFragment: "totalSupply",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'transfer', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "transfer", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'transferFrom',
+    functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
 
   events: {
-    'Approval(address,address,uint256)': EventFragment;
-    'Transfer(address,address,uint256)': EventFragment;
+    "Approval(address,address,uint256)": EventFragment;
+    "Transfer(address,address,uint256)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: 'Approval'): EventFragment;
-  getEvent(nameOrSignatureOrTopic: 'Transfer'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
 
 export type ApprovalEvent = TypedEvent<
@@ -395,7 +395,7 @@ export interface ReserveToken extends BaseContract {
   };
 
   filters: {
-    'Approval(address,address,uint256)'(
+    "Approval(address,address,uint256)"(
       owner?: string | null,
       spender?: string | null,
       value?: null
@@ -406,7 +406,7 @@ export interface ReserveToken extends BaseContract {
       value?: null
     ): ApprovalEventFilter;
 
-    'Transfer(address,address,uint256)'(
+    "Transfer(address,address,uint256)"(
       from?: string | null,
       to?: string | null,
       value?: null

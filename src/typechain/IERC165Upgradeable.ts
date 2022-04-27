@@ -9,23 +9,23 @@ import {
   PopulatedTransaction,
   Signer,
   utils,
-} from 'ethers';
-import { FunctionFragment, Result } from '@ethersproject/abi';
-import { Listener, Provider } from '@ethersproject/providers';
-import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from './common';
+} from "ethers";
+import { FunctionFragment, Result } from "@ethersproject/abi";
+import { Listener, Provider } from "@ethersproject/providers";
+import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface IERC165UpgradeableInterface extends utils.Interface {
   functions: {
-    'supportsInterface(bytes4)': FunctionFragment;
+    "supportsInterface(bytes4)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: 'supportsInterface',
+    functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: 'supportsInterface',
+    functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
 
