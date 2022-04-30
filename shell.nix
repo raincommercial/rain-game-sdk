@@ -26,7 +26,7 @@ let
  '';
 
  copy-contracts = pkgs.writeShellScriptBin "copy-contracts" ''
-  mkdir -p contracts && cp -r node_modules/@beehive-innovation/rain-game-engine/contracts .
+  mkdir -p contracts && cp -r node_modules/@beehiveinnovation/rain-game-engine/contracts .
   hardhat compile --no-typechain
  '';
 

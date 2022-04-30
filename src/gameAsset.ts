@@ -9,13 +9,12 @@ import {
   TxOverrides,
   ReadTxOverrides,
   FactoryContract,
-  State as StateConfig,
-  RainContract,
+  State,
+  StateConfig,
 } from 'rain-sdk';
 
 import { GameAssets__factory } from './typechain';
 import { AddressBook } from './addresses';
-import { StateConfigStruct } from './typechain/GameAssets';
 
 /**
  * @public
@@ -86,8 +85,8 @@ export class GameAssets extends FactoryContract {
 
   public readonly connect = (signer: Signer): GameAssets => {
     return new GameAssets(this.address, signer);
-
-  };  public static getBookAddress(chainId: number): string {
+  };
+  public static getBookAddress(chainId: number): string {
     return AddressBook.getAddressesForChainId(chainId)[this.nameBookReference];
   }
 
@@ -189,18 +188,9 @@ export type AssetConfig = {
   name: string;
   description: string;
   lootBoxId: BigNumber;
-  priceConfig: StateConfigStruct;
-  canMintConfig: StateConfigStruct;
+  priceConfig: StateConfig;
+  canMintConfig: StateConfig;
   currencies: string[];
   recepient: string;
   tokenURI: string;
-};
-
-// TODO: Update the rain-sdk to use the correctState
-export type State = {
-  stackIndex: BigNumber;
-  stack: BigNumber[];
-  sources: string[];
-  constants: BigNumber[];
-  arguments: BigNumber[];
 };
