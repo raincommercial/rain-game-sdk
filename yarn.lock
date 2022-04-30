@@ -12696,10 +12696,10 @@ queue-microtask@^1.2.2:
   resolved "https://registry.yarnpkg.com/queue-microtask/-/queue-microtask-1.2.3.tgz#4929228bbc724dfac43e0efb058caf7b6cfb6243"
   integrity sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==
 
-rain-sdk@^0.0.1-alpha.7:
-  version "0.0.1-alpha.7"
-  resolved "https://registry.yarnpkg.com/rain-sdk/-/rain-sdk-0.0.1-alpha.7.tgz#3272027d95dc1967ec1459bfa8f14e0670faa954"
-  integrity sha512-txx35lmbnk/YeSFA5Xwg+4WQXG/xcu7rihCKWRWWLBCyd/RGNZ6igJMK5mxL29ITLEol02vjprgVhZ9JDLQvxQ==
+rain-sdk@^0.0.1-alpha.8:
+  version "0.0.1-alpha.8"
+  resolved "https://registry.yarnpkg.com/rain-sdk/-/rain-sdk-0.0.1-alpha.8.tgz#1d6cf7217874cc31b9f191db5e926573af479132"
+  integrity sha512-YLgXgU7FsSsF8qQvjfFaURvg4SRQX2GBkMTveAUvxe+1H7v8KelSaGtELdw7EsGdCL61l5X9XNnuQcFH0FibNA==
   dependencies:
     ethers "^5.5.2"
 

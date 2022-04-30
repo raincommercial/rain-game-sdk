@@ -3,10 +3,10 @@ import {
   RainContract,
   VM,
   TierFactoryContract,
-  StandardOps,
+  AllStandardOps,
 } from 'rain-sdk';
 
-export { FactoryContract, RainContract, StandardOps, VM, TierFactoryContract };
+export { FactoryContract, RainContract, AllStandardOps, VM, TierFactoryContract };
 
 export * from './addresses';
 export * from './gameAsset';

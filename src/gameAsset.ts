@@ -10,10 +10,12 @@ import {
   ReadTxOverrides,
   FactoryContract,
   State as StateConfig,
+  RainContract,
 } from 'rain-sdk';
 
 import { GameAssets__factory } from './typechain';
 import { AddressBook } from './addresses';
+import { StateConfigStruct } from './typechain/GameAssets';
 
 /**
  * @public
@@ -82,7 +84,10 @@ export class GameAssets extends FactoryContract {
     return await this._isChild(signer, maybeChild);
   };
 
-  public static getBookAddress(chainId: number): string {
+  public readonly connect = (signer: Signer): GameAssets => {
+    return new GameAssets(this.address, signer);
+
+  };  public static getBookAddress(chainId: number): string {
     return AddressBook.getAddressesForChainId(chainId)[this.nameBookReference];
   }
 
@@ -184,8 +189,8 @@ export type AssetConfig = {
   name: string;
   description: string;
   lootBoxId: BigNumber;
-  priceConfig: StateConfig;
-  canMintConfig: StateConfig;
+  priceConfig: StateConfigStruct;
+  canMintConfig: StateConfigStruct;
   currencies: string[];
   recepient: string;
   tokenURI: string;

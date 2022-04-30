@@ -62,7 +62,7 @@
     "ethereum-waffle": "^3.4.0",
     "hardhat": "^2.7.0",
     "husky": "^7.0.4",
-    "rain-sdk": "^0.0.1-alpha.7",
+    "rain-sdk": "^0.0.1-alpha.8",
     "size-limit": "^6.0.4",
     "standardx": "3.0.0",
     "ts-node": "^10.4.0",
