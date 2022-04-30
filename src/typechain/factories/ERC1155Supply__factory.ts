@@ -4,10 +4,7 @@
 
 import { Contract, Signer, utils } from "ethers";
 import { Provider } from "@ethersproject/providers";
-import type {
-  ERC1155SupplyUpgradeable,
-  ERC1155SupplyUpgradeableInterface,
-} from "../ERC1155SupplyUpgradeable";
+import type { ERC1155Supply, ERC1155SupplyInterface } from "../ERC1155Supply";
 
 const _abi = [
   {
@@ -362,19 +359,15 @@ const _abi = [
   },
 ];
 
-export class ERC1155SupplyUpgradeable__factory {
+export class ERC1155Supply__factory {
   static readonly abi = _abi;
-  static createInterface(): ERC1155SupplyUpgradeableInterface {
-    return new utils.Interface(_abi) as ERC1155SupplyUpgradeableInterface;
+  static createInterface(): ERC1155SupplyInterface {
+    return new utils.Interface(_abi) as ERC1155SupplyInterface;
   }
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): ERC1155SupplyUpgradeable {
-    return new Contract(
-      address,
-      _abi,
-      signerOrProvider
-    ) as ERC1155SupplyUpgradeable;
+  ): ERC1155Supply {
+    return new Contract(address, _abi, signerOrProvider) as ERC1155Supply;
   }
 }

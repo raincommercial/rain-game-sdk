@@ -12,7 +12,7 @@ import {
   State as StateConfig,
 } from 'rain-sdk';
 
-import { GameAssets__factory, GameAssetsFactory__factory } from './typechain';
+import { GameAssets__factory } from './typechain';
 import { AddressBook } from './addresses';
 
 /**
@@ -56,7 +56,6 @@ export class GameAssets extends FactoryContract {
     this.assets = _gameAssets.assets;
     this.balanceOf = _gameAssets.balanceOf;
     this.balanceOfBatch = _gameAssets.balanceOfBatch;
-    this.createClass = _gameAssets.createClass;
     this.createNewAsset = _gameAssets.createNewAsset;
     this.getAssetPrice = _gameAssets.getAssetPrice;
     this.isApprovedForAll = _gameAssets.isApprovedForAll;
@@ -68,31 +67,6 @@ export class GameAssets extends FactoryContract {
     this.totalAssets = _gameAssets.totalAssets;
     this.uri = _gameAssets.uri;
   }
-
-  /**
-   * Deploys a new GameAssets.
-   *
-   * @param signer - An ethers.js Signer
-   * @param args - Arguments for deploying a GameAssets @see GameAssetsDeployArgs
-   * @param overrides - Specific transaction values to send it (e.g gasLimit, nonce or gasPrice)
-   * @returns A new GameAssets instance
-   *
-   */
-  public static deploy = async (
-    signer: Signer,
-    args: GameAssetsDeployArgs,
-    overrides: TxOverrides = {}
-  ): Promise<GameAssets> => {
-    const gameAssetsFactory = GameAssetsFactory__factory.connect(
-      this.getBookAddress(await this.getChainId(signer)),
-      signer
-    );
-
-    const tx = await gameAssetsFactory.createChildTyped(args, overrides);
-    const receipt = await tx.wait();
-    const address = this.getNewChildFromReceipt(receipt, gameAssetsFactory);
-    return new GameAssets(address, signer);
-  };
 
   /**
    * Checks if address is registered as a child contract of this GameAssetsFactory on a specific network
@@ -128,11 +102,6 @@ export class GameAssets extends FactoryContract {
     ids: BigNumberish[],
     overrides?: ReadTxOverrides
   ) => Promise<BigNumber[]>;
-
-  public readonly createClass: (
-    _attributes: string[],
-    overrides?: TxOverrides
-  ) => Promise<ContractTransaction>;
 
   public readonly createNewAsset: (
     _config: AssetConfig,
@@ -207,9 +176,8 @@ export type AssetDetails = {
   id: BigNumber;
   priceConfig: State;
   canMintConfig: State;
-  assetClass: BigNumber;
-  rarity: BigNumber;
-  creator: string;
+  recepient: string;
+  tokenURI: string;
 };
 
 export type AssetConfig = {
@@ -219,9 +187,8 @@ export type AssetConfig = {
   priceConfig: StateConfig;
   canMintConfig: StateConfig;
   currencies: string[];
-  assetClass: BigNumber;
-  rarity: BigNumber;
-  creator: string;
+  recepient: string;
+  tokenURI: string;
 };
 
 // TODO: Update the rain-sdk to use the correctState

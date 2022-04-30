@@ -947,9 +947,9 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@beehive-innovation/rain-game-engine@git+https://github.com/beehive-innovation/rain-game-engine.git#5d7f84fdc7eb92678f7247a3eafe101fe103b5a3":
+"@beehive-innovation/rain-game-engine@git+https://github.com/beehive-innovation/rain-game-engine.git#0b1a7e631ca7083f38d6533a60e1236cd61849f0":
   version "0.0.1"
-  resolved "git+https://github.com/beehive-innovation/rain-game-engine.git#5d7f84fdc7eb92678f7247a3eafe101fe103b5a3"
+  resolved "git+https://github.com/beehive-innovation/rain-game-engine.git#0b1a7e631ca7083f38d6533a60e1236cd61849f0"
   dependencies:
     "@beehiveinnovation/rain-protocol" "git+https://github.com/beehive-innovation/rain-protocol.git#2dd7102e9addf0662bc0aef2a6aacb8b82edf089"
     "@graphprotocol/graph-cli" "^0.26.0"

@@ -45,9 +45,8 @@ export type AssetDetailsStruct = {
   priceConfig: StateStruct;
   canMintConfig: StateStruct;
   currencies: string[];
-  assetClass: BigNumberish;
-  rarity: BigNumberish;
-  creator: string;
+  recepient: string;
+  tokenURI: string;
 };
 
 export type AssetDetailsStructOutput = [
@@ -56,8 +55,7 @@ export type AssetDetailsStructOutput = [
   StateStructOutput,
   StateStructOutput,
   string[],
-  BigNumber,
-  BigNumber,
+  string,
   string
 ] & {
   lootBoxId: BigNumber;
@@ -65,9 +63,8 @@ export type AssetDetailsStructOutput = [
   priceConfig: StateStructOutput;
   canMintConfig: StateStructOutput;
   currencies: string[];
-  assetClass: BigNumber;
-  rarity: BigNumber;
-  creator: string;
+  recepient: string;
+  tokenURI: string;
 };
 
 export type StateConfigStruct = {
@@ -89,13 +86,6 @@ export type StateConfigStructOutput = [
   argumentsLength: BigNumber;
 };
 
-export type GameAssetsConfigStruct = { _creator: string; _baseURI: string };
-
-export type GameAssetsConfigStructOutput = [string, string] & {
-  _creator: string;
-  _baseURI: string;
-};
-
 export type AssetConfigStruct = {
   name: string;
   description: string;
@@ -103,9 +93,8 @@ export type AssetConfigStruct = {
   priceConfig: StateConfigStruct;
   canMintConfig: StateConfigStruct;
   currencies: string[];
-  assetClass: BigNumberish;
-  rarity: BigNumberish;
-  creator: string;
+  recepient: string;
+  tokenURI: string;
 };
 
 export type AssetConfigStructOutput = [
@@ -115,8 +104,7 @@ export type AssetConfigStructOutput = [
   StateConfigStructOutput,
   StateConfigStructOutput,
   string[],
-  BigNumber,
-  BigNumber,
+  string,
   string
 ] & {
   name: string;
@@ -125,9 +113,8 @@ export type AssetConfigStructOutput = [
   priceConfig: StateConfigStructOutput;
   canMintConfig: StateConfigStructOutput;
   currencies: string[];
-  assetClass: BigNumber;
-  rarity: BigNumber;
-  creator: string;
+  recepient: string;
+  tokenURI: string;
 };
 
 export interface GameAssetsInterface extends utils.Interface {
@@ -136,11 +123,9 @@ export interface GameAssetsInterface extends utils.Interface {
     "balanceOf(address,uint256)": FunctionFragment;
     "balanceOfBatch(address[],uint256[])": FunctionFragment;
     "canMint(uint256)": FunctionFragment;
-    "createClass(string[])": FunctionFragment;
-    "createNewAsset((string,string,uint256,(bytes[],uint256[],uint256,uint256),(bytes[],uint256[],uint256,uint256),address[],uint256,uint256,address))": FunctionFragment;
+    "createNewAsset((string,string,uint256,(bytes[],uint256[],uint256,uint256),(bytes[],uint256[],uint256,uint256),address[],address,string))": FunctionFragment;
     "exists(uint256)": FunctionFragment;
     "getAssetPrice(uint256,address,uint256)": FunctionFragment;
-    "initialize((address,string))": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "mintAssets(uint256,uint256)": FunctionFragment;
     "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)": FunctionFragment;
@@ -169,10 +154,6 @@ export interface GameAssetsInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "createClass",
-    values: [string[]]
-  ): string;
-  encodeFunctionData(
     functionFragment: "createNewAsset",
     values: [AssetConfigStruct]
   ): string;
@@ -183,10 +164,6 @@ export interface GameAssetsInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "getAssetPrice",
     values: [BigNumberish, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "initialize",
-    values: [GameAssetsConfigStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
@@ -230,10 +207,6 @@ export interface GameAssetsInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "canMint", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "createClass",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "createNewAsset",
     data: BytesLike
   ): Result;
@@ -242,7 +215,6 @@ export interface GameAssetsInterface extends utils.Interface {
     functionFragment: "getAssetPrice",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
     data: BytesLike
@@ -278,7 +250,7 @@ export interface GameAssetsInterface extends utils.Interface {
     "ApprovalForAll(address,address,bool)": EventFragment;
     "AssetCreated(uint256,tuple,tuple,tuple,string,string)": EventFragment;
     "ClassCreated(string[])": EventFragment;
-    "Initialize(tuple)": EventFragment;
+    "Initialize(address)": EventFragment;
     "Snapshot(address,address,tuple)": EventFragment;
     "TransferBatch(address,address,address,uint256[],uint256[])": EventFragment;
     "TransferSingle(address,address,address,uint256,uint256)": EventFragment;
@@ -330,10 +302,7 @@ export type ClassCreatedEvent = TypedEvent<
 
 export type ClassCreatedEventFilter = TypedEventFilter<ClassCreatedEvent>;
 
-export type InitializeEvent = TypedEvent<
-  [GameAssetsConfigStructOutput],
-  { config: GameAssetsConfigStructOutput }
->;
+export type InitializeEvent = TypedEvent<[string], { _deployer: string }>;
 
 export type InitializeEventFilter = TypedEventFilter<InitializeEvent>;
 
@@ -413,17 +382,15 @@ export interface GameAssets extends BaseContract {
         BigNumber,
         StateStructOutput,
         StateStructOutput,
-        BigNumber,
-        BigNumber,
+        string,
         string
       ] & {
         lootBoxId: BigNumber;
         id: BigNumber;
         priceConfig: StateStructOutput;
         canMintConfig: StateStructOutput;
-        assetClass: BigNumber;
-        rarity: BigNumber;
-        creator: string;
+        recepient: string;
+        tokenURI: string;
       }
     >;
 
@@ -444,11 +411,6 @@ export interface GameAssets extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    createClass(
-      _classData: string[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     createNewAsset(
       _config: AssetConfigStruct,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -462,11 +424,6 @@ export interface GameAssets extends BaseContract {
       _units: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber[]]>;
-
-    initialize(
-      _config: GameAssetsConfigStruct,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
 
     isApprovedForAll(
       account: string,
@@ -528,17 +485,15 @@ export interface GameAssets extends BaseContract {
       BigNumber,
       StateStructOutput,
       StateStructOutput,
-      BigNumber,
-      BigNumber,
+      string,
       string
     ] & {
       lootBoxId: BigNumber;
       id: BigNumber;
       priceConfig: StateStructOutput;
       canMintConfig: StateStructOutput;
-      assetClass: BigNumber;
-      rarity: BigNumber;
-      creator: string;
+      recepient: string;
+      tokenURI: string;
     }
   >;
 
@@ -559,11 +514,6 @@ export interface GameAssets extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  createClass(
-    _classData: string[],
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   createNewAsset(
     _config: AssetConfigStruct,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -577,11 +527,6 @@ export interface GameAssets extends BaseContract {
     _units: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
-
-  initialize(
-    _config: GameAssetsConfigStruct,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   isApprovedForAll(
     account: string,
@@ -640,17 +585,15 @@ export interface GameAssets extends BaseContract {
         BigNumber,
         StateStructOutput,
         StateStructOutput,
-        BigNumber,
-        BigNumber,
+        string,
         string
       ] & {
         lootBoxId: BigNumber;
         id: BigNumber;
         priceConfig: StateStructOutput;
         canMintConfig: StateStructOutput;
-        assetClass: BigNumber;
-        rarity: BigNumber;
-        creator: string;
+        recepient: string;
+        tokenURI: string;
       }
     >;
 
@@ -668,8 +611,6 @@ export interface GameAssets extends BaseContract {
 
     canMint(_assetId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    createClass(_classData: string[], overrides?: CallOverrides): Promise<void>;
-
     createNewAsset(
       _config: AssetConfigStruct,
       overrides?: CallOverrides
@@ -683,11 +624,6 @@ export interface GameAssets extends BaseContract {
       _units: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
-
-    initialize(
-      _config: GameAssetsConfigStruct,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     isApprovedForAll(
       account: string,
@@ -772,8 +708,8 @@ export interface GameAssets extends BaseContract {
     "ClassCreated(string[])"(_classData?: null): ClassCreatedEventFilter;
     ClassCreated(_classData?: null): ClassCreatedEventFilter;
 
-    "Initialize(tuple)"(config?: null): InitializeEventFilter;
-    Initialize(config?: null): InitializeEventFilter;
+    "Initialize(address)"(_deployer?: null): InitializeEventFilter;
+    Initialize(_deployer?: null): InitializeEventFilter;
 
     "Snapshot(address,address,tuple)"(
       sender?: null,
@@ -839,11 +775,6 @@ export interface GameAssets extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    createClass(
-      _classData: string[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     createNewAsset(
       _config: AssetConfigStruct,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -856,11 +787,6 @@ export interface GameAssets extends BaseContract {
       _paymentToken: string,
       _units: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    initialize(
-      _config: GameAssetsConfigStruct,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     isApprovedForAll(
@@ -937,11 +863,6 @@ export interface GameAssets extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    createClass(
-      _classData: string[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     createNewAsset(
       _config: AssetConfigStruct,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -957,11 +878,6 @@ export interface GameAssets extends BaseContract {
       _paymentToken: string,
       _units: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    initialize(
-      _config: GameAssetsConfigStruct,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     isApprovedForAll(
