@@ -1,8 +1,10 @@
+import * as dotenv from 'dotenv';
 import { task } from 'hardhat/config';
 import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-ethers';
 import '@typechain/hardhat';
 
+dotenv.config();
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
 task('accounts', 'Prints the list of accounts', async (args, hre) => {
@@ -44,6 +46,10 @@ module.exports = {
     hardhat: {
       blockGasLimit: 30000000,
       allowUnlimitedContractSize: true,
+    },
+    mumbai: {
+      url: `https://polygon-mumbai.infura.io/v3/${process.env.API_KEY}`,
+      accounts: [process.env.PRIVATE_KEY],
     },
   },
 };

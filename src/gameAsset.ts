@@ -5,17 +5,12 @@ import {
   BigNumberish,
   ContractTransaction,
 } from 'ethers';
-import {
-  TxOverrides,
-  ReadTxOverrides,
-  FactoryContract,
-  State as StateConfig,
-  RainContract,
-} from 'rain-sdk';
+import { TxOverrides, ReadTxOverrides, FactoryContract } from 'rain-sdk';
 
 import { GameAssets__factory } from './typechain';
 import { AddressBook } from './addresses';
 import { StateConfigStruct } from './typechain/GameAssets';
+import { concat, Conditions, op, Opcode, Type, VMState } from './utils';
 
 /**
  * @public
@@ -41,7 +36,7 @@ import { StateConfigStruct } from './typechain/GameAssets';
  */
 
 export class GameAssets extends FactoryContract {
-  protected static readonly nameBookReference = 'gameAssetsFactory';
+  protected static readonly nameBookReference = 'gameAssets';
 
   /**
    * Constructs a new GameAssets from a known address.
@@ -84,10 +79,110 @@ export class GameAssets extends FactoryContract {
     return await this._isChild(signer, maybeChild);
   };
 
+  public static generatePriceScript = (
+    prices: price[]
+  ): [VMState, string[]] => {
+    let pos = -1;
+    let currencies: string[] = [];
+    let sources: BytesLike[] = [];
+    let constants: BigNumberish[] = [];
+    let i;
+    for (i = 0; i < prices.length; i++) {
+      let obj = prices[i];
+      if (obj.currency.type === Type.ERC1155) {
+        sources.push(
+          concat([
+            op(Opcode.VAL, ++pos),
+            op(Opcode.VAL, ++pos),
+            op(Opcode.VAL, ++pos),
+          ])
+        );
+        constants.push(obj.currency.type);
+        if (obj.currency.tokenId) constants.push(obj.currency.tokenId);
+        constants.push(obj.amount);
+      } else {
+        sources.push(concat([op(Opcode.VAL, ++pos), op(Opcode.VAL, ++pos)]));
+        constants.push(obj.currency.type);
+        constants.push(obj.amount);
+      }
+      currencies.push(obj.currency.address);
+    }
+    let state: VMState = {
+      sources: sources,
+      constants: constants,
+      stackLength: 3,
+      argumentsLength: 0,
+    };
+    return [state, currencies];
+  };
+
+  public static generateCanMintScript = (conditions: condition[]): VMState => {
+    let pos = -1;
+    let sources: Uint8Array[] = [];
+    let constants: BigNumberish[] = [];
+    let i;
+    let stackLenght = 3;
+
+    for (i = 0; i < conditions.length; i++) {
+      let condition = conditions[i];
+      if (condition.type === Conditions.BLOCK_NUMBER) {
+        if (condition.blockNumber) constants.push(condition.blockNumber);
+        sources.push(op(Opcode.BLOCK_NUMBER));
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.GREATER_THAN));
+      } else if (condition.type === Conditions.BALANCE_TIER) {
+        if (condition.tierAddress) constants.push(condition.tierAddress);
+        if (condition.tierCondition) constants.push(condition.tierCondition);
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.SENDER));
+        sources.push(op(Opcode.REPORT));
+        sources.push(op(Opcode.BLOCK_NUMBER));
+        sources.push(op(Opcode.REPORT_AT_BLOCK));
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.GREATER_THAN));
+      } else if (condition.type === Conditions.ERC20BALANCE) {
+        if (condition.address) constants.push(condition.address);
+        if (condition.balance) constants.push(condition.balance);
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.SENDER));
+        sources.push(op(Opcode.IERC20_BALANCE_OF));
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.GREATER_THAN));
+      } else if (condition.type === Conditions.ERC721BALANCE) {
+        if (condition.address) constants.push(condition.address);
+        if (condition.balance) constants.push(condition.balance);
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.SENDER));
+        sources.push(op(Opcode.IERC721_BALANCE_OF));
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.GREATER_THAN));
+      } else if (condition.type === Conditions.ERC1155BALANCE) {
+        if (condition.address) constants.push(condition.address);
+        if (condition.id) constants.push(condition.id);
+        if (condition.balance) constants.push(condition.balance);
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.SENDER));
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.IERC1155_BALANCE_OF));
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.GREATER_THAN));
+      }
+    }
+    sources.push(op(Opcode.EVERY, conditions.length));
+
+    let state: VMState = {
+      sources: [concat(sources)],
+      constants: constants,
+      stackLength: stackLenght + conditions.length,
+      argumentsLength: 0,
+    };
+    return state;
+  };
+
   public readonly connect = (signer: Signer): GameAssets => {
     return new GameAssets(this.address, signer);
-
-  };  public static getBookAddress(chainId: number): string {
+  };
+  public static getBookAddress(chainId: number): string {
     return AddressBook.getAddressesForChainId(chainId)[this.nameBookReference];
   }
 
@@ -203,4 +298,25 @@ export type State = {
   sources: string[];
   constants: BigNumber[];
   arguments: BigNumber[];
+};
+
+export type currency = {
+  type: number;
+  address: string;
+  tokenId?: BigNumberish;
+};
+
+export type price = {
+  currency: currency;
+  amount: BigNumber;
+};
+
+export type condition = {
+  type: number;
+  blockNumber?: number;
+  tierAddress?: string;
+  tierCondition?: number;
+  address?: string;
+  balance?: BigNumber;
+  id?: BigNumber;
 };
