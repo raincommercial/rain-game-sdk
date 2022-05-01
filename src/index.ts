@@ -6,7 +6,13 @@ import {
   AllStandardOps,
 } from 'rain-sdk';
 
-export { FactoryContract, RainContract, AllStandardOps, VM, TierFactoryContract };
+export {
+  FactoryContract,
+  RainContract,
+  AllStandardOps,
+  VM,
+  TierFactoryContract,
+};
 
 export * from './addresses';
 export * from './gameAsset';
