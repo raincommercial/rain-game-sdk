@@ -2,7 +2,7 @@ const addressBook = [
   {
     chainId: 80001,
     addresses: {
-      gameAssets: '0x509A853033AD12dC8A8Eb8534370b1002f2d9901',
+      gameAssets: '0x3bCF3423380E21d0e724165bc8Bd8499636586ED',
     },
   },
   {
