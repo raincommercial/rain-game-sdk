@@ -79,7 +79,10 @@ const generateCanMintScript = (conditions: condition[]): VMState => {
 
   for (i = 0; i < conditions.length; i++) {
     let condition = conditions[i];
-    if (condition.type === Conditions.BLOCK_NUMBER) {
+    if (condition.type === Conditions.NONE) {
+      constants.push(1);
+      sources.push(op(Opcode.VAL, ++pos));
+    } else if (condition.type === Conditions.BLOCK_NUMBER) {
       if (condition.blockNumber) constants.push(condition.blockNumber);
       sources.push(op(Opcode.BLOCK_NUMBER));
       sources.push(op(Opcode.VAL, ++pos));

@@ -19,6 +19,7 @@ export enum Type {
 }
 
 export enum Conditions {
+  NONE,
   BLOCK_NUMBER,
   BALANCE_TIER,
   ERC20BALANCE,
