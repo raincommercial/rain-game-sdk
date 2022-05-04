@@ -41,6 +41,15 @@ const generatePriceScript = (prices: price[]): [VMState, string[]] => {
   let sources: BytesLike[] = [];
   let constants: BigNumberish[] = [];
   let i;
+  if (prices.length === 0) {
+    let state: VMState = {
+      sources: [concat([op(Opcode.SKIP)])],
+      constants: constants,
+      stackLength: 1,
+      argumentsLength: 0,
+    };
+    return [state, currencies];
+  }
   for (i = 0; i < prices.length; i++) {
     let obj = prices[i];
     if (obj.currency.type === Type.ERC1155) {
@@ -68,6 +77,36 @@ const generatePriceScript = (prices: price[]): [VMState, string[]] => {
     argumentsLength: 0,
   };
   return [state, currencies];
+};
+
+const generatePriceConfig = (
+  priceScritp: VMState,
+  currencies: string[]
+): price[] => {
+  let prices: price[] = [];
+  let pos = -1;
+  for (let i = 0; i < priceScritp.sources.length; i++) {
+    let source: BytesLike = priceScritp.sources[i];
+    if (source.length === 4) {
+      prices.push({
+        currency: {
+          type: Number(priceScritp.constants[++pos]),
+          address: currencies[i],
+        },
+        amount: BigNumber.from(priceScritp.constants[++pos]),
+      });
+    } else if (source.length === 6) {
+      prices.push({
+        currency: {
+          type: Number(priceScritp.constants[++pos]),
+          address: currencies[i],
+          tokenId: priceScritp.constants[++pos],
+        },
+        amount: BigNumber.from(priceScritp.constants[++pos]),
+      });
+    }
+  }
+  return prices;
 };
 
 const generateCanMintScript = (conditions: condition[]): VMState => {
@@ -135,6 +174,11 @@ const generateCanMintScript = (conditions: condition[]): VMState => {
   };
   return state;
 };
+
+const generateCanMintConfig = (canMintScript: VMState): Conditions[] => {
+  let conditions: Conditions[] = [];
+  return conditions;
+};
 export class GameAssets extends FactoryContract {
   protected static readonly nameBookReference = 'gameAssets';
 
@@ -153,6 +197,7 @@ export class GameAssets extends FactoryContract {
     this.assets = _gameAssets.assets;
     this.balanceOf = _gameAssets.balanceOf;
     this.balanceOfBatch = _gameAssets.balanceOfBatch;
+    this.canMint = _gameAssets.canMint;
     this.createNewAsset = _gameAssets.createNewAsset;
     this.getAssetPrice = _gameAssets.getAssetPrice;
     this.isApprovedForAll = _gameAssets.isApprovedForAll;
@@ -173,6 +218,8 @@ export class GameAssets extends FactoryContract {
   }
 
   public readonly generatePriceScript = generatePriceScript;
+  public readonly generatePriceConfig = generatePriceConfig;
+
   public readonly generateCanMintScript = generateCanMintScript;
 
   public readonly assets: (
@@ -191,6 +238,12 @@ export class GameAssets extends FactoryContract {
     ids: BigNumberish[],
     overrides?: ReadTxOverrides
   ) => Promise<BigNumber[]>;
+
+  public readonly canMint: (
+    _assetId: BigNumberish,
+    _account: string,
+    overrides?: ReadTxOverrides
+  ) => Promise<boolean>;
 
   public readonly createNewAsset: (
     _config: AssetConfig,

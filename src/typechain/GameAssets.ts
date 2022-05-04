@@ -122,7 +122,7 @@ export interface GameAssetsInterface extends utils.Interface {
     "assets(uint256)": FunctionFragment;
     "balanceOf(address,uint256)": FunctionFragment;
     "balanceOfBatch(address[],uint256[])": FunctionFragment;
-    "canMint(uint256)": FunctionFragment;
+    "canMint(uint256,address)": FunctionFragment;
     "createNewAsset((string,string,uint256,(bytes[],uint256[],uint256,uint256),(bytes[],uint256[],uint256,uint256),address[],address,string))": FunctionFragment;
     "exists(uint256)": FunctionFragment;
     "getAssetPrice(uint256,address,uint256)": FunctionFragment;
@@ -151,7 +151,7 @@ export interface GameAssetsInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "canMint",
-    values: [BigNumberish]
+    values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "createNewAsset",
@@ -408,8 +408,9 @@ export interface GameAssets extends BaseContract {
 
     canMint(
       _assetId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
     createNewAsset(
       _config: AssetConfigStruct,
@@ -511,8 +512,9 @@ export interface GameAssets extends BaseContract {
 
   canMint(
     _assetId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+    _account: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   createNewAsset(
     _config: AssetConfigStruct,
@@ -609,7 +611,11 @@ export interface GameAssets extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
 
-    canMint(_assetId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+    canMint(
+      _assetId: BigNumberish,
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
     createNewAsset(
       _config: AssetConfigStruct,
@@ -772,7 +778,8 @@ export interface GameAssets extends BaseContract {
 
     canMint(
       _assetId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      _account: string,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     createNewAsset(
@@ -860,7 +867,8 @@ export interface GameAssets extends BaseContract {
 
     canMint(
       _assetId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      _account: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     createNewAsset(

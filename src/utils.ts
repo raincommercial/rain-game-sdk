@@ -1,10 +1,11 @@
 import { Logger } from '@ethersproject/logger';
 import { version } from './_version';
 import { StateConfigStruct } from './typechain/GameAssets';
-import { BigNumber } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
+import { AllStandardOps } from 'rain-sdk';
 
 const logger = new Logger(version);
 
@@ -25,69 +26,6 @@ export enum Conditions {
   ERC20BALANCE,
   ERC721BALANCE,
   ERC1155BALANCE,
-}
-
-export enum Rarity {
-  NONE,
-  COMMON,
-  UNCOMMON,
-  RARE,
-  ULTRARARE,
-}
-
-export enum Role {
-  Admin,
-  Creator,
-}
-
-export enum AllStandardOps {
-  SKIP,
-  VAL,
-  DUP,
-  ZIPMAP,
-  DEBUG,
-  BLOCK_NUMBER,
-  BLOCK_TIMESTAMP,
-  SENDER,
-  THIS_ADDRESS,
-  SCALE18_MUL,
-  SCALE18_DIV,
-  SCALE18,
-  SCALEN,
-  SCALE_BY,
-  SCALE18_ONE,
-  SCALE18_DECIMALS,
-  ADD,
-  SATURATING_ADD,
-  SUB,
-  SATURATING_SUB,
-  MUL,
-  SATURATING_MUL,
-  DIV,
-  MOD,
-  EXP,
-  MIN,
-  MAX,
-  ISZERO,
-  EAGER_IF,
-  EQUAL_TO,
-  LESS_THAN,
-  GREATER_THAN,
-  EVERY,
-  ANY,
-  REPORT,
-  NEVER,
-  ALWAYS,
-  SATURATING_DIFF,
-  UPDATE_BLOCKS_FOR_TIER_RANGE,
-  SELECT_LTE,
-  IERC20_BALANCE_OF,
-  IERC20_TOTAL_SUPPLY,
-  IERC721_BALANCE_OF,
-  IERC721_OWNER_OF,
-  IERC1155_BALANCE_OF,
-  IERC1155_BALANCE_OF_BATCH,
-  length,
 }
 
 enum GameAssetsOpcode {

@@ -969,9 +969,9 @@
     truffle-plugin-verify "^0.4.0"
     yarn "^1.22.5"
 
-"@beehiveinnovation/rain-game-engine@git+https://github.com/beehive-innovation/rain-game-engine.git#0b1a7e631ca7083f38d6533a60e1236cd61849f0":
+"@beehiveinnovation/rain-game-engine@git+https://github.com/beehive-innovation/rain-game-engine.git#5182ef404e1304f085290922682e2bcbc16f832c":
   version "0.0.1"
-  resolved "git+https://github.com/beehive-innovation/rain-game-engine.git#0b1a7e631ca7083f38d6533a60e1236cd61849f0"
+  resolved "git+https://github.com/beehive-innovation/rain-game-engine.git#5182ef404e1304f085290922682e2bcbc16f832c"
   dependencies:
     "@beehiveinnovation/rain-protocol" "git+https://github.com/beehive-innovation/rain-protocol.git#2dd7102e9addf0662bc0aef2a6aacb8b82edf089"
     "@graphprotocol/graph-cli" "^0.26.0"

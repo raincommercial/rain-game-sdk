@@ -29,7 +29,19 @@ export enum Tier {
   SEVEN,
   EIGHT,
 }
+export enum Type {
+  ERC20,
+  ERC1155
+}
 
+export enum Conditions {
+  NONE,
+  BLOCK_NUMBER,
+  BALANCE_TIER,
+  ERC20BALANCE,
+  ERC721BALANCE,
+  ERC1155BALANCE,
+}
 /**
  * Return the Levels tier used by default. LEVELS always will be an array with 8 elements to
  * correspond to the 8 TierLevels
