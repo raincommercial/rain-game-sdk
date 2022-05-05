@@ -1,13 +1,5 @@
-import { expect } from 'chai';
-import { artifacts, ethers } from 'hardhat';
 import {
-  chainId,
-  Tier,
-  TierLevels,
   Addresses,
-  deployErc20,
-  deployErc721,
-  expectAsyncError,
   eighteenZeros,
   Type,
   Conditions,
@@ -19,9 +11,7 @@ import {
   price,
   condition,
 } from '../dist';
-import { Contract, Signer } from 'ethers';
-import { ERC20BalanceTierFactory } from '../typechain/ERC20BalanceTierFactory';
-import { ERC20BalanceTier } from 'rain-sdk/dist/contracts/tiers/erc20BalanceTier';
+import { ethers } from 'hardhat';
 
 /**
  * Addresses saved that are in SDK BookAddresses deployed to Hardhat network.
@@ -68,7 +58,6 @@ describe('Rain Game SDK - Test', () => {
 
   it("it Should get deployed contract on mumbai",async () => {
     let signer = await ethers.getSigners();
-    console.log("Signer : ", signer[0].address)
     let gameAssetsAddress = AddressBook.getAddressesForChainId(80001).gameAssets
     let gameAssets = new GameAssets(gameAssetsAddress, signer[0]);
 
@@ -138,6 +127,9 @@ describe('Rain Game SDK - Test', () => {
 
     const conditions: condition[] = [
       {
+        type: Conditions.NONE
+      },
+      {
         type: Conditions.BLOCK_NUMBER,
         blockNumber: blockCondition
       },
@@ -159,6 +151,10 @@ describe('Rain Game SDK - Test', () => {
       }
     ];
 
-    const canMintConfig = gameAssets.generateCanMintScript(conditions);
+    const canMintScript = gameAssets.generateCanMintScript(conditions);
+    console.log(canMintScript)
+    const canMintConfig = gameAssets.generateCanMintConfig(canMintScript);
+    console.log(canMintConfig)
+
   })
 });

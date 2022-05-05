@@ -10,7 +10,17 @@ import { TxOverrides, ReadTxOverrides, FactoryContract } from 'rain-sdk';
 import { GameAssets__factory } from './typechain';
 import { AddressBook } from './addresses';
 import { StateConfigStruct } from './typechain/GameAssets';
-import { concat, Conditions, op, Opcode, Type, VMState } from './utils';
+import {
+  concat,
+  Conditions,
+  getCondition,
+  matchPattern,
+  op,
+  Opcode,
+  patternLengths,
+  Type,
+  VMState,
+} from './utils';
 
 /**
  * @public
@@ -35,7 +45,21 @@ import { concat, Conditions, op, Opcode, Type, VMState } from './utils';
  *
  */
 
+class ScriptError extends Error {
+  constructor(msg: string) {
+    super(msg);
+
+    // Set the prototype explicitly.
+    Object.setPrototypeOf(this, ScriptError.prototype);
+  }
+
+  error(type: string, attribute: string) {
+    return `ScriptError: type "${type}" is missing "${attribute}".`;
+  }
+}
+
 const generatePriceScript = (prices: price[]): [VMState, string[]] => {
+  let error = new ScriptError('Invalid Script parameters.');
   let pos = -1;
   let currencies: string[] = [];
   let sources: BytesLike[] = [];
@@ -61,7 +85,9 @@ const generatePriceScript = (prices: price[]): [VMState, string[]] => {
         ])
       );
       constants.push(obj.currency.type);
-      if (obj.currency.tokenId) constants.push(obj.currency.tokenId);
+      if (obj.currency.tokenId) {
+        constants.push(obj.currency.tokenId);
+      } else throw error.error('ERC1155', 'currency.tokenId');
       constants.push(obj.amount);
     } else {
       sources.push(concat([op(Opcode.VAL, ++pos), op(Opcode.VAL, ++pos)]));
@@ -110,6 +136,7 @@ const generatePriceConfig = (
 };
 
 const generateCanMintScript = (conditions: condition[]): VMState => {
+  let error = new ScriptError('Invalid Script parameters.');
   let pos = -1;
   let sources: Uint8Array[] = [];
   let constants: BigNumberish[] = [];
@@ -122,42 +149,62 @@ const generateCanMintScript = (conditions: condition[]): VMState => {
       constants.push(1);
       sources.push(op(Opcode.VAL, ++pos));
     } else if (condition.type === Conditions.BLOCK_NUMBER) {
-      if (condition.blockNumber) constants.push(condition.blockNumber);
+      if (condition.blockNumber) {
+        constants.push(condition.blockNumber);
+      } else throw error.error('BLOCK_NUMBER', 'blockNumber');
       sources.push(op(Opcode.BLOCK_NUMBER));
       sources.push(op(Opcode.VAL, ++pos));
       sources.push(op(Opcode.GREATER_THAN));
     } else if (condition.type === Conditions.BALANCE_TIER) {
-      if (condition.tierAddress) constants.push(condition.tierAddress);
-      if (condition.tierCondition) constants.push(condition.tierCondition);
+      if (condition.tierAddress) {
+        constants.push(condition.tierAddress);
+      } else throw error.error('BALANCE_TIER', 'tierAddress');
+      if (condition.tierCondition) {
+        constants.push(condition.tierCondition);
+      } else throw error.error('BALANCE_TIER', 'tierCondition');
       sources.push(op(Opcode.VAL, ++pos));
-      sources.push(op(Opcode.SENDER));
+      sources.push(op(Opcode.ACCOUNT));
       sources.push(op(Opcode.REPORT));
       sources.push(op(Opcode.BLOCK_NUMBER));
       sources.push(op(Opcode.REPORT_AT_BLOCK));
       sources.push(op(Opcode.VAL, ++pos));
       sources.push(op(Opcode.GREATER_THAN));
     } else if (condition.type === Conditions.ERC20BALANCE) {
-      if (condition.address) constants.push(condition.address);
-      if (condition.balance) constants.push(condition.balance);
+      if (condition.address) {
+        constants.push(condition.address);
+      } else throw error.error('ERC20BALANCE', 'address');
+      if (condition.balance) {
+        constants.push(condition.balance);
+      } else throw error.error('ERC20BALANCE', 'balance');
       sources.push(op(Opcode.VAL, ++pos));
-      sources.push(op(Opcode.SENDER));
+      sources.push(op(Opcode.ACCOUNT));
       sources.push(op(Opcode.IERC20_BALANCE_OF));
       sources.push(op(Opcode.VAL, ++pos));
       sources.push(op(Opcode.GREATER_THAN));
     } else if (condition.type === Conditions.ERC721BALANCE) {
-      if (condition.address) constants.push(condition.address);
-      if (condition.balance) constants.push(condition.balance);
+      if (condition.address) {
+        constants.push(condition.address);
+      } else throw error.error('ERC721BALANCE', 'address');
+      if (condition.balance) {
+        constants.push(condition.balance);
+      } else throw error.error('ERC721BALANCE', 'balance');
       sources.push(op(Opcode.VAL, ++pos));
-      sources.push(op(Opcode.SENDER));
+      sources.push(op(Opcode.ACCOUNT));
       sources.push(op(Opcode.IERC721_BALANCE_OF));
       sources.push(op(Opcode.VAL, ++pos));
       sources.push(op(Opcode.GREATER_THAN));
     } else if (condition.type === Conditions.ERC1155BALANCE) {
-      if (condition.address) constants.push(condition.address);
-      if (condition.id) constants.push(condition.id);
-      if (condition.balance) constants.push(condition.balance);
+      if (condition.address) {
+        constants.push(condition.address);
+      } else throw error.error('ERC1155BALANCE', 'address');
+      if (condition.id) {
+        constants.push(condition.id);
+      } else throw error.error('ERC1155BALANCE', 'id');
+      if (condition.balance) {
+        constants.push(condition.balance);
+      } else throw error.error('ERC1155BALANCE', 'balance');
       sources.push(op(Opcode.VAL, ++pos));
-      sources.push(op(Opcode.SENDER));
+      sources.push(op(Opcode.ACCOUNT));
       sources.push(op(Opcode.VAL, ++pos));
       sources.push(op(Opcode.IERC1155_BALANCE_OF));
       sources.push(op(Opcode.VAL, ++pos));
@@ -175,8 +222,101 @@ const generateCanMintScript = (conditions: condition[]): VMState => {
   return state;
 };
 
-const generateCanMintConfig = (canMintScript: VMState): Conditions[] => {
-  let conditions: Conditions[] = [];
+const generateCanMintConfig = (canMintScript: VMState): condition[] => {
+  let conditions: condition[] = [];
+  let sources = canMintScript.sources[0];
+  let constants = canMintScript.constants;
+  let opcodes: number[] = [];
+  for (let i = 0; i < sources.length - 2; i++) {
+    opcodes.push(parseInt(sources[i].toString()));
+  }
+  let len = opcodes.length;
+  let start = 0;
+  while (len > 0) {
+    for (let j = patternLengths.length - 1; j >= 0; j--) {
+      // console.log(opcodes.length);
+      if (opcodes.length >= patternLengths[j]) {
+        const [new_start, opcode] = matchPattern(
+          opcodes,
+          start,
+          patternLengths[j]
+        );
+        if (new_start !== start) {
+          conditions.push(
+            getCondition(opcodes.slice(start, new_start), constants)
+          );
+          start = new_start;
+          len = len - patternLengths[j];
+          break;
+        }
+      }
+    }
+    // if (opcodes.length >= patternLengths[4]) {
+    //   const [new_start, opcode] = matchPattern(
+    //     opcodes,
+    //     start,
+    //     patternLengths[4]
+    //   );
+    //   if (new_start !== start) {
+    //     start = new_start;
+    //     console.log(opcode);
+    //     len = len - patternLengths[4];
+    //     continue;
+    //   }
+    // }
+    // if (opcodes.length >= patternLengths[3]) {
+    //   const [new_start, opcode] = matchPattern(
+    //     opcodes,
+    //     start,
+    //     patternLengths[3]
+    //   );
+    //   if (new_start !== start) {
+    //     start = new_start;
+    //     console.log(opcode);
+    //     len = len - patternLengths[3];
+    //     continue;
+    //   }
+    // }
+    // if (opcodes.length >= patternLengths[2]) {
+    //   const [new_start, opcode] = matchPattern(
+    //     opcodes,
+    //     start,
+    //     patternLengths[2]
+    //   );
+    //   if (new_start !== start) {
+    //     start = new_start;
+    //     console.log(opcode);
+    //     len = len - patternLengths[2];
+    //     continue;
+    //   }
+    // }
+    // if (opcodes.length >= patternLengths[1]) {
+    //   const [new_start, opcode] = matchPattern(
+    //     opcodes,
+    //     start,
+    //     patternLengths[1]
+    //   );
+    //   if (new_start !== start) {
+    //     start = new_start;
+    //     console.log(opcode);
+    //     len = len - patternLengths[1];
+    //     continue;
+    //   }
+    // }
+    // if (opcodes.length >= patternLengths[0]) {
+    //   const [new_start, opcode] = matchPattern(
+    //     opcodes,
+    //     start,
+    //     patternLengths[0]
+    //   );
+    //   if (new_start !== start) {
+    //     start = new_start;
+    //     console.log(opcode);
+    //     len = len - patternLengths[0];
+    //     continue;
+    //   }
+    // }
+  }
   return conditions;
 };
 export class GameAssets extends FactoryContract {
@@ -221,6 +361,7 @@ export class GameAssets extends FactoryContract {
   public readonly generatePriceConfig = generatePriceConfig;
 
   public readonly generateCanMintScript = generateCanMintScript;
+  public readonly generateCanMintConfig = generateCanMintConfig;
 
   public readonly assets: (
     arg0: BigNumberish,

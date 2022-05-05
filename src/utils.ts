@@ -1,11 +1,13 @@
 import { Logger } from '@ethersproject/logger';
 import { version } from './_version';
 import { StateConfigStruct } from './typechain/GameAssets';
-import { BigNumber, ethers } from 'ethers';
-import fs from 'fs';
+import { BigNumber, BigNumberish } from 'ethers';
+import fs, { stat } from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { AllStandardOps } from 'rain-sdk';
+import { match } from 'assert';
+import { condition } from './gameAsset';
 
 const logger = new Logger(version);
 
@@ -30,6 +32,7 @@ export enum Conditions {
 
 enum GameAssetsOpcode {
   REPORT_AT_BLOCK = 0 + AllStandardOps.length,
+  ACCOUNT,
 }
 export const Opcode = {
   ...AllStandardOps,
@@ -66,7 +69,7 @@ export type DataOptions = {
 const HexCharacters: string = '0123456789abcdef';
 
 function isInteger(value: number) {
-  return typeof value === 'number' && value == value && value % 1 === 0;
+  return typeof value === 'number' && value % 1 === 0;
 }
 
 export function isBytes(value: any): value is Bytes {
@@ -141,16 +144,16 @@ export function hexlify(
   }
 
   if (isHexString(value)) {
-    if ((<string>value).length % 2) {
+    if ((value as string).length % 2) {
       if (options.hexPad === 'left') {
-        value = '0x0' + (<string>value).substring(2);
+        value = '0x0' + (value as string).substring(2);
       } else if (options.hexPad === 'right') {
         value += '0';
       } else {
         logger.throwArgumentError('hex data is odd-length', 'value', value);
       }
     }
-    return (<string>value).toLowerCase();
+    return (value as string).toLowerCase();
   }
 
   if (isBytes(value)) {
@@ -214,7 +217,7 @@ export function arrayify(
   }
 
   if (isHexString(value)) {
-    let hex = (<string>value).substring(2);
+    let hex = (value as string).substring(2);
     if (hex.length % 2) {
       if (options.hexPad === 'left') {
         hex = '0' + hex;
@@ -305,3 +308,161 @@ export const exec = (cmd: string): string | Buffer => {
     throw new Error(`Failed to run command \`${cmd}\``);
   }
 };
+
+export const matchPattern = (
+  opcodes: number[],
+  start: number,
+  size: number
+): [number, number[]] => {
+  const arr = opcodes.slice(start, opcodes.length);
+  let patterns = getPattern(size);
+  let next_start = start;
+  patternLoop: for (let j = 0; j < patterns.length; j++) {
+    let pattern = patterns[j];
+    for (let i = 0; i < size; i += 2) {
+      if (arr[i] !== pattern[i]) {
+        continue patternLoop;
+      }
+    }
+    next_start = start + size;
+    return [next_start, pattern];
+  }
+  return [next_start, []];
+};
+
+const patterns_2 = [[Opcode.VAL, 0]];
+const patterns_6 = [
+  [Opcode.BLOCK_NUMBER, 0, Opcode.VAL, 0, Opcode.GREATER_THAN, 0],
+];
+const patterns_10 = [
+  [
+    Opcode.VAL,
+    0,
+    Opcode.ACCOUNT,
+    0,
+    Opcode.IERC20_BALANCE_OF,
+    0,
+    Opcode.VAL,
+    0,
+    Opcode.GREATER_THAN,
+    0,
+  ],
+  [
+    Opcode.VAL,
+    0,
+    Opcode.ACCOUNT,
+    0,
+    Opcode.IERC721_BALANCE_OF,
+    0,
+    Opcode.VAL,
+    0,
+    Opcode.GREATER_THAN,
+    0,
+  ],
+];
+const patterns_12 = [
+  [
+    Opcode.VAL,
+    0,
+    Opcode.ACCOUNT,
+    0,
+    Opcode.VAL,
+    0,
+    Opcode.IERC1155_BALANCE_OF,
+    0,
+    Opcode.VAL,
+    0,
+    Opcode.GREATER_THAN,
+    0,
+  ],
+];
+
+const patterns_14 = [
+  [
+    Opcode.VAL,
+    0,
+    Opcode.ACCOUNT,
+    0,
+    Opcode.REPORT,
+    0,
+    Opcode.BLOCK_NUMBER,
+    0,
+    Opcode.REPORT_AT_BLOCK,
+    0,
+    Opcode.VAL,
+    0,
+    Opcode.GREATER_THAN,
+    0,
+  ],
+];
+
+const patterns = [
+  ...patterns_2,
+  ...patterns_6,
+  ...patterns_10,
+  ...patterns_12,
+  ...patterns_14,
+];
+
+const getPattern = (size: number): number[][] => {
+  let pattern = [];
+  for (let i = 0; i < patterns.length; i++) {
+    if (patterns[i].length === size) {
+      pattern.push(patterns[i]);
+    }
+  }
+  return pattern;
+};
+
+export const getCondition = (
+  opcodes: number[],
+  constants: BigNumberish[]
+): condition => {
+  if (opcodes.length === 2) {
+    let condition: condition = {
+      type: Conditions.NONE,
+    };
+    return condition;
+  } else if (opcodes.length === 6) {
+    let condition: condition = {
+      type: Conditions.BLOCK_NUMBER,
+      blockNumber: parseInt(constants[opcodes[3]].toString()),
+    };
+    return condition;
+  } else if (opcodes.includes(Opcode.IERC20_BALANCE_OF)) {
+    let condition: condition = {
+      type: Conditions.ERC20BALANCE,
+      address: constants[opcodes[1]].toString(),
+      balance: BigNumber.from(constants[opcodes[7]]),
+    };
+    return condition;
+  } else if (opcodes.includes(Opcode.IERC721_BALANCE_OF)) {
+    let condition: condition = {
+      type: Conditions.ERC721BALANCE,
+      address: constants[opcodes[1]].toString(),
+      balance: BigNumber.from(constants[opcodes[7]]),
+    };
+    return condition;
+  } else if (opcodes.includes(Opcode.IERC1155_BALANCE_OF)) {
+    let condition: condition = {
+      type: Conditions.ERC1155BALANCE,
+      address: constants[opcodes[1]].toString(),
+      id: BigNumber.from(constants[opcodes[5]]),
+      balance: BigNumber.from(constants[opcodes[9]]),
+    };
+    return condition;
+  } else if (opcodes.includes(Opcode.REPORT_AT_BLOCK)) {
+    let condition: condition = {
+      type: Conditions.BALANCE_TIER,
+      tierAddress: constants[opcodes[1]].toString(),
+      tierCondition: parseInt(constants[opcodes[11]].toString()),
+    };
+    return condition;
+  }
+  let condition: condition = {
+    type: Conditions.NONE,
+  };
+  return condition;
+};
+
+export const patternLengths = [2, 6, 10, 12, 14];
