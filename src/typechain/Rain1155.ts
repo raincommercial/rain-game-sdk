@@ -117,7 +117,7 @@ export type AssetConfigStructOutput = [
   tokenURI: string;
 };
 
-export interface GameAssetsInterface extends utils.Interface {
+export interface Rain1155Interface extends utils.Interface {
   functions: {
     "assets(uint256)": FunctionFragment;
     "balanceOf(address,uint256)": FunctionFragment;
@@ -346,12 +346,12 @@ export type URIEvent = TypedEvent<
 
 export type URIEventFilter = TypedEventFilter<URIEvent>;
 
-export interface GameAssets extends BaseContract {
+export interface Rain1155 extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: GameAssetsInterface;
+  interface: Rain1155Interface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,

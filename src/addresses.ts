@@ -2,14 +2,14 @@ const addressBook = [
   {
     chainId: 80001,
     addresses: {
-      gameAssets: '0x35fd023C989509fe0047e0A858D5c56ffC3aCb6e',
+      rain1155: '0x1BFb7231B152D9dB6Cc87c7933B5dea765e51Dd3',
     },
   },
   {
     // These addresess are deployed in HH Network (test)
     chainId: 31337,
     addresses: {
-      gameAssets: '0x610178dA211FEF7D417bC0e6FeD39F05609AD788',
+      rain1155: '0x610178dA211FEF7D417bC0e6FeD39F05609AD788',
     },
   },
 ];
@@ -20,7 +20,7 @@ const addressBook = [
  */
 export type Addresses = {
   [key: string]: string;
-  gameAssets: string;
+  rain1155: string;
 };
 
 /**

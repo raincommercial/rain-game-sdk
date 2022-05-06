@@ -969,18 +969,6 @@
     truffle-plugin-verify "^0.4.0"
     yarn "^1.22.5"
 
-"@beehiveinnovation/rain-game-engine@git+https://github.com/beehive-innovation/rain-game-engine.git#5182ef404e1304f085290922682e2bcbc16f832c":
-  version "0.0.1"
-  resolved "git+https://github.com/beehive-innovation/rain-game-engine.git#5182ef404e1304f085290922682e2bcbc16f832c"
-  dependencies:
-    "@beehiveinnovation/rain-protocol" "git+https://github.com/beehive-innovation/rain-protocol.git#2dd7102e9addf0662bc0aef2a6aacb8b82edf089"
-    "@graphprotocol/graph-cli" "^0.26.0"
-    "@graphprotocol/graph-ts" "^0.26.0"
-    "@nomiclabs/hardhat-waffle" "^2.0.3"
-    "@openzeppelin/contracts" "^4.5.0"
-    dotenv "^16.0.0"
-    mustache "^4.2.0"
-
 "@beehiveinnovation/rain-protocol@git+https://github.com/beehive-innovation/rain-protocol.git#2dd7102e9addf0662bc0aef2a6aacb8b82edf089":
   version "0.0.16"
   resolved "git+https://github.com/beehive-innovation/rain-protocol.git#2dd7102e9addf0662bc0aef2a6aacb8b82edf089"
@@ -989,6 +977,18 @@
     "@beehiveinnovation/configurable-rights-pool" "0.0.1"
     "@openzeppelin/contracts" "^4.3.3"
     "@openzeppelin/contracts-upgradeable" "^4.4.1"
+
+"@beehiveinnovation/rain1155@git+https://github.com/beehive-innovation/rain1155.git#2f064cce7aba24a2541ffbe3c9d044c504b30030":
+  version "0.0.1"
+  resolved "git+https://github.com/beehive-innovation/rain1155.git#2f064cce7aba24a2541ffbe3c9d044c504b30030"
+  dependencies:
+    "@beehiveinnovation/rain-protocol" "git+https://github.com/beehive-innovation/rain-protocol.git#2dd7102e9addf0662bc0aef2a6aacb8b82edf089"
+    "@graphprotocol/graph-cli" "^0.26.0"
+    "@graphprotocol/graph-ts" "^0.26.0"
+    "@nomiclabs/hardhat-waffle" "^2.0.3"
+    "@openzeppelin/contracts" "^4.5.0"
+    dotenv "^16.0.0"
+    mustache "^4.2.0"
 
 "@cspotcode/source-map-consumer@0.8.0":
   version "0.8.0"

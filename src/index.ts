@@ -15,4 +15,4 @@ export {
 };
 
 export * from './addresses';
-export * from './gameAsset';
+export * from './rain1155';

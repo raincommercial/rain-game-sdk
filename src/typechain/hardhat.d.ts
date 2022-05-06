@@ -113,14 +113,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC165__factory>;
     getContractFactory(
-      name: "GameAssets",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.GameAssets__factory>;
-    getContractFactory(
-      name: "ITransfer",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ITransfer__factory>;
-    getContractFactory(
       name: "Token",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Token__factory>;
@@ -136,6 +128,14 @@ declare module "hardhat/types/runtime" {
       name: "ReserveTokenERC721",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ReserveTokenERC721__factory>;
+    getContractFactory(
+      name: "ITransfer",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ITransfer__factory>;
+    getContractFactory(
+      name: "Rain1155",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Rain1155__factory>;
     getContractFactory(
       name: "ERC20BalanceTier",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -271,16 +271,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC165>;
     getContractAt(
-      name: "GameAssets",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.GameAssets>;
-    getContractAt(
-      name: "ITransfer",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ITransfer>;
-    getContractAt(
       name: "Token",
       address: string,
       signer?: ethers.Signer
@@ -300,6 +290,16 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.ReserveTokenERC721>;
+    getContractAt(
+      name: "ITransfer",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ITransfer>;
+    getContractAt(
+      name: "Rain1155",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Rain1155>;
     getContractAt(
       name: "ERC20BalanceTier",
       address: string,

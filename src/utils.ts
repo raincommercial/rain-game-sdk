@@ -1,13 +1,12 @@
 import { Logger } from '@ethersproject/logger';
 import { version } from './_version';
-import { StateConfigStruct } from './typechain/GameAssets';
+import { StateConfigStruct } from './typechain/Rain1155';
 import { BigNumber, BigNumberish } from 'ethers';
-import fs, { stat } from 'fs';
+import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { AllStandardOps } from 'rain-sdk';
-import { match } from 'assert';
-import { condition } from './gameAsset';
+import { condition } from './rain1155';
 
 const logger = new Logger(version);
 

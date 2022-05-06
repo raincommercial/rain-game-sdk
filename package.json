@@ -47,7 +47,7 @@
     }
   ],
   "devDependencies": {
-    "@beehiveinnovation/rain-game-engine": "git+https://github.com/beehive-innovation/rain-game-engine.git#5182ef404e1304f085290922682e2bcbc16f832c",
+    "@beehiveinnovation/rain1155": "git+https://github.com/beehive-innovation/rain1155.git#2f064cce7aba24a2541ffbe3c9d044c504b30030",
     "@microsoft/api-documenter": "^7.17.9",
     "@microsoft/api-extractor": "^7.22.2",
     "@nomiclabs/hardhat-ethers": "^2.0.3",

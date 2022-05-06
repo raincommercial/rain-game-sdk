@@ -7,7 +7,7 @@ import {
 
 import {
   AddressBook,
-  GameAssets,
+  Rain1155,
   price,
   condition,
 } from '../dist';
@@ -58,8 +58,8 @@ describe('Rain Game SDK - Test', () => {
 
   it("it Should get deployed contract on mumbai",async () => {
     let signer = await ethers.getSigners();
-    let gameAssetsAddress = AddressBook.getAddressesForChainId(80001).gameAssets
-    let gameAssets = new GameAssets(gameAssetsAddress, signer[0]);
+    let rain1155Address = AddressBook.getAddressesForChainId(80001).rain1155
+    let rain1155 = new Rain1155(rain1155Address, signer[0]);
 
     const Erc20 = await ethers.getContractFactory("Token");
     const stableCoins = await ethers.getContractFactory("ReserveToken");
@@ -121,7 +121,7 @@ describe('Rain Game SDK - Test', () => {
       },
     ] ;
 
-    const [priceScript, currencies] = gameAssets.generatePriceScript([]);
+    const [priceScript, currencies] = rain1155.generatePriceScript([]);
 
     let blockCondition = 15;
 
@@ -151,9 +151,9 @@ describe('Rain Game SDK - Test', () => {
       }
     ];
 
-    const canMintScript = gameAssets.generateCanMintScript(conditions);
+    const canMintScript = rain1155.generateCanMintScript(conditions);
     console.log(canMintScript)
-    const canMintConfig = gameAssets.generateCanMintConfig(canMintScript);
+    const canMintConfig = rain1155.generateCanMintConfig(canMintScript);
     console.log(canMintConfig)
 
   })

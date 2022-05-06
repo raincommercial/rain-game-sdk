@@ -7,9 +7,9 @@ import {
 } from 'ethers';
 import { TxOverrides, ReadTxOverrides, FactoryContract } from 'rain-sdk';
 
-import { GameAssets__factory } from './typechain';
+import { Rain1155__factory } from './typechain';
 import { AddressBook } from './addresses';
-import { StateConfigStruct } from './typechain/GameAssets';
+import { StateConfigStruct } from './typechain/Rain1155';
 import {
   concat,
   Conditions,
@@ -24,23 +24,23 @@ import {
 
 /**
  * @public
- * A class for deploying and calling methods in GameAssets contract.
+ * A class for deploying and calling methods in Rain1155 contract.
  *
  *
  * @remarks
- *   This class provides an easy way to deploy and interact with GameAsset contracts
+ *   This class provides an easy way to deploy and interact with Rain1155 contracts
  *
  * @example
  * ```typescript
- * import { GameAssets } from 'rain-sdk'
+ * import { Rain1155 } from 'rain-sdk'
  *
- * // To deploy a new GameAssets, pass an ethers.js Signerand the config for the GameAsset.
- * const newGameAssets = await GameAssets.deploy(signer, args)
+ * // To deploy a new Rain1155, pass an ethers.js Signerand the config for the Rain1155.
+ * const new Rain1155 = await Rain1155.deploy(signer, args)
  *
- * // To connect to an existing GameAssets just pass the address and an ethers.js Signer.
- * const existingGameAssets = new GameAssets(address, signer)
+ * // To connect to an existing Rain1155 just pass the address and an ethers.js Signer.
+ * const existing Rain1155 = new Rain1155(address, signer)
  *
- * // Once you have a GameAssets, you can call the smart contract methods:
+ * // Once you have a Rain1155, you can call the smart contract methods:
  * ```
  *
  */
@@ -319,39 +319,39 @@ const generateCanMintConfig = (canMintScript: VMState): condition[] => {
   }
   return conditions;
 };
-export class GameAssets extends FactoryContract {
-  protected static readonly nameBookReference = 'gameAssets';
+export class Rain1155 extends FactoryContract {
+  protected static readonly nameBookReference = 'Rain1155';
 
   /**
-   * Constructs a new GameAssets from a known address.
+   * Constructs a new Rain1155 from a known address.
    *
-   * @param address - The address of the GameAssets contract
+   * @param address - The address of the Rain1155 contract
    * @param signer - An ethers.js Signer
-   * @returns A new GameAssets instance
+   * @returns A new Rain1155 instance
    *
    */
   constructor(address: string, signer: Signer) {
     super(address, signer);
-    const _gameAssets = GameAssets__factory.connect(address, signer);
+    const _rain1155 = Rain1155__factory.connect(address, signer);
 
-    this.assets = _gameAssets.assets;
-    this.balanceOf = _gameAssets.balanceOf;
-    this.balanceOfBatch = _gameAssets.balanceOfBatch;
-    this.canMint = _gameAssets.canMint;
-    this.createNewAsset = _gameAssets.createNewAsset;
-    this.getAssetPrice = _gameAssets.getAssetPrice;
-    this.isApprovedForAll = _gameAssets.isApprovedForAll;
-    this.mintAssets = _gameAssets.mintAssets;
-    this.safeBatchTransferFrom = _gameAssets.safeBatchTransferFrom;
-    this.safeTransferFrom = _gameAssets.safeTransferFrom;
-    this.setApprovalForAll = _gameAssets.setApprovalForAll;
-    this.supportsInterface = _gameAssets.supportsInterface;
-    this.totalAssets = _gameAssets.totalAssets;
-    this.uri = _gameAssets.uri;
+    this.assets = _rain1155.assets;
+    this.balanceOf = _rain1155.balanceOf;
+    this.balanceOfBatch = _rain1155.balanceOfBatch;
+    this.canMint = _rain1155.canMint;
+    this.createNewAsset = _rain1155.createNewAsset;
+    this.getAssetPrice = _rain1155.getAssetPrice;
+    this.isApprovedForAll = _rain1155.isApprovedForAll;
+    this.mintAssets = _rain1155.mintAssets;
+    this.safeBatchTransferFrom = _rain1155.safeBatchTransferFrom;
+    this.safeTransferFrom = _rain1155.safeTransferFrom;
+    this.setApprovalForAll = _rain1155.setApprovalForAll;
+    this.supportsInterface = _rain1155.supportsInterface;
+    this.totalAssets = _rain1155.totalAssets;
+    this.uri = _rain1155.uri;
   }
 
-  public readonly connect = (signer: Signer): GameAssets => {
-    return new GameAssets(this.address, signer);
+  public readonly connect = (signer: Signer): Rain1155 => {
+    return new Rain1155(this.address, signer);
   };
   public static getBookAddress(chainId: number): string {
     return AddressBook.getAddressesForChainId(chainId)[this.nameBookReference];
