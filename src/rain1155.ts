@@ -1,9 +1,11 @@
+/* eslint-disable prettier/prettier */
 import {
   Signer,
   BytesLike,
   BigNumber,
   BigNumberish,
   ContractTransaction,
+  ethers,
 } from 'ethers';
 import { TxOverrides, ReadTxOverrides, FactoryContract } from 'rain-sdk';
 
@@ -109,10 +111,11 @@ const generatePriceConfig = (
   priceScritp: VMState,
   currencies: string[]
 ): price[] => {
+
   let prices: price[] = [];
   let pos = -1;
   for (let i = 0; i < priceScritp.sources.length; i++) {
-    let source: BytesLike = priceScritp.sources[i];
+    let source: BytesLike = ethers.utils.arrayify(priceScritp.sources[i]);
     if (source.length === 4) {
       prices.push({
         currency: {
@@ -224,7 +227,7 @@ const generateCanMintScript = (conditions: condition[]): VMState => {
 
 const generateCanMintConfig = (canMintScript: VMState): condition[] => {
   let conditions: condition[] = [];
-  let sources = canMintScript.sources[0];
+  let sources = ethers.utils.arrayify(canMintScript.sources[0]);
   let constants = canMintScript.constants;
   let opcodes: number[] = [];
   for (let i = 0; i < sources.length - 2; i++) {
@@ -232,90 +235,26 @@ const generateCanMintConfig = (canMintScript: VMState): condition[] => {
   }
   let len = opcodes.length;
   let start = 0;
+  let patterns = patternLengths();
   while (len > 0) {
-    for (let j = patternLengths.length - 1; j >= 0; j--) {
+    for (let j = patterns.length - 1; j >= 0; j--) {
       // console.log(opcodes.length);
-      if (opcodes.length >= patternLengths[j]) {
-        const [new_start, opcode] = matchPattern(
+      if (opcodes.length >= patterns[j]) {
+        const new_start = matchPattern(
           opcodes,
           start,
-          patternLengths[j]
+          patterns[j]
         );
         if (new_start !== start) {
           conditions.push(
             getCondition(opcodes.slice(start, new_start), constants)
           );
           start = new_start;
-          len = len - patternLengths[j];
+          len = len - patterns[j];
           break;
         }
       }
     }
-    // if (opcodes.length >= patternLengths[4]) {
-    //   const [new_start, opcode] = matchPattern(
-    //     opcodes,
-    //     start,
-    //     patternLengths[4]
-    //   );
-    //   if (new_start !== start) {
-    //     start = new_start;
-    //     console.log(opcode);
-    //     len = len - patternLengths[4];
-    //     continue;
-    //   }
-    // }
-    // if (opcodes.length >= patternLengths[3]) {
-    //   const [new_start, opcode] = matchPattern(
-    //     opcodes,
-    //     start,
-    //     patternLengths[3]
-    //   );
-    //   if (new_start !== start) {
-    //     start = new_start;
-    //     console.log(opcode);
-    //     len = len - patternLengths[3];
-    //     continue;
-    //   }
-    // }
-    // if (opcodes.length >= patternLengths[2]) {
-    //   const [new_start, opcode] = matchPattern(
-    //     opcodes,
-    //     start,
-    //     patternLengths[2]
-    //   );
-    //   if (new_start !== start) {
-    //     start = new_start;
-    //     console.log(opcode);
-    //     len = len - patternLengths[2];
-    //     continue;
-    //   }
-    // }
-    // if (opcodes.length >= patternLengths[1]) {
-    //   const [new_start, opcode] = matchPattern(
-    //     opcodes,
-    //     start,
-    //     patternLengths[1]
-    //   );
-    //   if (new_start !== start) {
-    //     start = new_start;
-    //     console.log(opcode);
-    //     len = len - patternLengths[1];
-    //     continue;
-    //   }
-    // }
-    // if (opcodes.length >= patternLengths[0]) {
-    //   const [new_start, opcode] = matchPattern(
-    //     opcodes,
-    //     start,
-    //     patternLengths[0]
-    //   );
-    //   if (new_start !== start) {
-    //     start = new_start;
-    //     console.log(opcode);
-    //     len = len - patternLengths[0];
-    //     continue;
-    //   }
-    // }
   }
   return conditions;
 };

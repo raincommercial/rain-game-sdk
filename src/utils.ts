@@ -312,7 +312,7 @@ export const matchPattern = (
   opcodes: number[],
   start: number,
   size: number
-): [number, number[]] => {
+): number => {
   const arr = opcodes.slice(start, opcodes.length);
   let patterns = getPattern(size);
   let next_start = start;
@@ -324,16 +324,14 @@ export const matchPattern = (
       }
     }
     next_start = start + size;
-    return [next_start, pattern];
+    return next_start;
   }
-  return [next_start, []];
+  return next_start;
 };
 
-const patterns_2 = [[Opcode.VAL, 0]];
-const patterns_6 = [
+const patterns = [
+  [Opcode.VAL, 0],
   [Opcode.BLOCK_NUMBER, 0, Opcode.VAL, 0, Opcode.GREATER_THAN, 0],
-];
-const patterns_10 = [
   [
     Opcode.VAL,
     0,
@@ -358,8 +356,6 @@ const patterns_10 = [
     Opcode.GREATER_THAN,
     0,
   ],
-];
-const patterns_12 = [
   [
     Opcode.VAL,
     0,
@@ -374,9 +370,6 @@ const patterns_12 = [
     Opcode.GREATER_THAN,
     0,
   ],
-];
-
-const patterns_14 = [
   [
     Opcode.VAL,
     0,
@@ -393,14 +386,6 @@ const patterns_14 = [
     Opcode.GREATER_THAN,
     0,
   ],
-];
-
-const patterns = [
-  ...patterns_2,
-  ...patterns_6,
-  ...patterns_10,
-  ...patterns_12,
-  ...patterns_14,
 ];
 
 const getPattern = (size: number): number[][] => {
@@ -464,4 +449,14 @@ export const getCondition = (
   return condition;
 };
 
-export const patternLengths = [2, 6, 10, 12, 14];
+export const patternLengths = (): number[] => {
+  let lengths: number[] = [];
+  for (let i = 0; i < patterns.length; i++) {
+    let len = patterns[i].length;
+    if (!lengths.includes(len)) lengths.push(len);
+  }
+
+  return lengths.sort(function(a, b) {
+    return a - b;
+  });
+};

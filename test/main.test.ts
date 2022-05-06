@@ -121,7 +121,9 @@ describe('Rain Game SDK - Test', () => {
       },
     ] ;
 
-    const [priceScript, currencies] = rain1155.generatePriceScript([]);
+    const [priceScript, currencies] = rain1155.generatePriceScript(prices);
+    const priceConfig = rain1155.generatePriceConfig(priceScript, currencies);
+    // console.log(priceScript, priceConfig);
 
     let blockCondition = 15;
 
@@ -155,6 +157,5 @@ describe('Rain Game SDK - Test', () => {
     console.log(canMintScript)
     const canMintConfig = rain1155.generateCanMintConfig(canMintScript);
     console.log(canMintConfig)
-
   })
 });
