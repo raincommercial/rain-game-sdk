@@ -14,13 +14,11 @@ import { AddressBook } from './addresses';
 import { StateConfigStruct } from './typechain/Rain1155';
 import {
   concat,
-  Conditions,
   getCondition,
   matchPattern,
   op,
   Opcode,
   patternLengths,
-  Type,
   VMState,
 } from './utils';
 
@@ -47,6 +45,9 @@ import {
  *
  */
 
+/**
+ * Custom error class
+ */
 class ScriptError extends Error {
   constructor(msg: string) {
     super(msg);
@@ -60,14 +61,19 @@ class ScriptError extends Error {
   }
 }
 
+/**
+ * 
+ * @param prices Array of type price
+ * @returns VMState: StateConfig, string[]: array of token addresses.
+ */
 const generatePriceScript = (prices: price[]): [VMState, string[]] => {
   let error = new ScriptError('Invalid Script parameters.');
-  let pos = -1;
+  let pos = -1; // setting pos(position) variable tp -1
   let currencies: string[] = [];
   let sources: BytesLike[] = [];
   let constants: BigNumberish[] = [];
   let i;
-  if (prices.length === 0) {
+  if (prices.length === 0) {// If empty config received return source with one opcode and empty currencies arary.
     let state: VMState = {
       sources: [concat([op(Opcode.SKIP)])],
       constants: constants,
@@ -76,23 +82,23 @@ const generatePriceScript = (prices: price[]): [VMState, string[]] => {
     };
     return [state, currencies];
   }
-  for (i = 0; i < prices.length; i++) {
+  for (i = 0; i < prices.length; i++) { // else loop over the prices array
     let obj = prices[i];
-    if (obj.currency.type === Type.ERC1155) {
+    if (obj.currency.type === Type.ERC1155) { // check price type
       sources.push(
         concat([
-          op(Opcode.VAL, ++pos),
+          op(Opcode.VAL, ++pos), 
           op(Opcode.VAL, ++pos),
           op(Opcode.VAL, ++pos),
         ])
-      );
-      constants.push(obj.currency.type);
+      ); // pushed 3 items in constants so used ++pos 3 times, then (Opcode.VAL, pos) will point to correct constant
+      constants.push(obj.currency.type); // push currency type in constants
       if (obj.currency.tokenId) {
-        constants.push(obj.currency.tokenId);
+        constants.push(obj.currency.tokenId); // push tokenId in constants
       } else throw error.error('ERC1155', 'currency.tokenId');
-      constants.push(obj.amount);
-    } else {
-      sources.push(concat([op(Opcode.VAL, ++pos), op(Opcode.VAL, ++pos)]));
+      constants.push(obj.amount); // push amount in constants
+    } else { // ERC20 type 
+      sources.push(concat([op(Opcode.VAL, ++pos), op(Opcode.VAL, ++pos)])); // pushed 2 items in constants so used ++pos 2 times, then (Opcode.VAL, pos) will point to correct constant
       constants.push(obj.currency.type);
       constants.push(obj.amount);
     }
@@ -104,7 +110,7 @@ const generatePriceScript = (prices: price[]): [VMState, string[]] => {
     stackLength: 3,
     argumentsLength: 0,
   };
-  return [state, currencies];
+  return [state, currencies]; // return the stateConfig and currencies[]
 };
 
 const generatePriceConfig = (
@@ -437,3 +443,17 @@ export type condition = {
   balance?: BigNumber;
   id?: BigNumber;
 };
+
+export enum Type {
+  ERC20,
+  ERC1155
+}
+
+export enum Conditions {
+  NONE,
+  BLOCK_NUMBER,
+  BALANCE_TIER,
+  ERC20BALANCE,
+  ERC721BALANCE,
+  ERC1155BALANCE,
+}

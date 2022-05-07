@@ -1,8 +1,6 @@
 import {
   Addresses,
   eighteenZeros,
-  Type,
-  Conditions,
 } from './utils';
 
 import {
@@ -10,8 +8,11 @@ import {
   Rain1155,
   price,
   condition,
+  Type, 
+  Conditions
 } from '../dist';
 import { ethers } from 'hardhat';
+
 
 /**
  * Addresses saved that are in SDK BookAddresses deployed to Hardhat network.
@@ -60,7 +61,6 @@ describe('Rain Game SDK - Test', () => {
     let signer = await ethers.getSigners();
     let rain1155Address = AddressBook.getAddressesForChainId(80001).rain1155
     let rain1155 = new Rain1155(rain1155Address, signer[0]);
-
     const Erc20 = await ethers.getContractFactory("Token");
     const stableCoins = await ethers.getContractFactory("ReserveToken");
     const Erc721 = await ethers.getContractFactory("ReserveTokenERC721");
