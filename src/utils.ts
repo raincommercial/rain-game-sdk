@@ -308,27 +308,37 @@ export const exec = (cmd: string): string | Buffer => {
   }
 };
 
+/**
+ * @param opcodes All opcodes as number[]
+ * @param start start index to start matching from
+ * @param size size of pattern to match with
+ * @returns new_start index
+ */
 export const matchPattern = (
   opcodes: number[],
   start: number,
   size: number
 ): number => {
-  const arr = opcodes.slice(start, opcodes.length);
-  let patterns = getPattern(size);
-  let next_start = start;
+  const arr = opcodes.slice(start, opcodes.length); // take subarray from start index
+  let patterns = getPattern(size); // get patterns of size length
+  let next_start = start; // set nex_start to start to chjeck if opcodes matched or not
   patternLoop: for (let j = 0; j < patterns.length; j++) {
+    // loop over all retrived patterns
     let pattern = patterns[j];
     for (let i = 0; i < size; i += 2) {
       if (arr[i] !== pattern[i]) {
-        continue patternLoop;
+        continue patternLoop; // if any opcode doesnot match goto pattern loop
       }
-    }
-    next_start = start + size;
-    return next_start;
+    } // pattern matched
+    next_start = start + size; // update the next_start
+    return next_start; //return new_start
   }
-  return next_start;
+  return next_start; // retrun start
 };
 
+/**
+ * List of all patterns
+ */
 const patterns = [
   [Opcode.VAL, 0],
   [Opcode.BLOCK_NUMBER, 0, Opcode.VAL, 0, Opcode.GREATER_THAN, 0],
@@ -388,6 +398,10 @@ const patterns = [
   ],
 ];
 
+/**
+ * @param size Length of pattern
+ * @returns array of patterns
+ */
 const getPattern = (size: number): number[][] => {
   let pattern = [];
   for (let i = 0; i < patterns.length; i++) {
@@ -398,22 +412,30 @@ const getPattern = (size: number): number[][] => {
   return pattern;
 };
 
+/**
+ * @param opcodes Opcode pattern
+ * @param constants array of consttants
+ * @returns condition object
+ */
 export const getCondition = (
   opcodes: number[],
   constants: BigNumberish[]
 ): condition => {
   if (opcodes.length === 2) {
+    // None condition
     let condition: condition = {
       type: Conditions.NONE,
     };
     return condition;
   } else if (opcodes.length === 6) {
+    // Block condition
     let condition: condition = {
       type: Conditions.BLOCK_NUMBER,
       blockNumber: parseInt(constants[opcodes[3]].toString()),
     };
     return condition;
   } else if (opcodes.includes(Opcode.IERC20_BALANCE_OF)) {
+    // ERC20 Balance condition
     let condition: condition = {
       type: Conditions.ERC20BALANCE,
       address: constants[opcodes[1]].toString(),
@@ -421,6 +443,7 @@ export const getCondition = (
     };
     return condition;
   } else if (opcodes.includes(Opcode.IERC721_BALANCE_OF)) {
+    // ERC721 Balance Condition
     let condition: condition = {
       type: Conditions.ERC721BALANCE,
       address: constants[opcodes[1]].toString(),
@@ -428,6 +451,7 @@ export const getCondition = (
     };
     return condition;
   } else if (opcodes.includes(Opcode.IERC1155_BALANCE_OF)) {
+    // ERC1155 Balance Condition
     let condition: condition = {
       type: Conditions.ERC1155BALANCE,
       address: constants[opcodes[1]].toString(),
@@ -436,6 +460,7 @@ export const getCondition = (
     };
     return condition;
   } else if (opcodes.includes(Opcode.REPORT_AT_BLOCK)) {
+    // ERC20BalanceTier condition
     let condition: condition = {
       type: Conditions.BALANCE_TIER,
       tierAddress: constants[opcodes[1]].toString(),
