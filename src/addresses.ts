@@ -9,7 +9,7 @@ const addressBook = [
     // These addresess are deployed in HH Network (test)
     chainId: 31337,
     addresses: {
-      rain1155: '0x610178dA211FEF7D417bC0e6FeD39F05609AD788',
+      rain1155: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
     },
   },
 ];
