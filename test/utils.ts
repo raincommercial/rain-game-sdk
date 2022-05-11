@@ -47,7 +47,8 @@ export const TierLevels: BigNumberish[] = Array.from(
  * **These addresses are deterministically generated with the HH signers.**
  */
 export interface Addresses {
-  GameAssetsFactory: string;
+  GameAssetsFactory?: string;
+  Rain1155: string;
 }
 
 export async function deployErc20(): Promise<ReserveToken> {
