@@ -12,3 +12,15 @@ artifacts
 cache
 /contracts
 /typechain
+
+
+## Subgraph
+subgraph
+subgraph.template.yaml
+subgraph.yaml
+schema.graphql
+abis
+build
+config
+docker
+Generated

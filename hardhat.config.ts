@@ -16,6 +16,23 @@ task('accounts', 'Prints the list of accounts', async (args, hre) => {
   }
 });
 
+function createLocalHostConfig() {
+  const url = 'http://localhost:8545';
+  const mnemonic =
+    'test test test test test test test test test test test junk';
+  return {
+    accounts: {
+      count: 10,
+      initialIndex: 0,
+      mnemonic,
+      path: "m/44'/60'/0'/0",
+    },
+    url,
+    blockGasLimit: 30000000,
+    allowUnlimitedContractSize: true,
+  };
+}
+
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
@@ -42,7 +59,9 @@ module.exports = {
       },
     ],
   },
+  defaultNetwork: 'hardhat',
   networks: {
+    localhost: createLocalHostConfig(),
     hardhat: {
       blockGasLimit: 30000000,
       allowUnlimitedContractSize: true,

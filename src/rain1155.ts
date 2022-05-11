@@ -7,7 +7,7 @@ import {
   ContractTransaction,
   ethers,
 } from 'ethers';
-import { TxOverrides, ReadTxOverrides, FactoryContract } from 'rain-sdk';
+import { TxOverrides, ReadTxOverrides, RainContract } from 'rain-sdk';
 
 import { Rain1155__factory } from './typechain';
 import { AddressBook } from './addresses';
@@ -33,9 +33,6 @@ import {
  * @example
  * ```typescript
  * import { Rain1155 } from 'rain-sdk'
- *
- * // To deploy a new Rain1155, pass an ethers.js Signerand the config for the Rain1155.
- * const new Rain1155 = await Rain1155.deploy(signer, args)
  *
  * // To connect to an existing Rain1155 just pass the address and an ethers.js Signer.
  * const existing Rain1155 = new Rain1155(address, signer)
@@ -182,13 +179,6 @@ const generateCanMintScript = (conditions: condition[]): VMState => {
     if (condition.type === Conditions.NONE) { // No condition
       constants.push(1); // push 1 in constants, will return true for Every OP in the end
       sources.push(op(Opcode.VAL, ++pos));
-      let state: VMState = {
-        sources: [concat(sources)],
-        constants: constants,
-        stackLength: stackLenght,
-        argumentsLength: 0,
-      };
-      return state; // return state
     } else if (condition.type === Conditions.BLOCK_NUMBER) {
       if (condition.blockNumber) {
         constants.push(condition.blockNumber);
@@ -300,7 +290,7 @@ const generateCanMintConfig = (canMintScript: VMState): condition[] => {
   }
   return conditions;
 };
-export class Rain1155 extends FactoryContract {
+export class Rain1155 extends RainContract {
   protected static readonly nameBookReference = 'Rain1155';
 
   /**
@@ -334,6 +324,7 @@ export class Rain1155 extends FactoryContract {
   public readonly connect = (signer: Signer): Rain1155 => {
     return new Rain1155(this.address, signer);
   };
+
   public static getBookAddress(chainId: number): string {
     return AddressBook.getAddressesForChainId(chainId)[this.nameBookReference];
   }

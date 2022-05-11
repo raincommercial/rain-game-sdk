@@ -2,17 +2,11 @@ import {
   FactoryContract,
   RainContract,
   VM,
-  TierFactoryContract,
+  TierContract,
   AllStandardOps,
 } from 'rain-sdk';
 
-export {
-  FactoryContract,
-  RainContract,
-  AllStandardOps,
-  VM,
-  TierFactoryContract,
-};
+export { FactoryContract, RainContract, AllStandardOps, VM, TierContract };
 
 export * from './addresses';
 export * from './rain1155';
