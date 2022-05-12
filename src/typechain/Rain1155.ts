@@ -42,8 +42,8 @@ export type StateStructOutput = [
 export type AssetDetailsStruct = {
   lootBoxId: BigNumberish;
   id: BigNumberish;
-  priceConfig: StateStruct;
-  canMintConfig: StateStruct;
+  priceScript: StateStruct;
+  canMintScript: StateStruct;
   currencies: string[];
   recepient: string;
   tokenURI: string;
@@ -60,8 +60,8 @@ export type AssetDetailsStructOutput = [
 ] & {
   lootBoxId: BigNumber;
   id: BigNumber;
-  priceConfig: StateStructOutput;
-  canMintConfig: StateStructOutput;
+  priceScript: StateStructOutput;
+  canMintScript: StateStructOutput;
   currencies: string[];
   recepient: string;
   tokenURI: string;
@@ -90,10 +90,10 @@ export type AssetConfigStruct = {
   name: string;
   description: string;
   lootBoxId: BigNumberish;
-  priceConfig: StateConfigStruct;
-  canMintConfig: StateConfigStruct;
+  priceScript: StateConfigStruct;
+  canMintScript: StateConfigStruct;
   currencies: string[];
-  recepient: string;
+  recipient: string;
   tokenURI: string;
 };
 
@@ -110,10 +110,10 @@ export type AssetConfigStructOutput = [
   name: string;
   description: string;
   lootBoxId: BigNumber;
-  priceConfig: StateConfigStructOutput;
-  canMintConfig: StateConfigStructOutput;
+  priceScript: StateConfigStructOutput;
+  canMintScript: StateConfigStructOutput;
   currencies: string[];
-  recepient: string;
+  recipient: string;
   tokenURI: string;
 };
 
@@ -286,8 +286,8 @@ export type AssetCreatedEvent = TypedEvent<
   {
     _assetId: BigNumber;
     _asset: AssetDetailsStructOutput;
-    _priceConfig: StateConfigStructOutput;
-    _canMintConfig: StateConfigStructOutput;
+    _priceScript: StateConfigStructOutput;
+    _canMintScript: StateConfigStructOutput;
     _name: string;
     _description: string;
   }
@@ -387,8 +387,8 @@ export interface Rain1155 extends BaseContract {
       ] & {
         lootBoxId: BigNumber;
         id: BigNumber;
-        priceConfig: StateStructOutput;
-        canMintConfig: StateStructOutput;
+        priceScript: StateStructOutput;
+        canMintScript: StateStructOutput;
         recepient: string;
         tokenURI: string;
       }
@@ -491,8 +491,8 @@ export interface Rain1155 extends BaseContract {
     ] & {
       lootBoxId: BigNumber;
       id: BigNumber;
-      priceConfig: StateStructOutput;
-      canMintConfig: StateStructOutput;
+      priceScript: StateStructOutput;
+      canMintScript: StateStructOutput;
       recepient: string;
       tokenURI: string;
     }
@@ -592,8 +592,8 @@ export interface Rain1155 extends BaseContract {
       ] & {
         lootBoxId: BigNumber;
         id: BigNumber;
-        priceConfig: StateStructOutput;
-        canMintConfig: StateStructOutput;
+        priceScript: StateStructOutput;
+        canMintScript: StateStructOutput;
         recepient: string;
         tokenURI: string;
       }
@@ -697,16 +697,16 @@ export interface Rain1155 extends BaseContract {
     "AssetCreated(uint256,tuple,tuple,tuple,string,string)"(
       _assetId?: null,
       _asset?: null,
-      _priceConfig?: null,
-      _canMintConfig?: null,
+      _priceScript?: null,
+      _canMintScript?: null,
       _name?: null,
       _description?: null
     ): AssetCreatedEventFilter;
     AssetCreated(
       _assetId?: null,
       _asset?: null,
-      _priceConfig?: null,
-      _canMintConfig?: null,
+      _priceScript?: null,
+      _canMintScript?: null,
       _name?: null,
       _description?: null
     ): AssetCreatedEventFilter;

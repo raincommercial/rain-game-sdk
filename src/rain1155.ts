@@ -424,8 +424,8 @@ export class Rain1155 extends RainContract {
 export type AssetDetails = {
   lootBoxId: BigNumber;
   id: BigNumber;
-  priceConfig: State;
-  canMintConfig: State;
+  priceScript: State;
+  canMintScript: State;
   recepient: string;
   tokenURI: string;
 };
@@ -434,10 +434,10 @@ export type AssetConfig = {
   name: string;
   description: string;
   lootBoxId: BigNumber;
-  priceConfig: StateConfigStruct;
-  canMintConfig: StateConfigStruct;
+  priceScript: StateConfigStruct;
+  canMintScript: StateConfigStruct;
   currencies: string[];
-  recepient: string;
+  recipient: string;
   tokenURI: string;
 };
 

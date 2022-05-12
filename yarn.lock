@@ -978,17 +978,17 @@
     "@openzeppelin/contracts" "^4.3.3"
     "@openzeppelin/contracts-upgradeable" "^4.4.1"
 
-"@beehiveinnovation/rain1155@git+https://github.com/beehive-innovation/rain1155.git#2f064cce7aba24a2541ffbe3c9d044c504b30030":
+"@beehiveinnovation/rain1155@git+https://github.com/beehive-innovation/rain1155.git#a894019202b63e06b55a8e1e144dd6dc1f45af72":
   version "0.0.1"
-  resolved "git+https://github.com/beehive-innovation/rain1155.git#2f064cce7aba24a2541ffbe3c9d044c504b30030"
+  resolved "git+https://github.com/beehive-innovation/rain1155.git#a894019202b63e06b55a8e1e144dd6dc1f45af72"
   dependencies:
     "@beehiveinnovation/rain-protocol" "git+https://github.com/beehive-innovation/rain-protocol.git#2dd7102e9addf0662bc0aef2a6aacb8b82edf089"
-    "@graphprotocol/graph-cli" "^0.26.0"
-    "@graphprotocol/graph-ts" "^0.26.0"
     "@nomiclabs/hardhat-waffle" "^2.0.3"
     "@openzeppelin/contracts" "^4.5.0"
     dotenv "^16.0.0"
     mustache "^4.2.0"
+    rain-game-sdk "git+https://github.com/beehive-innovation/rain-game-sdk.git#2304705c3149aa2ca2b43ce9269c1475adeceb4a"
+    rain-sdk "^0.0.2-alpha.1"
 
 "@cspotcode/source-map-consumer@0.8.0":
   version "0.8.0"
@@ -12710,6 +12710,13 @@ queue-microtask@^1.2.2:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/queue-microtask/-/queue-microtask-1.2.3.tgz#4929228bbc724dfac43e0efb058caf7b6cfb6243"
   integrity sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==
+
+"rain-game-sdk@git+https://github.com/beehive-innovation/rain-game-sdk.git#2304705c3149aa2ca2b43ce9269c1475adeceb4a":
+  version "0.0.1-alpha.1"
+  resolved "git+https://github.com/beehive-innovation/rain-game-sdk.git#2304705c3149aa2ca2b43ce9269c1475adeceb4a"
+  dependencies:
+    apollo-fetch "^0.7.0"
+    ethers "^5.5.2"
 
 rain-sdk@^0.0.2-alpha.1:
   version "0.0.2-alpha.1"
