@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
 import { BigNumberish, Contract, ContractTransaction } from 'ethers';
 import { assert } from 'chai';
-import fs from "fs";
+import fs from 'fs';
 import {
   ReserveToken,
   ReserveTokenERC1155,
@@ -10,7 +10,7 @@ import {
 import { Result } from 'ethers/lib/utils';
 import path from 'path';
 import { execSync } from 'child_process';
-import { ApolloFetch, createApolloFetch } from "apollo-fetch";
+import { ApolloFetch, createApolloFetch } from 'apollo-fetch';
 
 export const eighteenZeros = '000000000000000000';
 
@@ -121,7 +121,7 @@ export const getEventArgs = async (
     : contract.address;
 
   const eventObj = (await tx.wait()).events?.find(
-    (x) =>
+    x =>
       x.topics[0] == contract.filters[eventName]().topics?.[0] &&
       x.address == address
   );
@@ -138,7 +138,7 @@ export const fetchFile = (_path: string): string => {
     return fs.readFileSync(_path).toString();
   } catch (error) {
     console.log(error);
-    return "";
+    return '';
   }
 };
 
@@ -151,9 +151,9 @@ export const writeFile = (_path: string, file: any): void => {
 };
 
 export const exec = (cmd: string): string | Buffer => {
-  const srcDir = path.join(__dirname, "..");
+  const srcDir = path.join(__dirname, '..');
   try {
-    return execSync(cmd, { cwd: srcDir, stdio: "inherit" });
+    return execSync(cmd, { cwd: srcDir, stdio: 'inherit' });
   } catch (e) {
     throw new Error(`Failed to run command \`${cmd}\``);
   }
@@ -167,8 +167,8 @@ interface SyncedSubgraphType {
  * Create a promise to wait a determinated `ms`
  * @param ms Amount of time to wait in miliseconds
  */
- export function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+export function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**
@@ -179,11 +179,11 @@ interface SyncedSubgraphType {
  * @param seconds Max time in seconds to wait by synchronization
  * @returns Subgraph Synchronized
  */
- export const waitForSubgraphToBeSynced = async (
+export const waitForSubgraphToBeSynced = async (
   wait = 0,
   timeDelay = 1,
   seconds = 60,
-  subgraphName = "vishalkale151071/blocks"
+  subgraphName = 'vishalkale151071/blocks'
 ): Promise<SyncedSubgraphType> => {
   if (wait > 0) {
     await delay(wait);
@@ -225,24 +225,23 @@ interface SyncedSubgraphType {
         });
         const data = result.data.indexingStatusForCurrentVersion;
 
-        console.log({data})
         if (
           data.synced === true &&
           data.chains[0].latestBlock.number == currentBlock
         ) {
           resolve({ synced: true });
-        } else if (data.health === "failed") {
+        } else if (data.health === 'failed') {
           reject(new Error(`Subgraph fatalError - ${data.fatalError.message}`));
         } else {
           throw new Error(`subgraph is not sync`);
         }
       } catch (e) {
-        const message = e instanceof Error ? e.message : "Unknown Error";
-        if (message.includes("connect ECONNREFUSED")) {
+        const message = e instanceof Error ? e.message : 'Unknown Error';
+        if (message.includes('connect ECONNREFUSED')) {
           reject(new Error(`Unable to connect to Subgraph node: ${message}`));
         }
 
-        if (message == "Unknown Error") {
+        if (message == 'Unknown Error') {
           reject(new Error(`${message} - ${e}`));
         }
 
@@ -274,7 +273,7 @@ interface SyncedSubgraphType {
 
 // Subgraph Management
 export const fetchSubgraphs = createApolloFetch({
-  uri: "http://localhost:8030/graphql",
+  uri: 'http://localhost:8030/graphql',
 });
 
 export const fetchSubgraph = (subgraphName: string): ApolloFetch => {

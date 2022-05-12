@@ -29,7 +29,8 @@
     "deploy:localhost": "npm run prepare:localhost && npm run create-local && npm run deploy-local",
     "graph-node": "docker-compose -f \"docker/docker-compose.yml\" up",
     "hardhat-node": "hardhat node",
-    "build-graph": "graph build"
+    "build-graph": "graph build",
+    "test-subgraph": "hardhat test test/localhost.test.ts --network localhost"
   },
   "peerDependencies": {},
   "husky": {

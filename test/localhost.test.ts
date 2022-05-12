@@ -135,7 +135,7 @@ before("Deploy Rain1155 Contract and subgraph", async function () {
   try {
     exec(`npm run deploy:localhost`);
     subgraph = fetchSubgraph(subgraphName);
-    // await waitForSubgraphToBeSynced(1000);
+    await waitForSubgraphToBeSynced(1000);
 
     subgraphFlag = true;
   }catch(error){
