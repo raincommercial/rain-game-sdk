@@ -20,6 +20,7 @@ import {
   Opcode,
   patternLengths,
   VMState,
+  ZERO_ADDRESS,
 } from './utils';
 
 /**
@@ -59,6 +60,7 @@ class ScriptError extends Error {
 }
 
 export enum Type {
+  NATIVE,
   ERC20,
   ERC1155
 }
@@ -108,12 +110,22 @@ const generatePriceScript = (prices: price[]): [VMState, string[]] => {
         constants.push(obj.currency.tokenId); // push tokenId in constants
       } else throw error.error('ERC1155', 'currency.tokenId');
       constants.push(obj.amount); // push amount in constants
-    } else { // ERC20 type 
+      currencies.push(obj.currency.address);
+    } else if(obj.currency.type === Type.ERC20) { // ERC20 type 
       sources.push(concat([op(Opcode.VAL, ++pos), op(Opcode.VAL, ++pos)])); // pushed 2 items in constants so used ++pos 2 times, then (Opcode.VAL, pos) will point to correct constant
       constants.push(obj.currency.type); // push currency type in constants
       constants.push(obj.amount); // push amount in constants
+      currencies.push(obj.currency.address);
+    } else { //Native chain token
+      sources.push(
+        concat([
+          op(Opcode.VAL, ++pos),
+          op(Opcode.VAL, ++pos),
+        ])
+      )
+      constants.push(obj.currency.type); // push currency type in constants
+      constants.push(obj.amount); // push amount in constants
     }
-    currencies.push(obj.currency.address);
   }
   let state: VMState = {
     sources: sources,
@@ -139,14 +151,24 @@ const generatePriceConfig = (
   let pos = -1;
   for (let i = 0; i < priceScritp.sources.length; i++) {
     let source: BytesLike = ethers.utils.arrayify(priceScritp.sources[i]); // Convert the bytesArray to Uint8Array
-    if (source.length === 4) { // ERC20 price
-      prices.push({
-        currency: {
-          type: Number(priceScritp.constants[++pos]),
-          address: currencies[i],
-        },
-        amount: BigNumber.from(priceScritp.constants[++pos]),
-      });
+    if (source.length === 4) { // ERC20 price or Native
+      if(priceScritp.constants[++pos] === Type.ERC20){
+        prices.push({
+          currency: {
+            type: Number(priceScritp.constants[++pos]),
+            address: currencies[i],
+          },
+          amount: BigNumber.from(priceScritp.constants[++pos]),
+        });
+      }else {
+        prices.push({
+          currency: {
+            type: Number(priceScritp.constants[++pos]),
+            address: ZERO_ADDRESS,
+          },
+          amount: BigNumber.from(priceScritp.constants[++pos]),
+        });
+      }
     } else if (source.length === 6) { // ERC1155 price
       prices.push({
         currency: {
