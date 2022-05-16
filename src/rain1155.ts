@@ -110,12 +110,10 @@ const generatePriceScript = (prices: price[]): [VMState, string[]] => {
         constants.push(obj.currency.tokenId); // push tokenId in constants
       } else throw error.error('ERC1155', 'currency.tokenId');
       constants.push(obj.amount); // push amount in constants
-      currencies.push(obj.currency.address);
     } else if(obj.currency.type === Type.ERC20) { // ERC20 type 
       sources.push(concat([op(Opcode.VAL, ++pos), op(Opcode.VAL, ++pos)])); // pushed 2 items in constants so used ++pos 2 times, then (Opcode.VAL, pos) will point to correct constant
       constants.push(obj.currency.type); // push currency type in constants
       constants.push(obj.amount); // push amount in constants
-      currencies.push(obj.currency.address);
     } else { //Native chain token
       sources.push(
         concat([
@@ -126,6 +124,7 @@ const generatePriceScript = (prices: price[]): [VMState, string[]] => {
       constants.push(obj.currency.type); // push currency type in constants
       constants.push(obj.amount); // push amount in constants
     }
+    currencies.push(obj.currency.address);
   }
   let state: VMState = {
     sources: sources,
