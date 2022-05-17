@@ -132,16 +132,16 @@ before("Deploy Rain1155 Contract and subgraph", async function () {
   const pathConfigLocal = path.resolve(__dirname, "../config/localhost.json");
   writeFile(pathConfigLocal, JSON.stringify(config, null, 2));
 
-  try {
-    exec(`npm run deploy:localhost`);
-    subgraph = fetchSubgraph(subgraphName);
-    await waitForSubgraphToBeSynced(1000);
+  // try {
+  //   exec(`npm run deploy:localhost`);
+  //   subgraph = fetchSubgraph(subgraphName);
+  //   await waitForSubgraphToBeSynced(1000);
 
-    subgraphFlag = true;
-  }catch(error){
-    subgraphFlag = false;
-    console.log(`Subgraph deployment failed : ${error}`);
-  }
+  //   subgraphFlag = true;
+  // }catch(error){
+  //   subgraphFlag = false;
+  //   console.log(`Subgraph deployment failed : ${error}`);
+  // }
 
   // if(subgraphFlag){
   //   await waitForSubgraphToBeSynced(1000);
@@ -249,12 +249,12 @@ describe("Rain1155 Test", function () {
 
     const assetConfig: AssetConfig = {
       lootBoxId: ethers.BigNumber.from("0"),
-      priceConfig: priceConfig,
-      canMintConfig: canMintConfig,
+      priceScript: priceConfig,
+      canMintScript: canMintConfig,
       currencies: currencies,
       name: "F1",
       description: "BRUUUUMMM BRUUUMMM",
-      recepient: creator.address,
+      recipient: creator.address,
       tokenURI: "URI",
     }
 
@@ -264,7 +264,7 @@ describe("Rain1155 Test", function () {
     let expectAsset = {
       lootBoxId: assetData.lootBoxId,
       tokenURI: assetData.tokenURI,
-      creator: assetData.recepient,
+      creator: assetData.recipient,
     }
 
     expect(expectAsset).to.deep.equals({

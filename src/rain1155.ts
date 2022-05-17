@@ -426,7 +426,7 @@ export type AssetDetails = {
   id: BigNumber;
   priceScript: State;
   canMintScript: State;
-  recepient: string;
+  recipient: string;
   tokenURI: string;
 };
 

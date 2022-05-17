@@ -45,7 +45,7 @@ export type AssetDetailsStruct = {
   priceScript: StateStruct;
   canMintScript: StateStruct;
   currencies: string[];
-  recepient: string;
+  recipient: string;
   tokenURI: string;
 };
 
@@ -63,7 +63,7 @@ export type AssetDetailsStructOutput = [
   priceScript: StateStructOutput;
   canMintScript: StateStructOutput;
   currencies: string[];
-  recepient: string;
+  recipient: string;
   tokenURI: string;
 };
 
@@ -389,7 +389,7 @@ export interface Rain1155 extends BaseContract {
         id: BigNumber;
         priceScript: StateStructOutput;
         canMintScript: StateStructOutput;
-        recepient: string;
+        recipient: string;
         tokenURI: string;
       }
     >;
@@ -493,7 +493,7 @@ export interface Rain1155 extends BaseContract {
       id: BigNumber;
       priceScript: StateStructOutput;
       canMintScript: StateStructOutput;
-      recepient: string;
+      recipient: string;
       tokenURI: string;
     }
   >;
@@ -594,7 +594,7 @@ export interface Rain1155 extends BaseContract {
         id: BigNumber;
         priceScript: StateStructOutput;
         canMintScript: StateStructOutput;
-        recepient: string;
+        recipient: string;
         tokenURI: string;
       }
     >;
