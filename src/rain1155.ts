@@ -7,7 +7,7 @@ import {
   ContractTransaction,
   ethers,
 } from 'ethers';
-import { TxOverrides, ReadTxOverrides, RainContract } from 'rain-sdk';
+import { TxOverrides, ReadTxOverrides, RainContract, ERC721, ERC20, ERC1155 } from 'rain-sdk';
 
 import { Rain1155__factory } from './typechain';
 import { AddressBook } from './addresses';
@@ -21,6 +21,7 @@ import {
   patternLengths,
   VMState,
 } from './utils';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 /**
  * @public
@@ -290,6 +291,34 @@ const generateCanMintConfig = (canMintScript: VMState): condition[] => {
   }
   return conditions;
 };
+
+const isERC721 = async (address: string, signer: SignerWithAddress): Promise<boolean> => {
+  let erc721 = new ERC721(address, signer);
+  return await erc721.supportsInterface("0x80ac58cd");
+}
+
+const isERC1155 = async (address: string, signer: SignerWithAddress): Promise<boolean> => {
+  let erc1155 = new ERC1155(address, signer);
+  return await erc1155.supportsInterface("0xd9b67a26");
+}
+
+const isERC20 = async (address: string, signer: SignerWithAddress): Promise<boolean> => {
+  let erc20 = new ERC20(address, signer);
+  let balance;
+
+  try {
+    let name = await erc20.name()
+    let symbol = await erc20.symbol()
+    let decimals = await erc20.decimals()
+    balance = await erc20.balanceOf(signer.address);
+  } catch (error) {
+    return Promise.resolve(false);
+  }
+  if(!balance){
+    return Promise.resolve(false);
+  }
+  return Promise.resolve(true);
+}
 export class Rain1155 extends RainContract {
   protected static readonly nameBookReference = 'Rain1155';
 
@@ -328,6 +357,10 @@ export class Rain1155 extends RainContract {
   public static getBookAddress(chainId: number): string {
     return AddressBook.getAddressesForChainId(chainId)[this.nameBookReference];
   }
+
+  public readonly isERC20 = isERC20;
+  public readonly isERC721 = isERC721;
+  public readonly isERC1155 = isERC1155;
 
   public readonly generatePriceScript = generatePriceScript;
   public readonly generatePriceConfig = generatePriceConfig;

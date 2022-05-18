@@ -3,14 +3,14 @@ const { artifacts ,ethers, } = require("hardhat");
 
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { it } from "mocha";
-import type { Rain1155, AssetConfigStruct } from "../typechain/Rain1155";
+import type { Rain1155 } from "../typechain/Rain1155";
 import type { Token } from "../typechain/Token";
 import type { ReserveToken } from "../typechain/ReserveToken";
 import type { ReserveTokenERC1155 } from "../typechain/ReserveTokenERC1155";
 import type { ReserveTokenERC721 } from "../typechain/ReserveTokenERC721";
 import type { ERC20BalanceTierFactory } from "../typechain/ERC20BalanceTierFactory";
 import type { ERC20BalanceTier } from "../typechain/ERC20BalanceTier";
-import { Rain1155 as Rain1155SDK, Type, Conditions, condition, price} from "rain-game-sdk";
+import { Rain1155 as Rain1155SDK, Type, Conditions, condition, price, AssetConfig} from "../dist";
 
 import { eighteenZeros, getEventArgs, fetchFile, writeFile,  exec } from "./utils"
 import { Contract } from "ethers";
@@ -46,8 +46,6 @@ export let owner: SignerWithAddress,
   buyer2: SignerWithAddress,
   gameAsstesOwner: SignerWithAddress,
   admin: SignerWithAddress
-
-const subgraphName = "vishalkale151071/blocks";
 
 before("Deploy Rain1155 Contract and subgraph", async function () {
   const signers = await ethers.getSigners();
@@ -223,8 +221,8 @@ describe("Rain1155 Test", function () {
 
     const canMintConfig = rain1155SDK.generateCanMintScript(conditions);
 
-    const assetConfig: AssetConfigStruct = {
-      lootBoxId: 0,
+    const assetConfig: AssetConfig = {
+      lootBoxId: ethers.BigNumber.from(0),
       priceScript: priceConfig,
       canMintScript: canMintConfig,
       currencies: currencies,
@@ -234,9 +232,9 @@ describe("Rain1155 Test", function () {
       tokenURI: "https://ipfs.io/ipfs/QmVfbKBM7XxqZMRFzRGPGkWT8oUFNYY1DeK5dcoTgLuV8H",
     }
 
-    await rain1155.connect(gameAsstesOwner).createNewAsset(assetConfig);
+    await rain1155SDK.connect(gameAsstesOwner).createNewAsset(assetConfig);
 
-    let assetData = await rain1155.assets(1)
+    let assetData = await rain1155SDK.assets(1)
     let expectAsset = {
       lootBoxId: assetData.lootBoxId,
       tokenURI: assetData.tokenURI,
@@ -264,8 +262,8 @@ describe("Rain1155 Test", function () {
     await PLANES.connect(buyer1).mintTokens(ethers.BigNumber.from("15"), 5)
     await SHIPS.connect(buyer1).mintTokens(ethers.BigNumber.from("1"), 11)
 
-    let USDTPrice = (await rain1155.getAssetPrice(1, USDT.address, 1))[1]
-    let BNBPrice = (await rain1155.getAssetPrice(1, BNB.address, 1))[1]
+    let USDTPrice = (await rain1155SDK.getAssetPrice(1, USDT.address, 1))[1]
+    let BNBPrice = (await rain1155SDK.getAssetPrice(1, BNB.address, 1))[1]
 
     await USDT.connect(buyer1).approve(rain1155.address, USDTPrice);
     await BNB.connect(buyer1).approve(rain1155.address, BNBPrice);
@@ -273,9 +271,9 @@ describe("Rain1155 Test", function () {
     await CARS.connect(buyer1).setApprovalForAll(rain1155.address, true);
     await PLANES.connect(buyer1).setApprovalForAll(rain1155.address, true);
     
-    await rain1155.connect(buyer1).mintAssets(1,1);
+    await rain1155SDK.connect(buyer1).mintAssets(1,1);
 
-    expect(await rain1155.balanceOf(buyer1.address, 1)).to.deep.equals(ethers.BigNumber.from("1"))
+    expect(await rain1155SDK.balanceOf(buyer1.address, 1)).to.deep.equals(ethers.BigNumber.from("1"))
 
     expect(await USDT.balanceOf(creator.address)).to.deep.equals(ethers.BigNumber.from("1" + eighteenZeros))
     expect(await BNB.balanceOf(creator.address)).to.deep.equals(ethers.BigNumber.from("25" + eighteenZeros))
@@ -287,4 +285,10 @@ describe("Rain1155 Test", function () {
     expect(await CARS.balanceOf(buyer1.address, 5)).to.deep.equals(ethers.BigNumber.from("0"))
     expect(await PLANES.balanceOf(buyer1.address, 15)).to.deep.equals(ethers.BigNumber.from("0"))
   });
+
+  it("ERC type test",async () => {
+    expect(await rain1155SDK.isERC20(USDT.address, owner)).to.equals(true);
+    expect(await rain1155SDK.isERC1155(CARS.address, owner)).to.equals(true);
+    expect(await rain1155SDK.isERC721(BAYC.address, owner)).to.equals(true);
+  })
 });
