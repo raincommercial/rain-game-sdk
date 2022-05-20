@@ -99,7 +99,7 @@ const generatePriceScript = (prices: price[]): [VMState, string[]] => {
     if (obj.currency.type === Type.ERC1155) { // check price type
       sources.push(
         concat([
-          op(Opcode.VAL, ++pos), 
+          op(Opcode.VAL, ++pos),
           op(Opcode.VAL, ++pos),
           op(Opcode.VAL, ++pos),
         ])
@@ -167,90 +167,98 @@ const generatePriceConfig = (
  * @param conditions array of conditions
  * @returns StateConfig for canMint
  */
-const generateCanMintScript = (conditions: condition[]): VMState => {
+const generateCanMintScript = (conditionsGroup: condition[][]): VMState => {
   let error = new ScriptError('Invalid Script parameters.');
   let pos = -1;
   let sources: Uint8Array[] = [];
   let constants: BigNumberish[] = [];
   let i;
   let stackLenght = 3; // minimum stackLenght required for one binary opration in VM
-
-  for (i = 0; i < conditions.length; i++) { // Loop over conditions
-    let condition = conditions[i];
-    if (condition.type === Conditions.NONE) { // No condition
-      constants.push(1); // push 1 in constants, will return true for Every OP in the end
-      sources.push(op(Opcode.VAL, ++pos));
-    } else if (condition.type === Conditions.BLOCK_NUMBER) {
-      if (condition.blockNumber) {
-        constants.push(condition.blockNumber);
-      } else throw error.error('BLOCK_NUMBER', 'blockNumber');
-      sources.push(op(Opcode.BLOCK_NUMBER));
-      sources.push(op(Opcode.VAL, ++pos));
-      sources.push(op(Opcode.GREATER_THAN));
-    } else if (condition.type === Conditions.BALANCE_TIER) {
-      if (condition.tierAddress) {
-        constants.push(condition.tierAddress);
-      } else throw error.error('BALANCE_TIER', 'tierAddress');
-      if (condition.tierCondition) {
-        constants.push(condition.tierCondition);
-      } else throw error.error('BALANCE_TIER', 'tierCondition');
-      sources.push(op(Opcode.VAL, ++pos));
-      sources.push(op(Opcode.ACCOUNT));
-      sources.push(op(Opcode.REPORT));
-      sources.push(op(Opcode.BLOCK_NUMBER));
-      sources.push(op(Opcode.REPORT_AT_BLOCK));
-      sources.push(op(Opcode.VAL, ++pos));
-      sources.push(op(Opcode.GREATER_THAN));
-    } else if (condition.type === Conditions.ERC20BALANCE) {
-      if (condition.address) {
-        constants.push(condition.address);
-      } else throw error.error('ERC20BALANCE', 'address');
-      if (condition.balance) {
-        constants.push(condition.balance);
-      } else throw error.error('ERC20BALANCE', 'balance');
-      sources.push(op(Opcode.VAL, ++pos));
-      sources.push(op(Opcode.ACCOUNT));
-      sources.push(op(Opcode.IERC20_BALANCE_OF));
-      sources.push(op(Opcode.VAL, ++pos));
-      sources.push(op(Opcode.GREATER_THAN));
-    } else if (condition.type === Conditions.ERC721BALANCE) {
-      if (condition.address) {
-        constants.push(condition.address);
-      } else throw error.error('ERC721BALANCE', 'address');
-      if (condition.balance) {
-        constants.push(condition.balance);
-      } else throw error.error('ERC721BALANCE', 'balance');
-      sources.push(op(Opcode.VAL, ++pos));
-      sources.push(op(Opcode.ACCOUNT));
-      sources.push(op(Opcode.IERC721_BALANCE_OF));
-      sources.push(op(Opcode.VAL, ++pos));
-      sources.push(op(Opcode.GREATER_THAN));
-    } else if (condition.type === Conditions.ERC1155BALANCE) {
-      if (condition.address) {
-        constants.push(condition.address);
-      } else throw error.error('ERC1155BALANCE', 'address');
-      if (condition.id) {
-        constants.push(condition.id);
-      } else throw error.error('ERC1155BALANCE', 'id');
-      if (condition.balance) {
-        constants.push(condition.balance);
-      } else throw error.error('ERC1155BALANCE', 'balance');
-      sources.push(op(Opcode.VAL, ++pos));
-      sources.push(op(Opcode.ACCOUNT));
-      sources.push(op(Opcode.VAL, ++pos));
-      sources.push(op(Opcode.IERC1155_BALANCE_OF));
-      sources.push(op(Opcode.VAL, ++pos));
-      sources.push(op(Opcode.GREATER_THAN));
+  let outerArrIterator;
+  let totalStackLength = 0;
+  for (outerArrIterator = 0; outerArrIterator < conditionsGroup.length; outerArrIterator++) {
+    const conditions = conditionsGroup[outerArrIterator];
+    for (i = 0; i < conditions.length; i++) { // Loop over conditions
+      let condition = conditions[i];
+      if (condition.type === Conditions.NONE) { // No condition
+        constants.push(1); // push 1 in constants, will return true for Every OP in the end
+        sources.push(op(Opcode.VAL, ++pos));
+      } else if (condition.type === Conditions.BLOCK_NUMBER) {
+        if (condition.blockNumber) {
+          constants.push(condition.blockNumber);
+        } else throw error.error('BLOCK_NUMBER', 'blockNumber');
+        sources.push(op(Opcode.BLOCK_NUMBER));
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.GREATER_THAN));
+      } else if (condition.type === Conditions.BALANCE_TIER) {
+        if (condition.tierAddress) {
+          constants.push(condition.tierAddress);
+        } else throw error.error('BALANCE_TIER', 'tierAddress');
+        if (condition.tierCondition) {
+          constants.push(condition.tierCondition);
+        } else throw error.error('BALANCE_TIER', 'tierCondition');
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.ACCOUNT));
+        sources.push(op(Opcode.REPORT));
+        sources.push(op(Opcode.BLOCK_NUMBER));
+        sources.push(op(Opcode.REPORT_AT_BLOCK));
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.GREATER_THAN));
+      } else if (condition.type === Conditions.ERC20BALANCE) {
+        if (condition.address) {
+          constants.push(condition.address);
+        } else throw error.error('ERC20BALANCE', 'address');
+        if (condition.balance) {
+          constants.push(condition.balance);
+        } else throw error.error('ERC20BALANCE', 'balance');
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.ACCOUNT));
+        sources.push(op(Opcode.IERC20_BALANCE_OF));
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.GREATER_THAN));
+      } else if (condition.type === Conditions.ERC721BALANCE) {
+        if (condition.address) {
+          constants.push(condition.address);
+        } else throw error.error('ERC721BALANCE', 'address');
+        if (condition.balance) {
+          constants.push(condition.balance);
+        } else throw error.error('ERC721BALANCE', 'balance');
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.ACCOUNT));
+        sources.push(op(Opcode.IERC721_BALANCE_OF));
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.GREATER_THAN));
+      } else if (condition.type === Conditions.ERC1155BALANCE) {
+        if (condition.address) {
+          constants.push(condition.address);
+        } else throw error.error('ERC1155BALANCE', 'address');
+        if (condition.id) {
+          constants.push(condition.id);
+        } else throw error.error('ERC1155BALANCE', 'id');
+        if (condition.balance) {
+          constants.push(condition.balance);
+        } else throw error.error('ERC1155BALANCE', 'balance');
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.ACCOUNT));
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.IERC1155_BALANCE_OF));
+        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.GREATER_THAN));
+      }
     }
+    sources.push(op(Opcode.EVERY, conditions.length)); // EVERY opcode to check  all conditions within this group are true
+    totalStackLength += conditions.length;
   }
-  sources.push(op(Opcode.EVERY, conditions.length)); // Last OP as EVERY to check all conditions are true
-
+  sources.push(op(Opcode.ANY, conditionsGroup.length)); // Last OP as ANY to check any of the above condition group is true
+  // console.log("SOURCES = ", sources);
   let state: VMState = {
     sources: [concat(sources)],
     constants: constants,
-    stackLength: stackLenght + conditions.length,
+    
+    stackLength: stackLenght + totalStackLength,
     argumentsLength: 0,
   };
+  // console.log("STATE = ", state);
   return state;
 };
 
@@ -314,7 +322,7 @@ const isERC20 = async (address: string, signer: SignerWithAddress): Promise<bool
   } catch (error) {
     return Promise.resolve(false);
   }
-  if(!balance){
+  if (!balance) {
     return Promise.resolve(false);
   }
   return Promise.resolve(true);
