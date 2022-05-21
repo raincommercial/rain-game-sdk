@@ -485,3 +485,31 @@ export const patternLengths = (): number[] => {
     return a - b;
   });
 };
+
+
+export const getCanMintConfig = (opcodes: number[], constants: BigNumberish[]): condition[] => {
+  let conditions: condition[] = [];
+  let len = opcodes.length;
+  let start = 0; // Start index to start matching the pattern
+  let patterns = patternLengths(); // get lengths of all patternsa
+  while (len > 0) { // repet untill opcod length becomes 0
+    for (let j = patterns.length - 1; j >= 0; j--) { // loop over all diff pattern length
+      if (opcodes.length >= patterns[j]) {
+        const new_start = matchPattern( // get the matching pattern
+          opcodes, // opcodes
+          start, // start Index
+          patterns[j] // size of pattern
+        );
+        if (new_start !== start) { // update the start and len only if new_start != start
+          conditions.push(
+            getCondition(opcodes.slice(start, new_start), constants)
+          ); // get the condition and push it in array.
+          start = new_start;
+          len = len - patterns[j];
+          break; // break the forloop so next pattern can start from max size.
+        }
+      }
+    }
+  }
+  return conditions;
+};

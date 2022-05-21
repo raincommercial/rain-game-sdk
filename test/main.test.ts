@@ -210,6 +210,19 @@ describe("Rain1155 Test", function () {
         balance: ethers.BigNumber.from("10" + eighteenZeros)
       },
       {
+        type: Conditions.BLOCK_NUMBER,
+        blockNumber: blockCondition
+      },
+      {
+        type: Conditions.BALANCE_TIER,
+        tierAddress: erc20BalanceTier.address,
+        tierCondition: tierCondition
+      }
+      
+    ];
+    
+    const conditions3: condition[] = [
+      {
         type: Conditions.ERC721BALANCE,
         address: BAYC.address,
         balance: ethers.BigNumber.from("0")
@@ -219,10 +232,7 @@ describe("Rain1155 Test", function () {
         address: SHIPS.address,
         id: ethers.BigNumber.from("1"),
         balance: ethers.BigNumber.from("10")
-      }
-    ];
-    
-    const conditions3: condition[] = [
+      },
       {
         type: Conditions.ERC20BALANCE,
         address: BNB.address,
@@ -230,7 +240,6 @@ describe("Rain1155 Test", function () {
       }
     ];
 
-    // let conditionCombined = conditions1.concat(conditions2);
     const canMintConfig = rain1155SDK.generateCanMintScript([conditions1, conditions2, conditions3]);
     const assetConfig: AssetConfig = {
       lootBoxId: ethers.BigNumber.from(0),
@@ -242,7 +251,7 @@ describe("Rain1155 Test", function () {
       recipient: creator.address,
       tokenURI: "https://ipfs.io/ipfs/QmVfbKBM7XxqZMRFzRGPGkWT8oUFNYY1DeK5dcoTgLuV8H",
     }
-    
+
     // console.log(rain1155SDK.generateCanMintConfig(canMintConfig));
     await rain1155SDK.connect(gameAsstesOwner).createNewAsset(assetConfig);
 
