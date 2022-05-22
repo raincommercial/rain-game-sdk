@@ -368,6 +368,8 @@ export class Rain1155 extends RainContract {
   public static readonly isERC721 = isERC721;
   public static readonly isERC1155 = isERC1155;
 
+  public static readonly subgraph = "https://api.thegraph.com/subgraphs/name/beehive-innovation/rain-game-engine-mumbai-v1";
+
   public static readonly generatePriceScript = generatePriceScript;
   public static readonly generatePriceConfig = generatePriceConfig;
 
