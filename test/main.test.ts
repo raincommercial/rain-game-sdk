@@ -192,7 +192,7 @@ describe("Rain1155 Test", function () {
       },
     ];
 
-    const [priceConfig, currencies] = rain1155SDK.generatePriceScript(prices);
+    const [priceConfig, currencies] = Rain1155SDK.generatePriceScript(prices);
 
     const tierCondition = 4
     const blockCondition = 15
@@ -254,7 +254,7 @@ describe("Rain1155 Test", function () {
       }
     ];
 
-    const canMintConfig = rain1155SDK.generateCanMintScript([conditions1, conditions2, conditions3]);
+    const canMintConfig = Rain1155SDK.generateCanMintScript([conditions1, conditions2, conditions3]);
     const assetConfig: AssetConfig = {
       lootBoxId: ethers.BigNumber.from(0),
       priceScript: priceConfig,
@@ -388,7 +388,7 @@ describe("Rain1155 Test", function () {
       },
     ];
 
-    const [priceConfig, currencies] = rain1155SDK.generatePriceScript(prices);
+    const [priceConfig, currencies] = Rain1155SDK.generatePriceScript(prices);
 
     const tierCondition = 4
     const blockCondition = 15
@@ -413,7 +413,7 @@ describe("Rain1155 Test", function () {
       },
     ];
 
-    const canMintConfig = rain1155SDK.generateCanMintScript([conditions1]);
+    const canMintConfig = Rain1155SDK.generateCanMintScript([conditions1]);
     const assetConfig: AssetConfig = {
       lootBoxId: ethers.BigNumber.from(0),
       priceScript: priceConfig,
@@ -542,7 +542,7 @@ describe("Rain1155 Test", function () {
       },
     ];
 
-    const [priceConfig, currencies] = rain1155SDK.generatePriceScript(prices);
+    const [priceConfig, currencies] = Rain1155SDK.generatePriceScript(prices);
 
     const conditions1: condition[] = [
       {
@@ -566,7 +566,7 @@ describe("Rain1155 Test", function () {
       },
     ];
 
-    const canMintConfig = rain1155SDK.generateCanMintScript([conditions1, conditions2, conditions3]);
+    const canMintConfig = Rain1155SDK.generateCanMintScript([conditions1, conditions2, conditions3]);
     const assetConfig: AssetConfig = {
       lootBoxId: ethers.BigNumber.from(0),
       priceScript: priceConfig,
@@ -658,8 +658,51 @@ describe("Rain1155 Test", function () {
 
 
   it("ERC type test", async () => {
-    expect(await rain1155SDK.isERC20(USDT.address, owner)).to.equals(true);
-    expect(await rain1155SDK.isERC1155(CARS.address, owner)).to.equals(true);
-    expect(await rain1155SDK.isERC721(BAYC.address, owner)).to.equals(true);
+    expect(await Rain1155SDK.isERC20(USDT.address, owner)).to.equals(true);
+    expect(await Rain1155SDK.isERC1155(CARS.address, owner)).to.equals(true);
+    expect(await Rain1155SDK.isERC721(BAYC.address, owner)).to.equals(true);
   })
+
+  it("Should mint multiple assets",async () => {
+    
+    await PLANES.connect(buyer2).mintTokens(ethers.BigNumber.from("15"), 5  * 4)
+    await SHIPS.connect(buyer2).mintTokens(ethers.BigNumber.from("1"), 11)
+
+    await CARS.connect(buyer2).mintTokens(ethers.BigNumber.from("5"), 10 * 4)
+
+    await rTKN.connect(buyer2).mintTokens(5);
+
+    await USDT.connect(buyer2).mintTokens(1 * 4);
+    await BNB.connect(buyer2).mintTokens(25 * 4);
+
+    await SOL.connect(buyer2).mintTokens(11);
+
+    await BAYC.connect(buyer2).mintNewToken();
+
+    let USDTPrice = (await rain1155.getAssetPrice(1, USDT.address, 4))[1]
+    let BNBPrice = (await rain1155.getAssetPrice(1, BNB.address, 4))[1]
+
+    // console.log({USDTPrice, BNBPrice})
+
+    await USDT.connect(buyer2).approve(rain1155.address, USDTPrice);
+    await BNB.connect(buyer2).approve(rain1155.address, BNBPrice);
+    
+    await CARS.connect(buyer2).setApprovalForAll(rain1155.address, true);
+    await PLANES.connect(buyer2).setApprovalForAll(rain1155.address, true);
+    
+    await rain1155.connect(buyer2).mintAssets(1,4);
+
+    expect(await rain1155.balanceOf(buyer2.address, 1)).to.deep.equals(ethers.BigNumber.from("4"))
+
+    // expect(await USDT.balanceOf(creator.address)).to.deep.equals(ethers.BigNumber.from("1" + eighteenZeros))
+    // expect(await BNB.balanceOf(creator.address)).to.deep.equals(ethers.BigNumber.from("25" + eighteenZeros))
+    // expect(await CARS.balanceOf(creator.address, 5)).to.deep.equals(ethers.BigNumber.from("10"))
+    // expect(await PLANES.balanceOf(creator.address, 15)).to.deep.equals(ethers.BigNumber.from("5"))
+    
+    expect(await USDT.balanceOf(buyer2.address)).to.deep.equals(ethers.BigNumber.from("9" + eighteenZeros))
+    expect(await BNB.balanceOf(buyer2.address)).to.deep.equals(ethers.BigNumber.from("25" + eighteenZeros))
+    expect(await CARS.balanceOf(buyer2.address, 5)).to.deep.equals(ethers.BigNumber.from("10"))
+    expect(await PLANES.balanceOf(buyer2.address, 15)).to.deep.equals(ethers.BigNumber.from("5"))
+
+  });
 });

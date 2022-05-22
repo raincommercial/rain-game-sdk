@@ -249,7 +249,6 @@ export interface Rain1155Interface extends utils.Interface {
   events: {
     "ApprovalForAll(address,address,bool)": EventFragment;
     "AssetCreated(uint256,tuple,tuple,tuple,string,string)": EventFragment;
-    "ClassCreated(string[])": EventFragment;
     "Initialize(address)": EventFragment;
     "Snapshot(address,address,tuple)": EventFragment;
     "TransferBatch(address,address,address,uint256[],uint256[])": EventFragment;
@@ -259,7 +258,6 @@ export interface Rain1155Interface extends utils.Interface {
 
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "AssetCreated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ClassCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialize"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Snapshot"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferBatch"): EventFragment;
@@ -284,25 +282,18 @@ export type AssetCreatedEvent = TypedEvent<
     string
   ],
   {
-    _assetId: BigNumber;
-    _asset: AssetDetailsStructOutput;
-    _priceScript: StateConfigStructOutput;
-    _canMintScript: StateConfigStructOutput;
-    _name: string;
-    _description: string;
+    assetId_: BigNumber;
+    asset_: AssetDetailsStructOutput;
+    priceScript_: StateConfigStructOutput;
+    canMintScript_: StateConfigStructOutput;
+    name_: string;
+    description_: string;
   }
 >;
 
 export type AssetCreatedEventFilter = TypedEventFilter<AssetCreatedEvent>;
 
-export type ClassCreatedEvent = TypedEvent<
-  [string[]],
-  { _classData: string[] }
->;
-
-export type ClassCreatedEventFilter = TypedEventFilter<ClassCreatedEvent>;
-
-export type InitializeEvent = TypedEvent<[string], { _deployer: string }>;
+export type InitializeEvent = TypedEvent<[string], { deployer_: string }>;
 
 export type InitializeEventFilter = TypedEventFilter<InitializeEvent>;
 
@@ -407,22 +398,22 @@ export interface Rain1155 extends BaseContract {
     ): Promise<[BigNumber[]]>;
 
     canMint(
-      _assetId: BigNumberish,
-      _account: string,
+      assetId_: BigNumberish,
+      account_: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
     createNewAsset(
-      _config: AssetConfigStruct,
+      config_: AssetConfigStruct,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     exists(id: BigNumberish, overrides?: CallOverrides): Promise<[boolean]>;
 
     getAssetPrice(
-      _assetId: BigNumberish,
-      _paymentToken: string,
-      _units: BigNumberish,
+      assetId_: BigNumberish,
+      paymentToken_: string,
+      units_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber[]]>;
 
@@ -433,8 +424,8 @@ export interface Rain1155 extends BaseContract {
     ): Promise<[boolean]>;
 
     mintAssets(
-      _assetId: BigNumberish,
-      _units: BigNumberish,
+      assetId_: BigNumberish,
+      units_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -511,22 +502,22 @@ export interface Rain1155 extends BaseContract {
   ): Promise<BigNumber[]>;
 
   canMint(
-    _assetId: BigNumberish,
-    _account: string,
+    assetId_: BigNumberish,
+    account_: string,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
   createNewAsset(
-    _config: AssetConfigStruct,
+    config_: AssetConfigStruct,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   exists(id: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
   getAssetPrice(
-    _assetId: BigNumberish,
-    _paymentToken: string,
-    _units: BigNumberish,
+    assetId_: BigNumberish,
+    paymentToken_: string,
+    units_: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
 
@@ -537,8 +528,8 @@ export interface Rain1155 extends BaseContract {
   ): Promise<boolean>;
 
   mintAssets(
-    _assetId: BigNumberish,
-    _units: BigNumberish,
+    assetId_: BigNumberish,
+    units_: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -612,22 +603,22 @@ export interface Rain1155 extends BaseContract {
     ): Promise<BigNumber[]>;
 
     canMint(
-      _assetId: BigNumberish,
-      _account: string,
+      assetId_: BigNumberish,
+      account_: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     createNewAsset(
-      _config: AssetConfigStruct,
+      config_: AssetConfigStruct,
       overrides?: CallOverrides
     ): Promise<void>;
 
     exists(id: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
     getAssetPrice(
-      _assetId: BigNumberish,
-      _paymentToken: string,
-      _units: BigNumberish,
+      assetId_: BigNumberish,
+      paymentToken_: string,
+      units_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
 
@@ -638,8 +629,8 @@ export interface Rain1155 extends BaseContract {
     ): Promise<boolean>;
 
     mintAssets(
-      _assetId: BigNumberish,
-      _units: BigNumberish,
+      assetId_: BigNumberish,
+      units_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -695,27 +686,24 @@ export interface Rain1155 extends BaseContract {
     ): ApprovalForAllEventFilter;
 
     "AssetCreated(uint256,tuple,tuple,tuple,string,string)"(
-      _assetId?: null,
-      _asset?: null,
-      _priceScript?: null,
-      _canMintScript?: null,
-      _name?: null,
-      _description?: null
+      assetId_?: null,
+      asset_?: null,
+      priceScript_?: null,
+      canMintScript_?: null,
+      name_?: null,
+      description_?: null
     ): AssetCreatedEventFilter;
     AssetCreated(
-      _assetId?: null,
-      _asset?: null,
-      _priceScript?: null,
-      _canMintScript?: null,
-      _name?: null,
-      _description?: null
+      assetId_?: null,
+      asset_?: null,
+      priceScript_?: null,
+      canMintScript_?: null,
+      name_?: null,
+      description_?: null
     ): AssetCreatedEventFilter;
 
-    "ClassCreated(string[])"(_classData?: null): ClassCreatedEventFilter;
-    ClassCreated(_classData?: null): ClassCreatedEventFilter;
-
-    "Initialize(address)"(_deployer?: null): InitializeEventFilter;
-    Initialize(_deployer?: null): InitializeEventFilter;
+    "Initialize(address)"(deployer_?: null): InitializeEventFilter;
+    Initialize(deployer_?: null): InitializeEventFilter;
 
     "Snapshot(address,address,tuple)"(
       sender?: null,
@@ -777,22 +765,22 @@ export interface Rain1155 extends BaseContract {
     ): Promise<BigNumber>;
 
     canMint(
-      _assetId: BigNumberish,
-      _account: string,
+      assetId_: BigNumberish,
+      account_: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     createNewAsset(
-      _config: AssetConfigStruct,
+      config_: AssetConfigStruct,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     exists(id: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
     getAssetPrice(
-      _assetId: BigNumberish,
-      _paymentToken: string,
-      _units: BigNumberish,
+      assetId_: BigNumberish,
+      paymentToken_: string,
+      units_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -803,8 +791,8 @@ export interface Rain1155 extends BaseContract {
     ): Promise<BigNumber>;
 
     mintAssets(
-      _assetId: BigNumberish,
-      _units: BigNumberish,
+      assetId_: BigNumberish,
+      units_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -866,13 +854,13 @@ export interface Rain1155 extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     canMint(
-      _assetId: BigNumberish,
-      _account: string,
+      assetId_: BigNumberish,
+      account_: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     createNewAsset(
-      _config: AssetConfigStruct,
+      config_: AssetConfigStruct,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -882,9 +870,9 @@ export interface Rain1155 extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     getAssetPrice(
-      _assetId: BigNumberish,
-      _paymentToken: string,
-      _units: BigNumberish,
+      assetId_: BigNumberish,
+      paymentToken_: string,
+      units_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -895,8 +883,8 @@ export interface Rain1155 extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     mintAssets(
-      _assetId: BigNumberish,
-      _units: BigNumberish,
+      assetId_: BigNumberish,
+      units_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

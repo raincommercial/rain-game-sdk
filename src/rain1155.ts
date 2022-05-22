@@ -100,6 +100,8 @@ const generatePriceScript = (prices: price[]): [VMState, string[]] => {
           op(Opcode.VAL, ++pos),
           op(Opcode.VAL, ++pos),
           op(Opcode.VAL, ++pos),
+          op(Opcode.CURRENT_UNITS),
+          op(Opcode.MUL, 2)
         ])
       ); // pushed 3 items in constants so used ++pos 3 times, then (Opcode.VAL, pos) will point to correct constant
       constants.push(obj.currency.type); // push currency type in constants
@@ -108,7 +110,14 @@ const generatePriceScript = (prices: price[]): [VMState, string[]] => {
       } else throw error.error('ERC1155', 'currency.tokenId');
       constants.push(obj.amount); // push amount in constants
     } else { // ERC20 type 
-      sources.push(concat([op(Opcode.VAL, ++pos), op(Opcode.VAL, ++pos)])); // pushed 2 items in constants so used ++pos 2 times, then (Opcode.VAL, pos) will point to correct constant
+      sources.push(
+        concat([
+          op(Opcode.VAL, ++pos),
+          op(Opcode.VAL, ++pos),
+          op(Opcode.CURRENT_UNITS),
+          op(Opcode.MUL, 2)
+        ])
+      ); // pushed 2 items in constants so used ++pos 2 times, then (Opcode.VAL, pos) will point to correct constant
       constants.push(obj.currency.type); // push currency type in constants
       constants.push(obj.amount); // push amount in constants
     }
@@ -117,7 +126,7 @@ const generatePriceScript = (prices: price[]): [VMState, string[]] => {
   let state: VMState = {
     sources: sources,
     constants: constants,
-    stackLength: 3,
+    stackLength: 5,
     argumentsLength: 0,
   };
   return [state, currencies]; // return the stateConfig and currencies[]
@@ -355,15 +364,17 @@ export class Rain1155 extends RainContract {
     return AddressBook.getAddressesForChainId(chainId)[this.nameBookReference];
   }
 
-  public readonly isERC20 = isERC20;
-  public readonly isERC721 = isERC721;
-  public readonly isERC1155 = isERC1155;
+  public static readonly isERC20 = isERC20;
+  public static readonly isERC721 = isERC721;
+  public static readonly isERC1155 = isERC1155;
 
-  public readonly generatePriceScript = generatePriceScript;
-  public readonly generatePriceConfig = generatePriceConfig;
+  public static readonly subgraph = "https://api.thegraph.com/subgraphs/name/beehive-innovation/rain-game-engine-mumbai-v1";
 
-  public readonly generateCanMintScript = generateCanMintScript;
-  public readonly generateCanMintConfig = generateCanMintConfig;
+  public static readonly generatePriceScript = generatePriceScript;
+  public static readonly generatePriceConfig = generatePriceConfig;
+
+  public static readonly generateCanMintScript = generateCanMintScript;
+  public static readonly generateCanMintConfig = generateCanMintConfig;
 
   public readonly assets: (
     arg0: BigNumberish,
