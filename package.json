@@ -58,7 +58,7 @@
     }
   ],
   "devDependencies": {
-    "@beehiveinnovation/rain1155": "git+https://github.com/beehive-innovation/rain1155.git#c70e010fb876f36855bc0d2054c28657e3e775ba",
+    "@beehiveinnovation/rain1155": "git+https://github.com/beehive-innovation/rain1155.git#7ee572a8327b2e46ad34019b0211c478437a1910",
     "@graphprotocol/graph-cli": "0.26.0",
     "@graphprotocol/graph-ts": "0.26.0",
     "@microsoft/api-documenter": "^7.17.9",
