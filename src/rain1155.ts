@@ -370,17 +370,9 @@ export class Rain1155 extends RainContract {
 
   public static readonly subgraph = "https://api.thegraph.com/subgraphs/name/beehive-innovation/rain-game-engine-mumbai-v1";
 
-<<<<<<< Updated upstream
   public static readonly generatePriceScript = generatePriceScript;
   public static readonly generatePriceConfig = generatePriceConfig;
 
-=======
-  public static readonly subgraph = "https://api.thegraph.com/subgraphs/name/beehive-innovation/rain-game-engine-mumbai-v1";
-
-  public static readonly generatePriceScript = generatePriceScript;
-  public static readonly generatePriceConfig = generatePriceConfig;
-
->>>>>>> Stashed changes
   public static readonly generateCanMintScript = generateCanMintScript;
   public static readonly generateCanMintConfig = generateCanMintConfig;
 
