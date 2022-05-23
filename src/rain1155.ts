@@ -147,7 +147,7 @@ const generatePriceConfig = (
   let pos = -1;
   for (let i = 0; i < priceScritp.sources.length; i++) {
     let source: BytesLike = ethers.utils.arrayify(priceScritp.sources[i]); // Convert the bytesArray to Uint8Array
-    if (source.length === 4) { // ERC20 price
+    if (source.length === 8) { // ERC20 price
       prices.push({
         currency: {
           type: Number(priceScritp.constants[++pos]),
@@ -155,7 +155,7 @@ const generatePriceConfig = (
         },
         amount: BigNumber.from(priceScritp.constants[++pos]),
       });
-    } else if (source.length === 6) { // ERC1155 price
+    } else if (source.length === 10) { // ERC1155 price
       prices.push({
         currency: {
           type: Number(priceScritp.constants[++pos]),
