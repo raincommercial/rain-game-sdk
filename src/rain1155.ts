@@ -376,6 +376,72 @@ export class Rain1155 extends RainContract {
   public static readonly generateCanMintScript = generateCanMintScript;
   public static readonly generateCanMintConfig = generateCanMintConfig;
 
+  public readonly getPrice = async (
+    _assetId: BigNumberish,
+    _paymentToken: string,
+    _units: BigNumberish,
+  ): Promise<price> => {
+    let stack = await this.getAssetPrice(_assetId, _paymentToken, _units);
+    if(stack[0].eq(BigNumber.from(Type.ERC20))){
+      return {
+        currency: {
+          type: Type.ERC20,
+          address: _paymentToken
+        },
+        amount: stack[1]
+      }
+    }
+    return {
+      currency: {
+        type: Type.ERC1155,
+        address: _paymentToken,
+        tokenId: stack[1]
+      },
+      amount: stack[2]
+    }
+  }
+
+  public readonly checkAllowance = async (assetId: BigNumberish,prices: price[], units: BigNumberish, rain1155Address: string, signer: string): Promise<allowance[]> => {
+    let allowances: allowance[] = [];
+    for(let i=0;i<prices.length;i++){
+      let price = prices[i];
+      if(price.currency.type === Type.ERC20){
+        let ERC20Contract = new ERC20(price.currency.address, this.signer);
+        let amount = (await this.getPrice(assetId, price.currency.address, units)).amount;
+        let allowed = await ERC20Contract.allowance(signer, rain1155Address);
+        allowances.push({
+          type: Type.ERC20,
+          address: price.currency.address,
+          allowed: (allowed >= amount)? true: false,
+          amount: (allowed >= amount)? BigNumber.from(0): amount.sub(allowed),
+          name: await ERC20Contract.name(),
+          symbol: await ERC20Contract.name()
+        })
+      }else{
+        let ERC1155Contract = new ERC1155(price.currency.address, this.signer);
+        let erc1155Price = await this.getPrice(assetId, price.currency.address, units);
+        let allowed = await ERC1155Contract.isApprovedForAll(signer, rain1155Address);
+        let tokenURI: string ;
+        try {
+          tokenURI = (erc1155Price.currency.tokenId) ? await ERC1155Contract.uri(erc1155Price.currency.tokenId): "";
+          
+        } catch (error) {
+          tokenURI = `TokenID ${erc1155Price.currency.tokenId} may not exist now`;
+        }
+        allowances.push({
+          type: Type.ERC1155,
+          address: price.currency.address,
+          allowed: allowed,
+          amount: (allowed) ? BigNumber.from(0) :erc1155Price.amount,
+          tokenId: erc1155Price.currency.tokenId,
+          tokenURI: tokenURI
+        })
+      }
+    }
+
+    return allowances;
+  }
+
   public readonly assets: (
     arg0: BigNumberish,
     overrides?: ReadTxOverrides
@@ -511,3 +577,14 @@ export type condition = {
   balance?: BigNumber;
   id?: BigNumber;
 };
+
+export type allowance = {
+  type: number,
+  address: string,
+  allowed: boolean,
+  amount?: BigNumber,
+  tokenId?: BigNumberish,
+  tokenURI?: string,
+  name?: string,
+  symbol?: string
+}

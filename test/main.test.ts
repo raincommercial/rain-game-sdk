@@ -31,7 +31,6 @@ export let BNB: Token
 export let SOL: Token
 export let XRP: Token
 export let rTKN: Token
-
 export let BAYC: ReserveTokenERC721
 
 export let CARS: ReserveTokenERC1155
@@ -41,16 +40,18 @@ export let SHIPS: ReserveTokenERC1155
 export let erc20BalanceTier: ERC20BalanceTier
 
 export let owner: SignerWithAddress,
-  creator: SignerWithAddress,
-  creator2: SignerWithAddress,
-  buyer1: SignerWithAddress,
-  buyer2: SignerWithAddress,
-  buyer3: SignerWithAddress,
-  buyer4: SignerWithAddress,
-  buyer5: SignerWithAddress,
-  buyer6: SignerWithAddress,
-  gameAsstesOwner: SignerWithAddress,
-  admin: SignerWithAddress
+creator: SignerWithAddress,
+creator2: SignerWithAddress,
+buyer1: SignerWithAddress,
+buyer2: SignerWithAddress,
+buyer3: SignerWithAddress,
+buyer4: SignerWithAddress,
+buyer5: SignerWithAddress,
+buyer6: SignerWithAddress,
+gameAsstesOwner: SignerWithAddress,
+admin: SignerWithAddress
+
+export let prices: price[]
 
 before("Deploy Rain1155 Contract and subgraph", async function () {
   const signers = await ethers.getSigners();
@@ -159,7 +160,7 @@ describe("Rain1155 Test", function () {
 
   it("Should create asset '1' from creator. [AND - OR gating rules ((A && B) || (C && D)) ]", async function () {
 
-    const prices: price[] = [
+    prices = [
       {
         currency: {
           type: Type.ERC20,
@@ -191,10 +192,9 @@ describe("Rain1155 Test", function () {
         amount: ethers.BigNumber.from("5")
       },
     ];
-
     const [priceConfig, currencies] = Rain1155SDK.generatePriceScript(prices);
 
-    console.log(Rain1155SDK.generatePriceConfig(priceConfig, currencies));
+    // console.log(Rain1155SDK.generatePriceConfig(priceConfig, currencies));
 
     const tierCondition = 4
     const blockCondition = 15
@@ -283,6 +283,7 @@ describe("Rain1155 Test", function () {
       tokenURI: "https://ipfs.io/ipfs/QmVfbKBM7XxqZMRFzRGPGkWT8oUFNYY1DeK5dcoTgLuV8H",
       creator: creator.address,
     })
+
   });
 
   it("Should buy asset '1'", async function () {
@@ -290,23 +291,29 @@ describe("Rain1155 Test", function () {
     await rTKN.connect(buyer1).mintTokens(5)
 
     await USDT.connect(buyer1).mintTokens(15);
-    await BNB.connect(buyer1).mintTokens(25);
-
-    await SOL.connect(buyer1).mintTokens(10);
-
-    await BAYC.connect(buyer1).mintNewToken();
-
     await CARS.connect(buyer1).mintTokens(ethers.BigNumber.from("5"), 10)
+    
+    let USDTPrice = (await rain1155SDK.getPrice(1, USDT.address, 1))
+    await USDT.connect(buyer1).approve(rain1155.address, USDTPrice.amount);
+    await CARS.connect(buyer1).setApprovalForAll(rain1155.address, true);
+
+
+    console.log(await rain1155SDK.checkAllowance(1, prices, 1, rain1155.address, buyer1.address))
+
+    
+    await SOL.connect(buyer1).mintTokens(10);
+    
+    await BAYC.connect(buyer1).mintNewToken();
+    
+    await BNB.connect(buyer1).mintTokens(25);
     await PLANES.connect(buyer1).mintTokens(ethers.BigNumber.from("15"), 5)
     await SHIPS.connect(buyer1).mintTokens(ethers.BigNumber.from("10"), 11)
 
-    let USDTPrice = (await rain1155SDK.getAssetPrice(assetId, USDT.address, 1))[1]
-    let BNBPrice = (await rain1155SDK.getAssetPrice(assetId, BNB.address, 1))[1]
+    let BNBPrice = (await rain1155SDK.getPrice(1, BNB.address, 1))
 
-    await USDT.connect(buyer1).approve(rain1155.address, USDTPrice);
-    await BNB.connect(buyer1).approve(rain1155.address, BNBPrice);
 
-    await CARS.connect(buyer1).setApprovalForAll(rain1155.address, true);
+    await BNB.connect(buyer1).approve(rain1155.address, BNBPrice.amount);
+
     await PLANES.connect(buyer1).setApprovalForAll(rain1155.address, true);
 
     await rain1155SDK.connect(buyer1).mintAssets(assetId, 1);
