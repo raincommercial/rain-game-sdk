@@ -59,7 +59,7 @@ module.exports = {
       },
     ],
   },
-  defaultNetwork: 'hardhat',
+  defaultNetwork: 'localhost',
   networks: {
     localhost: createLocalHostConfig(),
     hardhat: {

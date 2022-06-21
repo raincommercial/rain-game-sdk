@@ -1,10 +1,8 @@
-const { expect } = require("chai");
-const { artifacts, ethers, } = require("hardhat");
-const { expectRevert } = require('@openzeppelin/test-helpers')
-
+import { expect } from "chai";
+import { artifacts, ethers, } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { it } from "mocha";
-import type { Rain1155 } from "../typechain/Rain1155";
+import type { Rain1155, Rain1155ConfigStruct } from "../typechain/Rain1155";
 import type { Token } from "../typechain/Token";
 import type { ReserveToken } from "../typechain/ReserveToken";
 import type { ReserveTokenERC1155 } from "../typechain/ReserveTokenERC1155";
@@ -13,15 +11,19 @@ import type { ERC20BalanceTierFactory } from "../typechain/ERC20BalanceTierFacto
 import type { ERC20BalanceTier } from "../typechain/ERC20BalanceTier";
 import { Rain1155 as Rain1155SDK, Type, Conditions, condition, price, AssetConfig } from "../dist";
 
-import { eighteenZeros, getEventArgs, fetchFile, writeFile, exec } from "./utils"
+import { eighteenZeros, getEventArgs, fetchFile, writeFile } from "./utils"
 import { Contract } from "ethers";
 import path from "path";
+import { VMStateBuilder } from "../typechain";
 
 const LEVELS = Array.from(Array(8).keys()).map((value) =>
   ethers.BigNumber.from(++value + eighteenZeros)
 ); // [1,2,3,4,5,6,7,8]
 
 export let rain1155: Rain1155
+export let rain1155Config: Rain1155ConfigStruct
+
+export let stateBuilder: VMStateBuilder;
 
 export let rain1155SDK: Rain1155SDK
 
@@ -68,10 +70,17 @@ before("Deploy Rain1155 Contract and subgraph", async function () {
   gameAsstesOwner = signers[9];
   admin = signers[10];
 
+  let StateBuilder = await ethers.getContractFactory("VMStateBuilder");
+  stateBuilder = await StateBuilder.deploy() as VMStateBuilder;
+  await stateBuilder.deployed();
 
   let Rain1155 = await ethers.getContractFactory("Rain1155")
 
-  rain1155 = await Rain1155.deploy()
+  rain1155Config = {
+    vmStateBuilder: stateBuilder.address
+  }
+
+  rain1155 = await Rain1155.deploy(rain1155Config) as Rain1155;
 
   await rain1155.deployed();
 
@@ -82,26 +91,26 @@ before("Deploy Rain1155 Contract and subgraph", async function () {
   const Erc721 = await ethers.getContractFactory("ReserveTokenERC721");
   const Erc1155 = await ethers.getContractFactory("ReserveTokenERC1155");
 
-  USDT = await stableCoins.deploy();
+  USDT = await stableCoins.deploy() as ReserveToken;
   await USDT.deployed();
-  BNB = await Erc20.deploy("Binance", "BNB");
+  BNB = await Erc20.deploy("Binance", "BNB") as Token;
   await BNB.deployed();
-  SOL = await Erc20.deploy("Solana", "SOL");
+  SOL = await Erc20.deploy("Solana", "SOL") as Token;
   await SOL.deployed();
-  XRP = await Erc20.deploy("Ripple", "XRP");
+  XRP = await Erc20.deploy("Ripple", "XRP") as Token;
   await XRP.deployed();
 
-  BAYC = await Erc721.deploy("Boared Ape Yatch Club", "BAYC");
+  BAYC = await Erc721.deploy("Boared Ape Yatch Club", "BAYC") as ReserveTokenERC721;
   await BAYC.deployed()
 
-  CARS = await Erc1155.deploy();
+  CARS = await Erc1155.deploy() as ReserveTokenERC1155;
   await CARS.deployed();
-  PLANES = await Erc1155.deploy();
+  PLANES = await Erc1155.deploy() as ReserveTokenERC1155;
   await PLANES.deployed();
-  SHIPS = await Erc1155.deploy();
+  SHIPS = await Erc1155.deploy() as ReserveTokenERC1155;
   await SHIPS.deployed();
 
-  rTKN = await Erc20.deploy("Rain Token", "rTKN");
+  rTKN = await Erc20.deploy("Rain Token", "rTKN") as Token;
   await rTKN.deployed()
 
   const erc20BalanceTierFactoryFactory = await ethers.getContractFactory("ERC20BalanceTierFactory");
@@ -146,11 +155,11 @@ before("Deploy Rain1155 Contract and subgraph", async function () {
 })
 
 describe("Rain1155 Test", function () {
-  it("Contract should be deployed.", async function () {
+  it.only("Contract should be deployed.", async function () {
     expect(rain1155.address).to.be.not.null;
   });
 
-  it("Should deploy all tokens", async function () {
+  it.only("Should deploy all tokens", async function () {
     expect(USDT.address).to.be.not.null;
     expect(BNB.address).to.be.not.null;
     expect(SOL.address).to.be.not.null;
@@ -158,7 +167,7 @@ describe("Rain1155 Test", function () {
     // console.log(USDT.address, BNB.address, SOL.address, XRP.address)
   });
 
-  it("Should create asset '1' from creator. [AND - OR gating rules ((A && B) || (C && D)) ]", async function () {
+  it.only("Should create asset '1' from creator. [AND - OR gating rules ((A && B) || (C && D)) ]", async function () {
 
     prices = [
       {
@@ -192,7 +201,6 @@ describe("Rain1155 Test", function () {
         amount: ethers.BigNumber.from("5")
       },
     ];
-    const [priceConfig, currencies] = Rain1155SDK.generatePriceScript(prices);
 
     // console.log(Rain1155SDK.generatePriceConfig(priceConfig, currencies));
 
@@ -203,20 +211,20 @@ describe("Rain1155 Test", function () {
       {
         type: Conditions.NONE
       },
-      {
-        type: Conditions.BLOCK_NUMBER,
-        blockNumber: blockCondition
-      },
-      {
-        type: Conditions.BALANCE_TIER,
-        tierAddress: erc20BalanceTier.address,
-        tierCondition: tierCondition
-      },
-      {
-        type: Conditions.ERC20BALANCE,
-        address: USDT.address,
-        balance: ethers.BigNumber.from("10" + eighteenZeros)
-      },
+      // {
+      //   type: Conditions.BLOCK_NUMBER,
+      //   blockNumber: blockCondition
+      // },
+      // // {
+      // //   type: Conditions.BALANCE_TIER,
+      // //   tierAddress: erc20BalanceTier.address,
+      // //   tierCondition: tierCondition
+      // // },
+      // {
+      //   type: Conditions.ERC20BALANCE,
+      //   address: USDT.address,
+      //   balance: ethers.BigNumber.from("10" + eighteenZeros)
+      // },
     ];
 
     const conditions2: condition[] = [
@@ -229,12 +237,11 @@ describe("Rain1155 Test", function () {
         type: Conditions.BLOCK_NUMBER,
         blockNumber: blockCondition
       },
-      {
-        type: Conditions.BALANCE_TIER,
-        tierAddress: erc20BalanceTier.address,
-        tierCondition: tierCondition
-      }
-
+      // {
+      //   type: Conditions.BALANCE_TIER,
+      //   tierAddress: erc20BalanceTier.address,
+      //   tierCondition: tierCondition
+      // }
     ];
 
     const conditions3: condition[] = [
@@ -256,11 +263,12 @@ describe("Rain1155 Test", function () {
       }
     ];
 
-    const canMintConfig = Rain1155SDK.generateCanMintScript([conditions1, conditions2, conditions3]);
+    const [ vmStateConfig, currencies ] = Rain1155SDK.generateScript([conditions1], prices); 
+    console.log(JSON.stringify(vmStateConfig, null, 2), currencies);
+
     const assetConfig: AssetConfig = {
       lootBoxId: ethers.BigNumber.from(0),
-      priceScript: priceConfig,
-      canMintScript: canMintConfig,
+      vmStateConfig: vmStateConfig,
       currencies: currencies,
       name: "F1",
       description: "BRUUUUMMM BRUUUMMM",
@@ -354,10 +362,13 @@ describe("Rain1155 Test", function () {
     await CARS.connect(buyer2).setApprovalForAll(rain1155.address, true);
     await PLANES.connect(buyer2).setApprovalForAll(rain1155.address, true);
 
-    await expectRevert(
-      rain1155SDK.connect(buyer2).mintAssets(assetId, 1),
-      "Cant Mint"
-    )
+    // await expectRevert(
+    //   rain1155SDK.connect(buyer2).mintAssets(assetId, 1),
+    //   "Cant Mint"
+    // )
+
+    await expect(rain1155SDK.connect(buyer2).mintAssets(assetId, 1)).to.revertedWith("Cant Mint");
+
     expect(await rain1155SDK.balanceOf(buyer2.address, assetId)).to.deep.equals(ethers.BigNumber.from("0"))
 
   });
@@ -397,9 +408,6 @@ describe("Rain1155 Test", function () {
       },
     ];
 
-    const [priceConfig, currencies] = Rain1155SDK.generatePriceScript(prices);
-
-    const tierCondition = 4
     const blockCondition = 15
 
     const conditions1: condition[] = [
@@ -422,11 +430,12 @@ describe("Rain1155 Test", function () {
       },
     ];
 
-    const canMintConfig = Rain1155SDK.generateCanMintScript([conditions1]);
+    const [ vmStateConfig, currencies ] = Rain1155SDK.generateScript([conditions1], prices); 
+
+
     const assetConfig: AssetConfig = {
       lootBoxId: ethers.BigNumber.from(0),
-      priceScript: priceConfig,
-      canMintScript: canMintConfig,
+      vmStateConfig: vmStateConfig,
       currencies: currencies,
       name: "F1",
       description: "BRUUUUMMM BRUUUMMM",
@@ -507,10 +516,13 @@ describe("Rain1155 Test", function () {
     await CARS.connect(buyer4).setApprovalForAll(rain1155.address, true);
     await PLANES.connect(buyer4).setApprovalForAll(rain1155.address, true);
 
-    await expectRevert(
-      rain1155SDK.connect(buyer4).mintAssets(assetId, 1),
-      "Cant Mint"
-    )
+    // await expectRevert(
+    //   rain1155SDK.connect(buyer4).mintAssets(assetId, 1),
+    //   "Cant Mint"
+    // )
+
+    await expect(rain1155SDK.connect(buyer4).mintAssets(assetId, 1)).to.revertedWith("Cant Mint");
+
 
     expect(await rain1155SDK.balanceOf(buyer4.address, assetId)).to.deep.equals(ethers.BigNumber.from("0"))
 
@@ -551,7 +563,6 @@ describe("Rain1155 Test", function () {
       },
     ];
 
-    const [priceConfig, currencies] = Rain1155SDK.generatePriceScript(prices);
 
     const conditions1: condition[] = [
       {
@@ -575,11 +586,11 @@ describe("Rain1155 Test", function () {
       },
     ];
 
-    const canMintConfig = Rain1155SDK.generateCanMintScript([conditions1, conditions2, conditions3]);
+    const [ vmStateConfig, currencies ] = Rain1155SDK.generateScript([conditions1, conditions2, conditions3], prices); 
+
     const assetConfig: AssetConfig = {
       lootBoxId: ethers.BigNumber.from(0),
-      priceScript: priceConfig,
-      canMintScript: canMintConfig,
+      vmStateConfig: vmStateConfig,
       currencies: currencies,
       name: "F1",
       description: "BRUUUUMMM BRUUUMMM",
@@ -656,10 +667,12 @@ describe("Rain1155 Test", function () {
     await CARS.connect(buyer6).setApprovalForAll(rain1155.address, true);
     await PLANES.connect(buyer6).setApprovalForAll(rain1155.address, true);
     
-    await expectRevert(
-      rain1155SDK.connect(buyer6).mintAssets(3, 1),
-      "Cant Mint"
-    )
+    // await expectRevert(
+    //   rain1155SDK.connect(buyer6).mintAssets(3, 1),
+    //   "Cant Mint"
+    // )
+    
+    await expect(rain1155SDK.connect(buyer6).mintAssets(3, 1)).to.revertedWith("Cant Mint");
     
     expect(await rain1155SDK.balanceOf(buyer6.address, 3)).to.deep.equals(ethers.BigNumber.from("0"))
     

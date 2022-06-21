@@ -36,7 +36,6 @@ enum GameAssetsOpcode {
 }
 export const Opcode = {
   ...AllStandardOps,
-  ...GameAssetsOpcode,
 };
 
 export type Bytes = ArrayLike<number>;
@@ -341,62 +340,62 @@ export const matchPattern = (
  * List of all patterns
  */
 const patterns = [
-  [Opcode.VAL, 0],
-  [Opcode.BLOCK_NUMBER, 0, Opcode.VAL, 0, Opcode.GREATER_THAN, 0],
+  [Opcode.CONSTANTS, 0],
+  [Opcode.BLOCK_NUMBER, 0, Opcode.CONSTANTS, 0, Opcode.GREATER_THAN, 0],
   [
-    Opcode.VAL,
+    Opcode.CONSTANTS,
     0,
-    Opcode.ACCOUNT,
+    Opcode.CONTEXT,
     0,
     Opcode.IERC20_BALANCE_OF,
     0,
-    Opcode.VAL,
+    Opcode.CONSTANTS,
     0,
     Opcode.GREATER_THAN,
     0,
   ],
   [
-    Opcode.VAL,
+    Opcode.CONSTANTS,
     0,
-    Opcode.ACCOUNT,
+    Opcode.CONTEXT,
     0,
     Opcode.IERC721_BALANCE_OF,
     0,
-    Opcode.VAL,
+    Opcode.CONSTANTS,
     0,
     Opcode.GREATER_THAN,
     0,
   ],
   [
-    Opcode.VAL,
+    Opcode.CONSTANTS,
     0,
-    Opcode.ACCOUNT,
+    Opcode.CONTEXT,
     0,
-    Opcode.VAL,
+    Opcode.CONSTANTS,
     0,
     Opcode.IERC1155_BALANCE_OF,
     0,
-    Opcode.VAL,
+    Opcode.CONSTANTS,
     0,
     Opcode.GREATER_THAN,
     0,
   ],
-  [
-    Opcode.VAL,
-    0,
-    Opcode.ACCOUNT,
-    0,
-    Opcode.REPORT,
-    0,
-    Opcode.BLOCK_NUMBER,
-    0,
-    Opcode.REPORT_AT_BLOCK,
-    0,
-    Opcode.VAL,
-    0,
-    Opcode.GREATER_THAN,
-    0,
-  ],
+  // [
+  //   Opcode.CONSTANTS,
+  //   0,
+  //   Opcode.CONTEXT,
+  //   0,
+  //   Opcode.REPORT,
+  //   0,
+  //   Opcode.BLOCK_NUMBER,
+  //   0,
+  //   Opcode.REPORT_AT_BLOCK,
+  //   0,
+  //   Opcode.CONSTANTS,
+  //   0,
+  //   Opcode.GREATER_THAN,
+  //   0,
+  // ],
 ];
 
 /**
@@ -460,14 +459,14 @@ export const getCondition = (
       balance: BigNumber.from(constants[opcodes[9]]),
     };
     return condition;
-  } else if (opcodes.includes(Opcode.REPORT_AT_BLOCK)) {
-    // ERC20BalanceTier condition
-    let condition: condition = {
-      type: Conditions.BALANCE_TIER,
-      tierAddress: constants[opcodes[1]].toString(),
-      tierCondition: parseInt(constants[opcodes[11]].toString()),
-    };
-    return condition;
+  // } else if (opcodes.includes(Opcode.REPORT_AT_BLOCK)) {
+  //   // ERC20BalanceTier condition
+  //   let condition: condition = {
+  //     type: Conditions.BALANCE_TIER,
+  //     tierAddress: constants[opcodes[1]].toString(),
+  //     tierCondition: parseInt(constants[opcodes[11]].toString()),
+  //   };
+  //   return condition;
   }
   let condition: condition = {
     type: Conditions.NONE,

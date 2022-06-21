@@ -76,60 +76,42 @@ export enum Conditions {
  * @param prices Array of type price
  * @returns VMState: StateConfig, string[]: array of token addresses.
  */
-const generatePriceScript = (prices: price[]): [VMState, string[]] => {
+const generatePriceScript = (prices: price[], pos: number): [Uint8Array, BigNumberish[], string[]] => {
   let error = new ScriptError('Invalid Script parameters.');
-  let pos = -1; // setting pos(position) variable tp -1
   let currencies: string[] = [];
   let sources: BytesLike[] = [];
   let constants: BigNumberish[] = [];
   let i;
   if (prices.length === 0) {// If empty config received return source with one opcode and empty currencies arary.
-    let state: VMState = {
-      sources: [concat([op(Opcode.SKIP)])],
-      constants: constants,
-      stackLength: 1,
-      argumentsLength: 0,
-    };
-    return [state, currencies];
+    return [concat([op(Opcode.CONSTANTS)]), constants, currencies];
   }
   for (i = 0; i < prices.length; i++) { // else loop over the prices array
     let obj = prices[i];
     if (obj.currency.type === Type.ERC1155) { // check price type
-      sources.push(
-        concat([
-          op(Opcode.VAL, ++pos),
-          op(Opcode.VAL, ++pos),
-          op(Opcode.VAL, ++pos),
-          op(Opcode.CURRENT_UNITS),
-          op(Opcode.MUL, 2)
-        ])
-      ); // pushed 3 items in constants so used ++pos 3 times, then (Opcode.VAL, pos) will point to correct constant
+      sources.push(op(Opcode.CONSTANTS, ++pos))
+      sources.push(op(Opcode.CONSTANTS, ++pos))
+      sources.push(op(Opcode.CONSTANTS, ++pos))
+      sources.push(op(Opcode.CONTEXT))
+      sources.push(op(Opcode.MUL, 2))
+      
+      // pushed 3 items in constants so used ++pos 3 times, then (Opcode.CONSTANTS, pos) will point to correct constant
       constants.push(obj.currency.type); // push currency type in constants
       if (obj.currency.tokenId) {
         constants.push(obj.currency.tokenId); // push tokenId in constants
       } else throw error.error('ERC1155', 'currency.tokenId');
       constants.push(obj.amount); // push amount in constants
     } else { // ERC20 type 
-      sources.push(
-        concat([
-          op(Opcode.VAL, ++pos),
-          op(Opcode.VAL, ++pos),
-          op(Opcode.CURRENT_UNITS),
-          op(Opcode.MUL, 2)
-        ])
-      ); // pushed 2 items in constants so used ++pos 2 times, then (Opcode.VAL, pos) will point to correct constant
+      sources.push(op(Opcode.CONSTANTS, ++pos));
+      sources.push(op(Opcode.CONSTANTS, ++pos));
+      sources.push(op(Opcode.CONTEXT));
+      sources.push(op(Opcode.MUL, 2));
+     // pushed 2 items in constants so used ++pos 2 times, then (Opcode.CONSTANTS, pos) will point to correct constant
       constants.push(obj.currency.type); // push currency type in constants
       constants.push(obj.amount); // push amount in constants
     }
     currencies.push(obj.currency.address);
   }
-  let state: VMState = {
-    sources: sources,
-    constants: constants,
-    stackLength: 5,
-    argumentsLength: 0,
-  };
-  return [state, currencies]; // return the stateConfig and currencies[]
+  return [concat(sources), constants, currencies]; // return the stateConfig and currencies[]
 };
 
 /**
@@ -173,45 +155,43 @@ const generatePriceConfig = (
 /**
  * 
  * @param conditions array of conditions
- * @returns StateConfig for canMint
+ * @returns [Uint8Array, BigNumberish[]] for canMint
  */
-const generateCanMintScript = (conditionsGroup: condition[][]): VMState => {
+const generateCanMintScript = (conditionsGroup: condition[][]): [Uint8Array, BigNumberish[]] => {
   let error = new ScriptError('Invalid Script parameters.');
   let pos = -1;
   let sources: Uint8Array[] = [];
   let constants: BigNumberish[] = [];
   let i;
-  let stackLenght = 3; // minimum stackLenght required for one binary opration in VM
   let outerArrIterator;
-  let totalStackLength = 0;
   for (outerArrIterator = 0; outerArrIterator < conditionsGroup.length; outerArrIterator++) {
     const conditions = conditionsGroup[outerArrIterator];
     for (i = 0; i < conditions.length; i++) { // Loop over conditions
       let condition = conditions[i];
       if (condition.type === Conditions.NONE) { // No condition
         constants.push(1); // push 1 in constants, will return true for Every OP in the end
-        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.CONSTANTS, ++pos));
       } else if (condition.type === Conditions.BLOCK_NUMBER) {
         if (condition.blockNumber) {
           constants.push(condition.blockNumber);
         } else throw error.error('BLOCK_NUMBER', 'blockNumber');
         sources.push(op(Opcode.BLOCK_NUMBER));
-        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.CONSTANTS, ++pos));
         sources.push(op(Opcode.GREATER_THAN));
-      } else if (condition.type === Conditions.BALANCE_TIER) {
-        if (condition.tierAddress) {
-          constants.push(condition.tierAddress);
-        } else throw error.error('BALANCE_TIER', 'tierAddress');
-        if (condition.tierCondition) {
-          constants.push(condition.tierCondition);
-        } else throw error.error('BALANCE_TIER', 'tierCondition');
-        sources.push(op(Opcode.VAL, ++pos));
-        sources.push(op(Opcode.ACCOUNT));
-        sources.push(op(Opcode.REPORT));
-        sources.push(op(Opcode.BLOCK_NUMBER));
-        sources.push(op(Opcode.REPORT_AT_BLOCK));
-        sources.push(op(Opcode.VAL, ++pos));
-        sources.push(op(Opcode.GREATER_THAN));
+      // } else if (condition.type === Conditions.BALANCE_TIER) {
+      //   if (condition.tierAddress) {
+      //     constants.push(condition.tierAddress);
+      //   } else throw error.error('BALANCE_TIER', 'tierAddress');
+      //   if (condition.tierCondition) {
+      //     constants.push(condition.tierCondition);
+      //   } else throw error.error('BALANCE_TIER', 'tierCondition');
+      //   sources.push(op(Opcode.CONSTANTS, ++pos));
+      //   sources.push(op(Opcode.CONTEXT));
+      //   sources.push(op(Opcode.REPORT));
+      //   sources.push(op(Opcode.BLOCK_NUMBER));
+      //   sources.push(op(Opcode.REPORT_AT_BLOCK));
+      //   sources.push(op(Opcode.CONSTANTS, ++pos));
+      //   sources.push(op(Opcode.GREATER_THAN));
       } else if (condition.type === Conditions.ERC20BALANCE) {
         if (condition.address) {
           constants.push(condition.address);
@@ -219,10 +199,10 @@ const generateCanMintScript = (conditionsGroup: condition[][]): VMState => {
         if (condition.balance) {
           constants.push(condition.balance);
         } else throw error.error('ERC20BALANCE', 'balance');
-        sources.push(op(Opcode.VAL, ++pos));
-        sources.push(op(Opcode.ACCOUNT));
+        sources.push(op(Opcode.CONSTANTS, ++pos));
+        sources.push(op(Opcode.CONTEXT));
         sources.push(op(Opcode.IERC20_BALANCE_OF));
-        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.CONSTANTS, ++pos));
         sources.push(op(Opcode.GREATER_THAN));
       } else if (condition.type === Conditions.ERC721BALANCE) {
         if (condition.address) {
@@ -231,10 +211,10 @@ const generateCanMintScript = (conditionsGroup: condition[][]): VMState => {
         if (condition.balance) {
           constants.push(condition.balance);
         } else throw error.error('ERC721BALANCE', 'balance');
-        sources.push(op(Opcode.VAL, ++pos));
-        sources.push(op(Opcode.ACCOUNT));
+        sources.push(op(Opcode.CONSTANTS, ++pos));
+        sources.push(op(Opcode.CONTEXT));
         sources.push(op(Opcode.IERC721_BALANCE_OF));
-        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.CONSTANTS, ++pos));
         sources.push(op(Opcode.GREATER_THAN));
       } else if (condition.type === Conditions.ERC1155BALANCE) {
         if (condition.address) {
@@ -246,28 +226,20 @@ const generateCanMintScript = (conditionsGroup: condition[][]): VMState => {
         if (condition.balance) {
           constants.push(condition.balance);
         } else throw error.error('ERC1155BALANCE', 'balance');
-        sources.push(op(Opcode.VAL, ++pos));
-        sources.push(op(Opcode.ACCOUNT));
-        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.CONSTANTS, ++pos));
+        sources.push(op(Opcode.CONTEXT));
+        sources.push(op(Opcode.CONSTANTS, ++pos));
         sources.push(op(Opcode.IERC1155_BALANCE_OF));
-        sources.push(op(Opcode.VAL, ++pos));
+        sources.push(op(Opcode.CONSTANTS, ++pos));
         sources.push(op(Opcode.GREATER_THAN));
       }
     }
     sources.push(op(Opcode.EVERY, conditions.length)); // EVERY opcode to check  all conditions within this group are true
-    totalStackLength += conditions.length;
   }
   sources.push(op(Opcode.ANY, conditionsGroup.length)); // Last OP as ANY to check any of the above condition group is true
   // console.log("SOURCES = ", sources);
-  let state: VMState = {
-    sources: [concat(sources)],
-    constants: constants,
-
-    stackLength: stackLenght + totalStackLength,
-    argumentsLength: 0,
-  };
   // console.log("STATE = ", state);
-  return state;
+  return [concat(sources), constants];
 };
 
 /**
@@ -297,6 +269,22 @@ const generateCanMintScript = (conditionsGroup: condition[][]): VMState => {
   return conditions;
 };
 
+const generateScript = (conditionsGroup: condition[][], prices: price[]): [VMState, string[]] => {
+  const [ canMintSource, canMintConstants ] = generateCanMintScript(conditionsGroup);
+
+  const [ priceSources, priceConstants, currencies ] = generatePriceScript(prices, canMintConstants.length - 1);
+
+  const sources = [canMintSource, priceSources];
+  const constants = [...canMintConstants, ...priceConstants];
+
+  return [
+    {
+      sources: sources,
+      constants: constants
+    },
+    currencies
+  ];
+}
 
 const isERC721 = async (address: string, signer: SignerWithAddress): Promise<boolean> => {
   let erc721 = new ERC721(address, signer);
@@ -375,6 +363,8 @@ export class Rain1155 extends RainContract {
 
   public static readonly generateCanMintScript = generateCanMintScript;
   public static readonly generateCanMintConfig = generateCanMintConfig;
+  
+  public static readonly generateScript = generateScript;
 
   public readonly getPrice = async (
     _assetId: BigNumberish,
@@ -531,8 +521,8 @@ export class Rain1155 extends RainContract {
 export type AssetDetails = {
   lootBoxId: BigNumber;
   id: BigNumber;
-  priceScript: State;
-  canMintScript: State;
+  vmStateConfig: StateConfigStruct;
+  vmStatePointer: string;
   recipient: string;
   tokenURI: string;
 };
@@ -541,8 +531,7 @@ export type AssetConfig = {
   name: string;
   description: string;
   lootBoxId: BigNumber;
-  priceScript: StateConfigStruct;
-  canMintScript: StateConfigStruct;
+  vmStateConfig: StateConfigStruct;
   currencies: string[];
   recipient: string;
   tokenURI: string;
