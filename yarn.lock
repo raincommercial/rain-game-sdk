@@ -964,9 +964,9 @@
     "@openzeppelin/contracts" "^4.3.3"
     "@openzeppelin/contracts-upgradeable" "^4.4.1"
 
-"@beehiveinnovation/rain1155@git+https://github.com/beehive-innovation/rain1155.git#91f7b2a94c2754d893b851526dc39e82f8667e31":
+"@beehiveinnovation/rain1155@git+https://github.com/beehive-innovation/rain1155.git#ae30a945ef96f1364cc70cc352aae5c7c5e7d520":
   version "0.0.1"
-  resolved "git+https://github.com/beehive-innovation/rain1155.git#91f7b2a94c2754d893b851526dc39e82f8667e31"
+  resolved "git+https://github.com/beehive-innovation/rain1155.git#ae30a945ef96f1364cc70cc352aae5c7c5e7d520"
   dependencies:
     "@0xsequence/sstore2" "github:0xsequence/sstore2"
     "@beehiveinnovation/rain-protocol" "git+https://github.com/beehive-innovation/rain-protocol.git#af9a3f638d8084d96cbf6898c035920544647879"
@@ -13001,9 +13001,9 @@ rain-sdk@^0.0.2-alpha.1:
     ethers "^5.5.2"
     prettier "^2.6.2"
 
-"rain-sdk@git+https://github.com/beehive-innovation/rain-sdk.git#54c5fde61d87ebccb4dff74365fdc17c70aae528":
+"rain-sdk@git+https://github.com/beehive-innovation/rain-sdk.git#17a7a72339d14cff1dd00c16b5d9a5b5173f6488":
   version "1.1.0"
-  resolved "git+https://github.com/beehive-innovation/rain-sdk.git#54c5fde61d87ebccb4dff74365fdc17c70aae528"
+  resolved "git+https://github.com/beehive-innovation/rain-sdk.git#17a7a72339d14cff1dd00c16b5d9a5b5173f6488"
   dependencies:
     ethers "^5.5.2"
     prettier "^2.6.2"

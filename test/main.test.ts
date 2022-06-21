@@ -210,7 +210,7 @@ describe("Rain1155 Test", function () {
     const conditions1: condition[] = [
       {
         type: Conditions.NONE
-      },
+      }, 
       // {
       //   type: Conditions.BLOCK_NUMBER,
       //   blockNumber: blockCondition

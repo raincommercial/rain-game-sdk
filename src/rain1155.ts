@@ -83,29 +83,29 @@ const generatePriceScript = (prices: price[], pos: number): [Uint8Array, BigNumb
   let constants: BigNumberish[] = [];
   let i;
   if (prices.length === 0) {// If empty config received return source with one opcode and empty currencies arary.
-    return [concat([op(Opcode.CONSTANTS)]), constants, currencies];
+    return [concat([op(Opcode.CONSTANT)]), constants, currencies];
   }
   for (i = 0; i < prices.length; i++) { // else loop over the prices array
     let obj = prices[i];
     if (obj.currency.type === Type.ERC1155) { // check price type
-      sources.push(op(Opcode.CONSTANTS, ++pos))
-      sources.push(op(Opcode.CONSTANTS, ++pos))
-      sources.push(op(Opcode.CONSTANTS, ++pos))
-      sources.push(op(Opcode.CONTEXT))
+      sources.push(op(Opcode.CONSTANT, ++pos)) // token type ERC1155 = 1
+      sources.push(op(Opcode.CONSTANT, ++pos)) // tokeinID
+      sources.push(op(Opcode.CONSTANT, ++pos)) // amount
+      sources.push(op(Opcode.CONTEXT, 0))
       sources.push(op(Opcode.MUL, 2))
       
-      // pushed 3 items in constants so used ++pos 3 times, then (Opcode.CONSTANTS, pos) will point to correct constant
+      // pushed 3 items in constants so used ++pos 3 times, then (Opcode.CONSTANT, pos) will point to correct constant
       constants.push(obj.currency.type); // push currency type in constants
       if (obj.currency.tokenId) {
         constants.push(obj.currency.tokenId); // push tokenId in constants
       } else throw error.error('ERC1155', 'currency.tokenId');
       constants.push(obj.amount); // push amount in constants
     } else { // ERC20 type 
-      sources.push(op(Opcode.CONSTANTS, ++pos));
-      sources.push(op(Opcode.CONSTANTS, ++pos));
-      sources.push(op(Opcode.CONTEXT));
+      sources.push(op(Opcode.CONSTANT, ++pos)); // token type ERC20 = 0
+      sources.push(op(Opcode.CONSTANT, ++pos)); // amount
+      sources.push(op(Opcode.CONTEXT, 0));
       sources.push(op(Opcode.MUL, 2));
-     // pushed 2 items in constants so used ++pos 2 times, then (Opcode.CONSTANTS, pos) will point to correct constant
+     // pushed 2 items in constants so used ++pos 2 times, then (Opcode.CONSTANT, pos) will point to correct constant
       constants.push(obj.currency.type); // push currency type in constants
       constants.push(obj.amount); // push amount in constants
     }
@@ -170,13 +170,13 @@ const generateCanMintScript = (conditionsGroup: condition[][]): [Uint8Array, Big
       let condition = conditions[i];
       if (condition.type === Conditions.NONE) { // No condition
         constants.push(1); // push 1 in constants, will return true for Every OP in the end
-        sources.push(op(Opcode.CONSTANTS, ++pos));
+        sources.push(op(Opcode.CONSTANT, ++pos));
       } else if (condition.type === Conditions.BLOCK_NUMBER) {
         if (condition.blockNumber) {
           constants.push(condition.blockNumber);
         } else throw error.error('BLOCK_NUMBER', 'blockNumber');
         sources.push(op(Opcode.BLOCK_NUMBER));
-        sources.push(op(Opcode.CONSTANTS, ++pos));
+        sources.push(op(Opcode.CONSTANT, ++pos));
         sources.push(op(Opcode.GREATER_THAN));
       // } else if (condition.type === Conditions.BALANCE_TIER) {
       //   if (condition.tierAddress) {
@@ -185,12 +185,12 @@ const generateCanMintScript = (conditionsGroup: condition[][]): [Uint8Array, Big
       //   if (condition.tierCondition) {
       //     constants.push(condition.tierCondition);
       //   } else throw error.error('BALANCE_TIER', 'tierCondition');
-      //   sources.push(op(Opcode.CONSTANTS, ++pos));
+      //   sources.push(op(Opcode.CONSTANT, ++pos));
       //   sources.push(op(Opcode.CONTEXT));
       //   sources.push(op(Opcode.REPORT));
       //   sources.push(op(Opcode.BLOCK_NUMBER));
       //   sources.push(op(Opcode.REPORT_AT_BLOCK));
-      //   sources.push(op(Opcode.CONSTANTS, ++pos));
+      //   sources.push(op(Opcode.CONSTANT, ++pos));
       //   sources.push(op(Opcode.GREATER_THAN));
       } else if (condition.type === Conditions.ERC20BALANCE) {
         if (condition.address) {
@@ -199,10 +199,10 @@ const generateCanMintScript = (conditionsGroup: condition[][]): [Uint8Array, Big
         if (condition.balance) {
           constants.push(condition.balance);
         } else throw error.error('ERC20BALANCE', 'balance');
-        sources.push(op(Opcode.CONSTANTS, ++pos));
-        sources.push(op(Opcode.CONTEXT));
+        sources.push(op(Opcode.CONSTANT, ++pos));
+        sources.push(op(Opcode.CONTEXT, 0));
         sources.push(op(Opcode.IERC20_BALANCE_OF));
-        sources.push(op(Opcode.CONSTANTS, ++pos));
+        sources.push(op(Opcode.CONSTANT, ++pos));
         sources.push(op(Opcode.GREATER_THAN));
       } else if (condition.type === Conditions.ERC721BALANCE) {
         if (condition.address) {
@@ -211,10 +211,10 @@ const generateCanMintScript = (conditionsGroup: condition[][]): [Uint8Array, Big
         if (condition.balance) {
           constants.push(condition.balance);
         } else throw error.error('ERC721BALANCE', 'balance');
-        sources.push(op(Opcode.CONSTANTS, ++pos));
-        sources.push(op(Opcode.CONTEXT));
+        sources.push(op(Opcode.CONSTANT, ++pos));
+        sources.push(op(Opcode.CONTEXT, 0));
         sources.push(op(Opcode.IERC721_BALANCE_OF));
-        sources.push(op(Opcode.CONSTANTS, ++pos));
+        sources.push(op(Opcode.CONSTANT, ++pos));
         sources.push(op(Opcode.GREATER_THAN));
       } else if (condition.type === Conditions.ERC1155BALANCE) {
         if (condition.address) {
@@ -226,11 +226,11 @@ const generateCanMintScript = (conditionsGroup: condition[][]): [Uint8Array, Big
         if (condition.balance) {
           constants.push(condition.balance);
         } else throw error.error('ERC1155BALANCE', 'balance');
-        sources.push(op(Opcode.CONSTANTS, ++pos));
+        sources.push(op(Opcode.CONSTANT, ++pos));
         sources.push(op(Opcode.CONTEXT));
-        sources.push(op(Opcode.CONSTANTS, ++pos));
+        sources.push(op(Opcode.CONSTANT, ++pos));
         sources.push(op(Opcode.IERC1155_BALANCE_OF));
-        sources.push(op(Opcode.CONSTANTS, ++pos));
+        sources.push(op(Opcode.CONSTANT, ++pos));
         sources.push(op(Opcode.GREATER_THAN));
       }
     }
