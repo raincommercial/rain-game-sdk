@@ -5,8 +5,8 @@ import { BigNumber, BigNumberish } from 'ethers';
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
-import { AllStandardOps } from 'rain-sdk';
 import { condition } from './rain1155';
+import { AllStandardOps } from "rain-sdk";
 
 const logger = new Logger(version);
 
@@ -29,11 +29,53 @@ export enum Conditions {
   ERC1155BALANCE,
 }
 
-enum GameAssetsOpcode {
-  REPORT_AT_BLOCK = 0 + AllStandardOps.length,
-  ACCOUNT,
-  CURRENT_UNITS,
-}
+// export enum AllStandardOps {
+//   CONSTANT,
+//   STACK,
+//   CONTEXT,
+//   STORAGE,
+//   ZIPMAP,
+//   DEBUG,
+//   BLOCK_NUMBER,
+//   BLOCK_TIMESTAMP,
+//   SENDER,
+//   THIS_ADDRESS,
+//   SCALE18_MUL,
+//   SCALE18_DIV,
+//   SCALE18,
+//   SCALEN,
+//   SCALE_BY,
+//   ADD,
+//   SATURATING_ADD,
+//   SUB,
+//   SATURATING_SUB,
+//   MUL,
+//   SATURATING_MUL,
+//   DIV,
+//   MOD,
+//   EXP,
+//   MIN,
+//   MAX,
+//   ISZERO,
+//   EAGER_IF,
+//   EQUAL_TO,
+//   LESS_THAN,
+//   GREATER_THAN,
+//   EVERY,
+//   ANY,
+//   REPORT,
+//   SATURATING_DIFF,
+//   UPDATE_BLOCKS_FOR_TIER_RANGE,
+//   SELECT_LTE,
+//   IERC20_BALANCE_OF,
+//   IERC20_TOTAL_SUPPLY,
+//   IERC721_BALANCE_OF,
+//   IERC721_OWNER_OF,
+//   IERC1155_BALANCE_OF,
+//   IERC1155_BALANCE_OF_BATCH,
+//   length,
+// }
+
 export const Opcode = {
   ...AllStandardOps,
 };
@@ -340,48 +382,48 @@ export const matchPattern = (
  * List of all patterns
  */
 const patterns = [
-  [Opcode.CONSTANTS, 0],
-  [Opcode.BLOCK_NUMBER, 0, Opcode.CONSTANTS, 0, Opcode.GREATER_THAN, 0],
+  [Opcode.CONSTANT, 0],
+  [Opcode.BLOCK_NUMBER, 0, Opcode.CONSTANT, 0, Opcode.GREATER_THAN, 0],
   [
-    Opcode.CONSTANTS,
+    Opcode.CONSTANT,
     0,
     Opcode.CONTEXT,
     0,
     Opcode.IERC20_BALANCE_OF,
     0,
-    Opcode.CONSTANTS,
+    Opcode.CONSTANT,
     0,
     Opcode.GREATER_THAN,
     0,
   ],
   [
-    Opcode.CONSTANTS,
+    Opcode.CONSTANT,
     0,
     Opcode.CONTEXT,
     0,
     Opcode.IERC721_BALANCE_OF,
     0,
-    Opcode.CONSTANTS,
+    Opcode.CONSTANT,
     0,
     Opcode.GREATER_THAN,
     0,
   ],
   [
-    Opcode.CONSTANTS,
+    Opcode.CONSTANT,
     0,
     Opcode.CONTEXT,
     0,
-    Opcode.CONSTANTS,
+    Opcode.CONSTANT,
     0,
     Opcode.IERC1155_BALANCE_OF,
     0,
-    Opcode.CONSTANTS,
+    Opcode.CONSTANT,
     0,
     Opcode.GREATER_THAN,
     0,
   ],
   // [
-  //   Opcode.CONSTANTS,
+  //   Opcode.CONSTANT,
   //   0,
   //   Opcode.CONTEXT,
   //   0,
@@ -391,7 +433,7 @@ const patterns = [
   //   0,
   //   Opcode.REPORT_AT_BLOCK,
   //   0,
-  //   Opcode.CONSTANTS,
+  //   Opcode.CONSTANT,
   //   0,
   //   Opcode.GREATER_THAN,
   //   0,

@@ -2,19 +2,6 @@
 # yarn lockfile v1
 
 
-"@0xsequence/create3@https://github.com/0xsequence/create3.git":
-  version "3.0.0"
-  resolved "https://github.com/0xsequence/create3.git#acc4703a21ec1d71dc2a99db088c4b1f467530fd"
-  dependencies:
-    csv-writer "^1.6.0"
-
-"@0xsequence/sstore2@github:0xsequence/sstore2":
-  version "1.1.0"
-  resolved "https://codeload.github.com/0xsequence/sstore2/tar.gz/0a28fe61b6e81de9a05b462a24b9f4ba8c70d5b7"
-  dependencies:
-    "@0xsequence/create3" "https://github.com/0xsequence/create3.git"
-    csv-writer "^1.6.0"
-
 "@ampproject/remapping@^2.1.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@ampproject/remapping/-/remapping-2.2.0.tgz#56c133824780de3174aed5ab6834f3026790154d"
@@ -957,19 +944,18 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@beehiveinnovation/rain-protocol@git+https://github.com/beehive-innovation/rain-protocol.git#af9a3f638d8084d96cbf6898c035920544647879":
+"@beehiveinnovation/rain-protocol@git+https://github.com/beehive-innovation/rain-protocol.git#5a35b097475d37fd5f44446922a32025708c1f8c":
   version "0.0.16"
-  resolved "git+https://github.com/beehive-innovation/rain-protocol.git#af9a3f638d8084d96cbf6898c035920544647879"
+  resolved "git+https://github.com/beehive-innovation/rain-protocol.git#5a35b097475d37fd5f44446922a32025708c1f8c"
   dependencies:
     "@openzeppelin/contracts" "^4.3.3"
     "@openzeppelin/contracts-upgradeable" "^4.4.1"
 
-"@beehiveinnovation/rain1155@git+https://github.com/beehive-innovation/rain1155.git#ae30a945ef96f1364cc70cc352aae5c7c5e7d520":
+"@beehiveinnovation/rain1155@git+https://github.com/beehive-innovation/rain1155.git#d16a49864fcffd6c36fc06b676dd9505eab9b03e":
   version "0.0.1"
-  resolved "git+https://github.com/beehive-innovation/rain1155.git#ae30a945ef96f1364cc70cc352aae5c7c5e7d520"
+  resolved "git+https://github.com/beehive-innovation/rain1155.git#d16a49864fcffd6c36fc06b676dd9505eab9b03e"
   dependencies:
-    "@0xsequence/sstore2" "github:0xsequence/sstore2"
-    "@beehiveinnovation/rain-protocol" "git+https://github.com/beehive-innovation/rain-protocol.git#af9a3f638d8084d96cbf6898c035920544647879"
+    "@beehiveinnovation/rain-protocol" "git+https://github.com/beehive-innovation/rain-protocol.git#5a35b097475d37fd5f44446922a32025708c1f8c"
     "@graphprotocol/graph-cli" "0.26.0"
     "@graphprotocol/graph-ts" "0.26.0"
     "@nomiclabs/hardhat-waffle" "^2.0.3"
@@ -5757,11 +5743,6 @@ cssstyle@^2.3.0:
   integrity sha512-AZL67abkUzIuvcHqk7c09cezpGNcxUxU4Ioi/05xHk4DQeTkWmGYftIE6ctU6AEt+Gn4n1lDStOtj7FKycP71A==
   dependencies:
     cssom "~0.3.6"
-
-csv-writer@^1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/csv-writer/-/csv-writer-1.6.0.tgz#d0cea44b6b4d7d3baa2ecc6f3f7209233514bcf9"
-  integrity sha512-NOx7YDFWEsM/fTRAJjRpPp8t+MKRVvniAg9wQlUKx20MFrPs73WLJhFf5iteqrxNYnsy924K3Iroh3yNHeYd2g==
 
 d@1, d@^1.0.1:
   version "1.0.1"
@@ -12993,17 +12974,18 @@ rain-game-sdk@0.0.1-alpha.1:
     apollo-fetch "^0.7.0"
     ethers "^5.5.2"
 
-rain-sdk@^0.0.2-alpha.1:
-  version "0.0.2-alpha.1"
-  resolved "https://registry.yarnpkg.com/rain-sdk/-/rain-sdk-0.0.2-alpha.1.tgz#9f33d8714e88ff6e197965a32c4953c2f4dcc42d"
-  integrity sha512-XAXI4VKTSVs2LI/6vlpCyBjx+mehjKHyNjJTW2jPz9JdWtmz/ngPo9Bayz+LlNLfQBfmdEkWyJ/oaTYk4E4atg==
+rain-sdk@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/rain-sdk/-/rain-sdk-2.0.0.tgz#1e3e18f806a03b9343cf2820a66c0db1260d2bf3"
+  integrity sha512-uMLyyEGeVNMuq2qSYoNP4Er1bK3v9ymzy+g5+R5qW8fBGNLGA0p+dFww/MXLa4HBcjhqzeUcx4JE8C04tgjInw==
   dependencies:
     ethers "^5.5.2"
     prettier "^2.6.2"
 
-"rain-sdk@git+https://github.com/beehive-innovation/rain-sdk.git#17a7a72339d14cff1dd00c16b5d9a5b5173f6488":
-  version "1.1.0"
-  resolved "git+https://github.com/beehive-innovation/rain-sdk.git#17a7a72339d14cff1dd00c16b5d9a5b5173f6488"
+rain-sdk@^0.0.2-alpha.1:
+  version "0.0.2-alpha.1"
+  resolved "https://registry.yarnpkg.com/rain-sdk/-/rain-sdk-0.0.2-alpha.1.tgz#9f33d8714e88ff6e197965a32c4953c2f4dcc42d"
+  integrity sha512-XAXI4VKTSVs2LI/6vlpCyBjx+mehjKHyNjJTW2jPz9JdWtmz/ngPo9Bayz+LlNLfQBfmdEkWyJ/oaTYk4E4atg==
   dependencies:
     ethers "^5.5.2"
     prettier "^2.6.2"

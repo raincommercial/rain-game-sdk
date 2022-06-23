@@ -394,7 +394,7 @@ export interface Rain1155 extends BaseContract {
       paymentToken: string,
       units: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber[]] & { stack: BigNumber[] }>;
+    ): Promise<[BigNumber[]]>;
 
     isApprovedForAll(
       account: string,

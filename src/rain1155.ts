@@ -19,7 +19,6 @@ import {
   VMState,
   getCanMintConfig
 } from './utils';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 /**
  * @public
@@ -76,7 +75,7 @@ export enum Conditions {
  * @param prices Array of type price
  * @returns VMState: StateConfig, string[]: array of token addresses.
  */
-const generatePriceScript = (prices: price[], pos: number): [Uint8Array, BigNumberish[], string[]] => {
+const generatePriceScript = (prices: price[], position: number): [Uint8Array, BigNumberish[], string[]] => {
   let error = new ScriptError('Invalid Script parameters.');
   let currencies: string[] = [];
   let sources: BytesLike[] = [];
@@ -88,12 +87,9 @@ const generatePriceScript = (prices: price[], pos: number): [Uint8Array, BigNumb
   for (i = 0; i < prices.length; i++) { // else loop over the prices array
     let obj = prices[i];
     if (obj.currency.type === Type.ERC1155) { // check price type
-      sources.push(op(Opcode.CONSTANT, ++pos)) // token type ERC1155 = 1
-      sources.push(op(Opcode.CONSTANT, ++pos)) // tokeinID
-      sources.push(op(Opcode.CONSTANT, ++pos)) // amount
-      sources.push(op(Opcode.CONTEXT, 0))
-      sources.push(op(Opcode.MUL, 2))
-      
+      sources.push(op(Opcode.CONSTANT, ++position)) // token type ERC1155 = 1
+      sources.push(op(Opcode.CONSTANT, ++position)) // tokeinID
+      sources.push(op(Opcode.CONSTANT, ++position)) // amount
       // pushed 3 items in constants so used ++pos 3 times, then (Opcode.CONSTANT, pos) will point to correct constant
       constants.push(obj.currency.type); // push currency type in constants
       if (obj.currency.tokenId) {
@@ -101,10 +97,8 @@ const generatePriceScript = (prices: price[], pos: number): [Uint8Array, BigNumb
       } else throw error.error('ERC1155', 'currency.tokenId');
       constants.push(obj.amount); // push amount in constants
     } else { // ERC20 type 
-      sources.push(op(Opcode.CONSTANT, ++pos)); // token type ERC20 = 0
-      sources.push(op(Opcode.CONSTANT, ++pos)); // amount
-      sources.push(op(Opcode.CONTEXT, 0));
-      sources.push(op(Opcode.MUL, 2));
+      sources.push(op(Opcode.CONSTANT, ++position)); // token type ERC20 = 0
+      sources.push(op(Opcode.CONSTANT, ++position)); // amount
      // pushed 2 items in constants so used ++pos 2 times, then (Opcode.CONSTANT, pos) will point to correct constant
       constants.push(obj.currency.type); // push currency type in constants
       constants.push(obj.amount); // push amount in constants
@@ -285,34 +279,6 @@ const generateScript = (conditionsGroup: condition[][], prices: price[]): [VMSta
     currencies
   ];
 }
-
-const isERC721 = async (address: string, signer: SignerWithAddress): Promise<boolean> => {
-  let erc721 = new ERC721(address, signer);
-  return await erc721.supportsInterface("0x80ac58cd");
-}
-
-const isERC1155 = async (address: string, signer: SignerWithAddress): Promise<boolean> => {
-  let erc1155 = new ERC1155(address, signer);
-  return await erc1155.supportsInterface("0xd9b67a26");
-}
-
-const isERC20 = async (address: string, signer: SignerWithAddress): Promise<boolean> => {
-  let erc20 = new ERC20(address, signer);
-  let balance;
-
-  try {
-    let name = await erc20.name()
-    let symbol = await erc20.symbol()
-    let decimals = await erc20.decimals()
-    balance = await erc20.balanceOf(signer.address);
-  } catch (error) {
-    return Promise.resolve(false);
-  }
-  if (!balance) {
-    return Promise.resolve(false);
-  }
-  return Promise.resolve(true);
-}
 export class Rain1155 extends RainContract {
   protected static readonly nameBookReference = 'Rain1155';
 
@@ -351,10 +317,6 @@ export class Rain1155 extends RainContract {
   public static getBookAddress(chainId: number): string {
     return AddressBook.getAddressesForChainId(chainId)[this.nameBookReference];
   }
-
-  public static readonly isERC20 = isERC20;
-  public static readonly isERC721 = isERC721;
-  public static readonly isERC1155 = isERC1155;
 
   public static readonly subgraph = "https://api.thegraph.com/subgraphs/name/beehive-innovation/rain-game-engine-mumbai-v1";
 
