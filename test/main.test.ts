@@ -9,7 +9,7 @@ import type { ReserveTokenERC1155 } from "../typechain/ReserveTokenERC1155";
 import type { ReserveTokenERC721 } from "../typechain/ReserveTokenERC721";
 import { Rain1155 as Rain1155SDK, Type, Conditions, condition, price, AssetConfig } from "../dist";
 
-import { eighteenZeros, getEventArgs, fetchFile, writeFile } from "./utils"
+import { eighteenZeros, fetchFile, writeFile } from "./utils"
 import path from "path";
 import { AllStandardOpsStateBuilder } from "../typechain";
 
@@ -167,7 +167,6 @@ describe("Rain1155 Test", function () {
       },
     ];
 
-    const tierCondition = 4
     const blockCondition = 15
 
     const conditions1: condition[] = [
@@ -216,7 +215,9 @@ describe("Rain1155 Test", function () {
       }
     ];
 
-    const [ vmStateConfig, currencies ] = Rain1155SDK.generateScript([conditions1, conditions2, conditions3], prices); 
+    const [ vmStateConfig, currencies ] = Rain1155SDK.generateScript([conditions1, conditions2, conditions3], prices);
+    const [canMintConfig, priceConfig] = Rain1155SDK.generateConfig(vmStateConfig, currencies);
+    console.log(JSON.stringify(canMintConfig, null, 2), JSON.stringify(priceConfig, null, 2));
 
     const assetConfig: AssetConfig = {
       lootBoxId: ethers.BigNumber.from(0),

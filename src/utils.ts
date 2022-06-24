@@ -23,7 +23,6 @@ export enum Type {
 export enum Conditions {
   NONE,
   BLOCK_NUMBER,
-  BALANCE_TIER,
   ERC20BALANCE,
   ERC721BALANCE,
   ERC1155BALANCE,
@@ -422,22 +421,6 @@ const patterns = [
     Opcode.GREATER_THAN,
     0,
   ],
-  // [
-  //   Opcode.CONSTANT,
-  //   0,
-  //   Opcode.CONTEXT,
-  //   0,
-  //   Opcode.REPORT,
-  //   0,
-  //   Opcode.BLOCK_NUMBER,
-  //   0,
-  //   Opcode.REPORT_AT_BLOCK,
-  //   0,
-  //   Opcode.CONSTANT,
-  //   0,
-  //   Opcode.GREATER_THAN,
-  //   0,
-  // ],
 ];
 
 /**
@@ -501,14 +484,6 @@ export const getCondition = (
       balance: BigNumber.from(constants[opcodes[9]]),
     };
     return condition;
-  // } else if (opcodes.includes(Opcode.REPORT_AT_BLOCK)) {
-  //   // ERC20BalanceTier condition
-  //   let condition: condition = {
-  //     type: Conditions.BALANCE_TIER,
-  //     tierAddress: constants[opcodes[1]].toString(),
-  //     tierCondition: parseInt(constants[opcodes[11]].toString()),
-  //   };
-  //   return condition;
   }
   let condition: condition = {
     type: Conditions.NONE,

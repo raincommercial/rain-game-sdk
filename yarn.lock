@@ -951,9 +951,9 @@
     "@openzeppelin/contracts" "^4.3.3"
     "@openzeppelin/contracts-upgradeable" "^4.4.1"
 
-"@beehiveinnovation/rain1155@git+https://github.com/beehive-innovation/rain1155.git#d16a49864fcffd6c36fc06b676dd9505eab9b03e":
+"@beehiveinnovation/rain1155@git+https://github.com/beehive-innovation/rain1155.git#913fced8ddfb61b76c5f33165e1ad848a5096440":
   version "0.0.1"
-  resolved "git+https://github.com/beehive-innovation/rain1155.git#d16a49864fcffd6c36fc06b676dd9505eab9b03e"
+  resolved "git+https://github.com/beehive-innovation/rain1155.git#913fced8ddfb61b76c5f33165e1ad848a5096440"
   dependencies:
     "@beehiveinnovation/rain-protocol" "git+https://github.com/beehive-innovation/rain-protocol.git#5a35b097475d37fd5f44446922a32025708c1f8c"
     "@graphprotocol/graph-cli" "0.26.0"

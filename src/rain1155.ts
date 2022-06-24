@@ -8,7 +8,6 @@ import {
   ethers,
 } from 'ethers';
 import { TxOverrides, ReadTxOverrides, RainContract, ERC721, ERC20, ERC1155 } from 'rain-sdk';
-
 import { Rain1155__factory } from './typechain';
 import { AddressBook } from './addresses';
 import { StateConfigStruct } from './typechain/Rain1155';
@@ -19,6 +18,7 @@ import {
   VMState,
   getCanMintConfig
 } from './utils';
+import { start } from 'repl';
 
 /**
  * @public
@@ -115,33 +115,39 @@ const generatePriceScript = (prices: price[], position: number): [Uint8Array, Bi
  * @returns array of priceConfig
  */
 const generatePriceConfig = (
-  priceScritp: VMState,
+  priceScript: VMState,
   currencies: string[]
 ): price[] => {
 
   let prices: price[] = [];
   let pos = -1;
-  for (let i = 0; i < priceScritp.sources.length; i++) {
-    let source: BytesLike = ethers.utils.arrayify(priceScritp.sources[i]); // Convert the bytesArray to Uint8Array
-    if (source.length === 8) { // ERC20 price
-      prices.push({
-        currency: {
-          type: Number(priceScritp.constants[++pos]),
-          address: currencies[i],
-        },
-        amount: BigNumber.from(priceScritp.constants[++pos]),
-      });
-    } else if (source.length === 10) { // ERC1155 price
-      prices.push({
-        currency: {
-          type: Number(priceScritp.constants[++pos]),
-          address: currencies[i],
-          tokenId: priceScritp.constants[++pos],
-        },
-        amount: BigNumber.from(priceScritp.constants[++pos]),
-      });
+    const source: BytesLike = ethers.utils.arrayify(priceScript.sources[1]); // Convert the bytesArray to Uint8Array
+    const constants = priceScript.constants;
+    let index = source[1];
+    let i = 0;
+    while(index < constants.length){
+      if(constants[index] === 0){
+        prices.push({
+          currency: {
+            type: Number(constants[index]),
+            address: currencies[i++],
+          },
+          amount: BigNumber.from(constants[index + 1]),
+        });
+        index = index + 2;
+      }
+      else if(constants[index] === 1){
+        prices.push({
+          currency: {
+            type: Number(constants[index]),
+            tokenId: constants[index + 1],
+            address: currencies[i++],
+          },
+          amount: BigNumber.from(constants[index + 2]),
+        });
+        index = index + 3;
+      }
     }
-  }
   return prices;
 };
 
@@ -172,20 +178,6 @@ const generateCanMintScript = (conditionsGroup: condition[][]): [Uint8Array, Big
         sources.push(op(Opcode.BLOCK_NUMBER));
         sources.push(op(Opcode.CONSTANT, ++pos));
         sources.push(op(Opcode.GREATER_THAN));
-      // } else if (condition.type === Conditions.BALANCE_TIER) {
-      //   if (condition.tierAddress) {
-      //     constants.push(condition.tierAddress);
-      //   } else throw error.error('BALANCE_TIER', 'tierAddress');
-      //   if (condition.tierCondition) {
-      //     constants.push(condition.tierCondition);
-      //   } else throw error.error('BALANCE_TIER', 'tierCondition');
-      //   sources.push(op(Opcode.CONSTANT, ++pos));
-      //   sources.push(op(Opcode.CONTEXT));
-      //   sources.push(op(Opcode.REPORT));
-      //   sources.push(op(Opcode.BLOCK_NUMBER));
-      //   sources.push(op(Opcode.REPORT_AT_BLOCK));
-      //   sources.push(op(Opcode.CONSTANT, ++pos));
-      //   sources.push(op(Opcode.GREATER_THAN));
       } else if (condition.type === Conditions.ERC20BALANCE) {
         if (condition.address) {
           constants.push(condition.address);
@@ -279,6 +271,12 @@ const generateScript = (conditionsGroup: condition[][], prices: price[]): [VMSta
     currencies
   ];
 }
+
+const generateConfig = (script: VMState, currencies: string[]): [condition[][], price[]] => {
+  const priceConfig = generatePriceConfig(script, currencies);
+  const canMintConfig = generateCanMintConfig(script);
+  return [canMintConfig, priceConfig];
+}
 export class Rain1155 extends RainContract {
   protected static readonly nameBookReference = 'Rain1155';
 
@@ -327,6 +325,7 @@ export class Rain1155 extends RainContract {
   public static readonly generateCanMintConfig = generateCanMintConfig;
   
   public static readonly generateScript = generateScript;
+  public static readonly generateConfig = generateConfig;
 
   public readonly getPrice = async (
     _assetId: BigNumberish,
