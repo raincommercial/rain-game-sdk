@@ -49,7 +49,6 @@ export let prices: price[]
 
 before("Deploy Rain1155 Contract and subgraph", async function () {
   const signers = await ethers.getSigners();
-
   owner = signers[0];
   creator = signers[1];
   creator2 = signers[2];
@@ -79,7 +78,7 @@ before("Deploy Rain1155 Contract and subgraph", async function () {
   await rain1155.deployed();
 
   rain1155SDK = new Rain1155SDK(rain1155.address, owner);
-
+  
   const Erc20 = await ethers.getContractFactory("Token");
   const stableCoins = await ethers.getContractFactory("ReserveToken");
   const Erc721 = await ethers.getContractFactory("ReserveTokenERC721");
@@ -170,9 +169,9 @@ describe("Rain1155 Test", function () {
     const blockCondition = 15
 
     const conditions1: condition[] = [
-      // {
-      //   type: Conditions.NONE
-      // }, 
+      {
+        type: Conditions.NONE
+      },
       {
         type: Conditions.BLOCK_NUMBER,
         blockNumber: blockCondition
@@ -193,7 +192,7 @@ describe("Rain1155 Test", function () {
       {
         type: Conditions.BLOCK_NUMBER,
         blockNumber: blockCondition
-      },
+      }
     ];
 
     const conditions3: condition[] = [
@@ -217,7 +216,7 @@ describe("Rain1155 Test", function () {
 
     const [ vmStateConfig, currencies ] = Rain1155SDK.generateScript([conditions1, conditions2, conditions3], prices);
     const [canMintConfig, priceConfig] = Rain1155SDK.generateConfig(vmStateConfig, currencies);
-    console.log(JSON.stringify(canMintConfig, null, 2), JSON.stringify(priceConfig, null, 2));
+    console.log(JSON.stringify(canMintConfig, null, 2));
 
     const assetConfig: AssetConfig = {
       lootBoxId: ethers.BigNumber.from(0),

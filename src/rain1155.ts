@@ -18,7 +18,6 @@ import {
   VMState,
   getCanMintConfig
 } from './utils';
-import { start } from 'repl';
 
 /**
  * @public
@@ -64,7 +63,6 @@ export enum Type {
 export enum Conditions {
   NONE,
   BLOCK_NUMBER,
-  BALANCE_TIER,
   ERC20BALANCE,
   ERC721BALANCE,
   ERC1155BALANCE,
@@ -223,8 +221,6 @@ const generateCanMintScript = (conditionsGroup: condition[][]): [Uint8Array, Big
     sources.push(op(Opcode.EVERY, conditions.length)); // EVERY opcode to check  all conditions within this group are true
   }
   sources.push(op(Opcode.ANY, conditionsGroup.length)); // Last OP as ANY to check any of the above condition group is true
-  // console.log("SOURCES = ", sources);
-  // console.log("STATE = ", state);
   return [concat(sources), constants];
 };
 

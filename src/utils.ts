@@ -5,7 +5,7 @@ import { BigNumber, BigNumberish } from 'ethers';
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
-import { condition } from './rain1155';
+import { condition, Conditions } from './rain1155';
 import { AllStandardOps } from "rain-sdk";
 
 const logger = new Logger(version);
@@ -15,18 +15,6 @@ export type VMState = StateConfigStruct;
 export const eighteenZeros = '000000000000000000';
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
-export enum Type {
-  ERC20,
-  ERC1155,
-}
-
-export enum Conditions {
-  NONE,
-  BLOCK_NUMBER,
-  ERC20BALANCE,
-  ERC721BALANCE,
-  ERC1155BALANCE,
-}
 
 // export enum AllStandardOps {
 //   CONSTANT,
@@ -459,7 +447,7 @@ export const getCondition = (
       blockNumber: parseInt(constants[opcodes[3]].toString()),
     };
     return condition;
-  } else if (opcodes.includes(Opcode.IERC20_BALANCE_OF)) {
+  } else if (checkOpcode(opcodes, Opcode.IERC20_BALANCE_OF)) {
     // ERC20 Balance condition
     let condition: condition = {
       type: Conditions.ERC20BALANCE,
@@ -467,7 +455,7 @@ export const getCondition = (
       balance: BigNumber.from(constants[opcodes[7]]),
     };
     return condition;
-  } else if (opcodes.includes(Opcode.IERC721_BALANCE_OF)) {
+  } else if (checkOpcode(opcodes, Opcode.IERC721_BALANCE_OF)) {
     // ERC721 Balance Condition
     let condition: condition = {
       type: Conditions.ERC721BALANCE,
@@ -475,7 +463,7 @@ export const getCondition = (
       balance: BigNumber.from(constants[opcodes[7]]),
     };
     return condition;
-  } else if (opcodes.includes(Opcode.IERC1155_BALANCE_OF)) {
+  } else if (checkOpcode(opcodes, Opcode.IERC1155_BALANCE_OF)) {
     // ERC1155 Balance Condition
     let condition: condition = {
       type: Conditions.ERC1155BALANCE,
@@ -523,6 +511,7 @@ export const getCanMintConfig = (
           patterns[j] // size of pattern
         );
         if (new_start !== start) {
+          console.log("Matched patterns : ", opcodes.slice(start, new_start))
           // update the start and len only if new_start != start
           conditions.push(
             getCondition(opcodes.slice(start, new_start), constants)
@@ -536,3 +525,11 @@ export const getCanMintConfig = (
   }
   return conditions;
 };
+
+const checkOpcode = (opcodes: number[], opcode: number): boolean => {
+  let stripedOpcodes: number[] = [];
+  for(let i=0;i<opcodes.length; i+=2){
+    stripedOpcodes.push(opcodes[i]);
+  }
+  return (stripedOpcodes.includes(opcode))
+}
