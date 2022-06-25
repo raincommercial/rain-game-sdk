@@ -312,13 +312,7 @@ export class Rain1155 extends RainContract {
     return AddressBook.getAddressesForChainId(chainId)[this.nameBookReference];
   }
 
-  public static readonly subgraph = "https://api.thegraph.com/subgraphs/name/beehive-innovation/rain-game-engine-mumbai-v1";
-
-  public static readonly generatePriceScript = generatePriceScript;
-  public static readonly generatePriceConfig = generatePriceConfig;
-
-  public static readonly generateCanMintScript = generateCanMintScript;
-  public static readonly generateCanMintConfig = generateCanMintConfig;
+  public static readonly subgraph = "https://api.thegraph.com/subgraphs/name/vishalkale151071/blocks";
   
   public static readonly generateScript = generateScript;
   public static readonly generateConfig = generateConfig;
