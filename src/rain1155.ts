@@ -7,17 +7,19 @@ import {
   ContractTransaction,
   ethers,
 } from 'ethers';
-import { TxOverrides, ReadTxOverrides, RainContract, ERC721, ERC20, ERC1155, VM } from 'rain-sdk';
+import { TxOverrides, ReadTxOverrides, RainContract, ERC721, ERC20, ERC1155, VM, StateConfig } from 'rain-sdk';
 import { Rain1155__factory } from './typechain';
 import { AddressBook } from './addresses';
 import { StateConfigStruct } from './typechain/Rain1155';
+import { generateAfterTimeState, generateANDState, generateBeforeTimeState, generateERC20State, generateInBetweenTimeState, generateNoneState, generateORState } from "./rulesGenerator"
 import {
   concat,
   op,
   Opcode,
-  VMState,
-  getCanMintConfig
+  getCanMintConfig,
+  ScriptError
 } from './utils';
+
 
 /**
  * @public
@@ -39,33 +41,30 @@ import {
  *
  */
 
-/**
- * Custom error class
- */
-class ScriptError extends Error {
-  constructor(msg: string) {
-    super(msg);
-
-    // Set the prototype explicitly.
-    Object.setPrototypeOf(this, ScriptError.prototype);
-  }
-
-  error(type: string, attribute: string) {
-    return `ScriptError: type "${type}" is missing "${attribute}".`;
-  }
-}
-
-export enum Type {
+export enum CurrencyType {
   ERC20,
   ERC1155
 }
 
-export enum Conditions {
+export enum ConditionType {
   NONE,
-  BLOCK_NUMBER,
-  ERC20BALANCE,
-  ERC721BALANCE,
-  ERC1155BALANCE,
+  TIME_IN_BETWEEN,
+  TIME_AFTER,
+  TIME_BEFORE,
+  DAYS_FROM_TODAY,
+  LT_ERC20,
+  GT_ERC20,
+  EQ_ERC20
+}
+
+export enum RuleType {
+  CONDITION,
+  OPERATOR
+}
+
+export enum OperatorType {
+  OR,
+  AND
 }
 
 /**
@@ -84,7 +83,7 @@ const generatePriceScript = (prices: price[], position: number): [Uint8Array, Bi
   }
   for (i = 0; i < prices.length; i++) { // else loop over the prices array
     let obj = prices[i];
-    if (obj.currency.type === Type.ERC1155) { // check price type
+    if (obj.currency.type === CurrencyType.ERC1155) { // check price type
       sources.push(op(Opcode.CONSTANT, ++position)) // token type ERC1155 = 1
       sources.push(op(Opcode.CONSTANT, ++position)) // tokeinID
       sources.push(op(Opcode.CONSTANT, ++position)) // amount
@@ -113,7 +112,7 @@ const generatePriceScript = (prices: price[], position: number): [Uint8Array, Bi
  * @returns array of priceConfig
  */
 const generatePriceConfig = (
-  priceScript: VMState,
+  priceScript: StateConfig,
   currencies: string[]
 ): price[] => {
 
@@ -149,87 +148,80 @@ const generatePriceConfig = (
   return prices;
 };
 
+let states: StateConfig[] = []; 
+function generateCanMintHelper(children: conditionObject[]) {
+  let error = new ScriptError('Invalid Script parameters.');
+  for (let i = 0; i < children.length; i++) { // Loop over children
+// let states: StateConfig[] = []; 
 
+    let child = children[i];
+    if (child.type === RuleType.CONDITION) { // If it is a condition, then fill sources and constants
+      let condition = child.condition!;
+      if (condition.type === ConditionType.NONE) { // No condition
+        states.push(generateNoneState());
+      } else if (condition.type === ConditionType.TIME_IN_BETWEEN) {
+        if(condition.startTimestamp && condition.endTimestamp) states.push(generateInBetweenTimeState(condition.startTimestamp, condition.endTimestamp));
+        else throw error.error("TIME_IN_BETWEEN", "startTImestamp or endTimestamp");
+      } else if (condition.type === ConditionType.TIME_AFTER) {
+        if(condition.timestamp)states.push(generateAfterTimeState(condition.timestamp));
+        else throw error.error("TIME_AFTER", "timestamp")
+      } else if (condition.type === ConditionType.TIME_BEFORE) {
+        if(condition.timestamp)states.push(generateBeforeTimeState(condition.timestamp));
+        else throw error.error("TIME_AFTER", "timestamp")
+      } else if (condition.type === ConditionType.DAYS_FROM_TODAY) {
+        // states.push(generateDaysFromTodayState());
+      } else if (condition.type === ConditionType.EQ_ERC20) {
+        if(condition.balance && condition.address)states.push(generateERC20State(condition.address, condition.balance,0))
+        else throw error.error("EQ_ERC20", "address or balance")
+      } else if (condition.type === ConditionType.LT_ERC20) {
+        if(condition.balance && condition.address)states.push(generateERC20State(condition.address, condition.balance,1))
+        else throw error.error("LT_ERC20", "address or balance")
+      }else if (condition.type === ConditionType.GT_ERC20) {
+        if(condition.balance && condition.address)states.push(generateERC20State(condition.address, condition.balance,2))
+        else throw error.error("GT_ERC20", "address or balance")
+      }
+    }
+    else if (child.type === RuleType.OPERATOR) { // If it is a operator, then call the same function recursively
+      // recursive call 
+       generateCanMintHelper(child.children!);
+
+      // pushing operator at the end
+      if (child.operator === OperatorType.OR) {
+          states.push(generateORState(children.length)) // Last OP as ANY to check any of the above condition group is true
+      }
+      else if (child.operator === OperatorType.AND) {
+        states.push(generateANDState(children.length)) // Last OP as ANY to check any of the above condition group is true          
+      }
+    }
+  }
+}
 /**
  * 
  * @param conditions array of conditions
  * @returns [Uint8Array, BigNumberish[]] for canMint
  */
-const generateCanMintScript = (conditionsGroup: condition[][]): [Uint8Array, BigNumberish[]] => {
-  let error = new ScriptError('Invalid Script parameters.');
-  let pos = -1;
-  let sources: Uint8Array[] = [];
-  let constants: BigNumberish[] = [];
-  let i;
-  let outerArrIterator;
-  for (outerArrIterator = 0; outerArrIterator < conditionsGroup.length; outerArrIterator++) {
-    const conditions = conditionsGroup[outerArrIterator];
-    for (i = 0; i < conditions.length; i++) { // Loop over conditions
-      let condition = conditions[i];
-      if (condition.type === Conditions.NONE) { // No condition
-        constants.push(1); // push 1 in constants, will return true for Every OP in the end
-        sources.push(op(Opcode.CONSTANT, ++pos));
-      } else if (condition.type === Conditions.BLOCK_NUMBER) {
-        if (condition.blockNumber) {
-          constants.push(condition.blockNumber);
-        } else throw error.error('BLOCK_NUMBER', 'blockNumber');
-        sources.push(op(Opcode.BLOCK_NUMBER));
-        sources.push(op(Opcode.CONSTANT, ++pos));
-        sources.push(op(Opcode.GREATER_THAN));
-      } else if (condition.type === Conditions.ERC20BALANCE) {
-        if (condition.address) {
-          constants.push(condition.address);
-        } else throw error.error('ERC20BALANCE', 'address');
-        if (condition.balance) {
-          constants.push(condition.balance);
-        } else throw error.error('ERC20BALANCE', 'balance');
-        sources.push(op(Opcode.CONSTANT, ++pos));
-        sources.push(op(Opcode.CONTEXT, 0));
-        sources.push(op(Opcode.IERC20_BALANCE_OF));
-        sources.push(op(Opcode.CONSTANT, ++pos));
-        sources.push(op(Opcode.GREATER_THAN));
-      } else if (condition.type === Conditions.ERC721BALANCE) {
-        if (condition.address) {
-          constants.push(condition.address);
-        } else throw error.error('ERC721BALANCE', 'address');
-        if (condition.balance) {
-          constants.push(condition.balance);
-        } else throw error.error('ERC721BALANCE', 'balance');
-        sources.push(op(Opcode.CONSTANT, ++pos));
-        sources.push(op(Opcode.CONTEXT, 0));
-        sources.push(op(Opcode.IERC721_BALANCE_OF));
-        sources.push(op(Opcode.CONSTANT, ++pos));
-        sources.push(op(Opcode.GREATER_THAN));
-      } else if (condition.type === Conditions.ERC1155BALANCE) {
-        if (condition.address) {
-          constants.push(condition.address);
-        } else throw error.error('ERC1155BALANCE', 'address');
-        if (condition.id) {
-          constants.push(condition.id);
-        } else throw error.error('ERC1155BALANCE', 'id');
-        if (condition.balance) {
-          constants.push(condition.balance);
-        } else throw error.error('ERC1155BALANCE', 'balance');
-        sources.push(op(Opcode.CONSTANT, ++pos));
-        sources.push(op(Opcode.CONTEXT));
-        sources.push(op(Opcode.CONSTANT, ++pos));
-        sources.push(op(Opcode.IERC1155_BALANCE_OF));
-        sources.push(op(Opcode.CONSTANT, ++pos));
-        sources.push(op(Opcode.GREATER_THAN));
-      }
-    }
-    sources.push(op(Opcode.EVERY, conditions.length)); // EVERY opcode to check  all conditions within this group are true
+ const generateCanMintScript = (objects: conditionObject): StateConfig => {
+  generateCanMintHelper(objects.children!);
+  // pushing operator at the end
+  if (objects.operator === OperatorType.OR) {
+    states.push(generateORState(objects.children!.length)) // Last OP as ANY to check any of the above condition group is true
   }
-  sources.push(op(Opcode.ANY, conditionsGroup.length)); // Last OP as ANY to check any of the above condition group is true
-  return [concat(sources), constants];
+  else if (objects.operator === OperatorType.AND) {
+    states.push(generateANDState(objects.children!.length)) // Last OP as ANY to check any of the above condition group is true          
+  }
+  
+  let result = VM.pair(states[0], states[1])
+  for(let i=2;i<states.length;i++){
+    result = VM.pair(result, states[i])
+  }
+  return result;
 };
-
 /**
  * 
  * @param canMintScript StateConfig generated by generateCanMintScript
  * @returns array of conditions
  */
- const generateCanMintConfig = (canMintScript: VMState): condition[][] => {
+ const generateCanMintConfig = (canMintScript: StateConfig): condition[][] => {
   let conditions: condition[][] = [];
   let sources = ethers.utils.arrayify(canMintScript.sources[0]); // Convert from BytesArray to Uint8Array
   let constants = canMintScript.constants;
@@ -251,24 +243,25 @@ const generateCanMintScript = (conditionsGroup: condition[][]): [Uint8Array, Big
   return conditions;
 };
 
-const generateScript = (conditionsGroup: condition[][], prices: price[]): [VMState, string[]] => {
-  const [ canMintSource, canMintConstants ] = generateCanMintScript(conditionsGroup);
+const generateScript = (condition: conditionObject): StateConfig => {
+  const script = generateCanMintScript(condition);
 
-  const [ priceSources, priceConstants, currencies ] = generatePriceScript(prices, canMintConstants.length - 1);
+  // const [ priceSources, priceConstants, currencies ] = generatePriceScript(prices, canMintConstants.length - 1);
 
-  const sources = [canMintSource, priceSources];
-  const constants = [...canMintConstants, ...priceConstants];
+  // const sources = [canMintSource, priceSources];
+  // const constants = [...canMintConstants, ...priceConstants];
 
-  return [
-    {
-      sources: sources,
-      constants: constants
-    },
-    currencies
-  ];
+  // return [
+  //   {
+  //     sources: sources,
+  //     constants: constants
+  //   },
+  //   currencies
+  // ];
+  return script;
 }
 
-const generateConfig = (script: VMState, currencies: string[]): [condition[][], price[]] => {
+const generateConfig = (script: StateConfig, currencies: string[]): [condition[][], price[]] => {
   const priceConfig = generatePriceConfig(script, currencies);
   const canMintConfig = generateCanMintConfig(script);
   return [canMintConfig, priceConfig];
@@ -323,10 +316,10 @@ export class Rain1155 extends RainContract {
     _units: BigNumberish,
   ): Promise<price> => {
     let stack = await this.getAssetPrice(_assetId, _paymentToken, _units);
-    if(stack[0].eq(BigNumber.from(Type.ERC20))){
+    if(stack[0].eq(BigNumber.from(CurrencyType.ERC20))){
       return {
         currency: {
-          type: Type.ERC20,
+          type: CurrencyType.ERC20,
           address: _paymentToken
         },
         amount: stack[1]
@@ -334,7 +327,7 @@ export class Rain1155 extends RainContract {
     }
     return {
       currency: {
-        type: Type.ERC1155,
+        type: CurrencyType.ERC1155,
         address: _paymentToken,
         tokenId: stack[1]
       },
@@ -346,12 +339,12 @@ export class Rain1155 extends RainContract {
     let allowances: allowance[] = [];
     for(let i=0;i<prices.length;i++){
       let price = prices[i];
-      if(price.currency.type === Type.ERC20){
+      if(price.currency.type === CurrencyType.ERC20){
         let ERC20Contract = new ERC20(price.currency.address, this.signer);
         let amount = (await this.getPrice(assetId, price.currency.address, units)).amount;
         let allowed = await ERC20Contract.allowance(signer, rain1155Address);
         allowances.push({
-          type: Type.ERC20,
+          type: CurrencyType.ERC20,
           address: price.currency.address,
           allowed: (allowed >= amount)? true: false,
           amount: (allowed >= amount)? BigNumber.from(0): amount.sub(allowed),
@@ -370,7 +363,7 @@ export class Rain1155 extends RainContract {
           tokenURI = `TokenID ${erc1155Price.currency.tokenId} may not exist now`;
         }
         allowances.push({
-          type: Type.ERC1155,
+          type: CurrencyType.ERC1155,
           address: price.currency.address,
           allowed: allowed,
           amount: (allowed) ? BigNumber.from(0) :erc1155Price.amount,
@@ -516,6 +509,9 @@ export type condition = {
   address?: string;
   balance?: BigNumber;
   id?: BigNumber;
+  startTimestamp?: number;
+  endTimestamp?: number;
+  timestamp?: number;
 };
 
 export type allowance = {
@@ -527,4 +523,11 @@ export type allowance = {
   tokenURI?: string,
   name?: string,
   symbol?: string
+}
+
+export type conditionObject = {
+  type: RuleType,
+  operator?: OperatorType,
+  children?: conditionObject[],
+  condition?: condition
 }

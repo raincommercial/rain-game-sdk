@@ -1,67 +1,13 @@
 import { Logger } from '@ethersproject/logger';
 import { version } from './_version';
-import { StateConfigStruct } from './typechain/Rain1155';
 import { BigNumber, BigNumberish } from 'ethers';
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
-import { condition, Conditions } from './rain1155';
-import { AllStandardOps } from "rain-sdk";
+import { condition, ConditionType } from './rain1155';
+import { AllStandardOps, StateConfig } from "rain-sdk";
 
 const logger = new Logger(version);
-
-export type VMState = StateConfigStruct;
-
-export const eighteenZeros = '000000000000000000';
-export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
-
-
-// export enum AllStandardOps {
-//   CONSTANT,
-//   STACK,
-//   CONTEXT,
-//   STORAGE,
-//   ZIPMAP,
-//   DEBUG,
-//   BLOCK_NUMBER,
-//   BLOCK_TIMESTAMP,
-//   SENDER,
-//   THIS_ADDRESS,
-//   SCALE18_MUL,
-//   SCALE18_DIV,
-//   SCALE18,
-//   SCALEN,
-//   SCALE_BY,
-//   ADD,
-//   SATURATING_ADD,
-//   SUB,
-//   SATURATING_SUB,
-//   MUL,
-//   SATURATING_MUL,
-//   DIV,
-//   MOD,
-//   EXP,
-//   MIN,
-//   MAX,
-//   ISZERO,
-//   EAGER_IF,
-//   EQUAL_TO,
-//   LESS_THAN,
-//   GREATER_THAN,
-//   EVERY,
-//   ANY,
-//   REPORT,
-//   SATURATING_DIFF,
-//   UPDATE_BLOCKS_FOR_TIER_RANGE,
-//   SELECT_LTE,
-//   IERC20_BALANCE_OF,
-//   IERC20_TOTAL_SUPPLY,
-//   IERC721_BALANCE_OF,
-//   IERC721_OWNER_OF,
-//   IERC1155_BALANCE_OF,
-//   IERC1155_BALANCE_OF_BATCH,
-//   length,
-// }
 
 export const Opcode = {
   ...AllStandardOps,
@@ -437,20 +383,20 @@ export const getCondition = (
   if (opcodes.length === 2) {
     // None condition
     let condition: condition = {
-      type: Conditions.NONE,
+      type: ConditionType.NONE,
     };
     return condition;
   } else if (opcodes.length === 6) {
     // Block condition
     let condition: condition = {
-      type: Conditions.BLOCK_NUMBER,
+      type: ConditionType.NONE,
       blockNumber: parseInt(constants[opcodes[3]].toString()),
     };
     return condition;
   } else if (checkOpcode(opcodes, Opcode.IERC20_BALANCE_OF)) {
     // ERC20 Balance condition
     let condition: condition = {
-      type: Conditions.ERC20BALANCE,
+      type: ConditionType.NONE,
       address: constants[opcodes[1]].toString(),
       balance: BigNumber.from(constants[opcodes[7]]),
     };
@@ -458,7 +404,7 @@ export const getCondition = (
   } else if (checkOpcode(opcodes, Opcode.IERC721_BALANCE_OF)) {
     // ERC721 Balance Condition
     let condition: condition = {
-      type: Conditions.ERC721BALANCE,
+      type: ConditionType.NONE,
       address: constants[opcodes[1]].toString(),
       balance: BigNumber.from(constants[opcodes[7]]),
     };
@@ -466,7 +412,7 @@ export const getCondition = (
   } else if (checkOpcode(opcodes, Opcode.IERC1155_BALANCE_OF)) {
     // ERC1155 Balance Condition
     let condition: condition = {
-      type: Conditions.ERC1155BALANCE,
+      type: ConditionType.NONE,
       address: constants[opcodes[1]].toString(),
       id: BigNumber.from(constants[opcodes[5]]),
       balance: BigNumber.from(constants[opcodes[9]]),
@@ -474,7 +420,7 @@ export const getCondition = (
     return condition;
   }
   let condition: condition = {
-    type: Conditions.NONE,
+    type: ConditionType.NONE,
   };
   return condition;
 };
@@ -532,4 +478,20 @@ const checkOpcode = (opcodes: number[], opcode: number): boolean => {
     stripedOpcodes.push(opcodes[i]);
   }
   return (stripedOpcodes.includes(opcode))
+}
+
+/**
+ * Custom error class
+ */
+ export class ScriptError extends Error {
+  constructor(msg: string) {
+    super(msg);
+
+    // Set the prototype explicitly.
+    Object.setPrototypeOf(this, ScriptError.prototype);
+  }
+
+  error(type: string, attribute: string) {
+    return `ScriptError: type "${type}" is missing "${attribute}".`;
+  }
 }
