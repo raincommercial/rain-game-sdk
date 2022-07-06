@@ -96,7 +96,7 @@ const generatePriceScript = (prices: price[], position: number): [Uint8Array, Bi
     } else { // ERC20 type 
       sources.push(op(Opcode.CONSTANT, ++position)); // token type ERC20 = 0
       sources.push(op(Opcode.CONSTANT, ++position)); // amount
-     // pushed 2 items in constants so used ++pos 2 times, then (Opcode.CONSTANT, pos) will point to correct constant
+      // pushed 2 items in constants so used ++pos 2 times, then (Opcode.CONSTANT, pos) will point to correct constant
       constants.push(obj.currency.type); // push currency type in constants
       constants.push(obj.amount); // push amount in constants
     }
@@ -118,41 +118,41 @@ const generatePriceConfig = (
 
   let prices: price[] = [];
   let pos = -1;
-    const source: BytesLike = ethers.utils.arrayify(priceScript.sources[1]); // Convert the bytesArray to Uint8Array
-    const constants = priceScript.constants;
-    let index = source[1];
-    let i = 0;
-    while(index < constants.length){
-      if(constants[index] === 0){
-        prices.push({
-          currency: {
-            type: Number(constants[index]),
-            address: currencies[i++],
-          },
-          amount: BigNumber.from(constants[index + 1]),
-        });
-        index = index + 2;
-      }
-      else if(constants[index] === 1){
-        prices.push({
-          currency: {
-            type: Number(constants[index]),
-            tokenId: constants[index + 1],
-            address: currencies[i++],
-          },
-          amount: BigNumber.from(constants[index + 2]),
-        });
-        index = index + 3;
-      }
+  const source: BytesLike = ethers.utils.arrayify(priceScript.sources[1]); // Convert the bytesArray to Uint8Array
+  const constants = priceScript.constants;
+  let index = source[1];
+  let i = 0;
+  while (index < constants.length) {
+    if (constants[index] === 0) {
+      prices.push({
+        currency: {
+          type: Number(constants[index]),
+          address: currencies[i++],
+        },
+        amount: BigNumber.from(constants[index + 1]),
+      });
+      index = index + 2;
     }
+    else if (constants[index] === 1) {
+      prices.push({
+        currency: {
+          type: Number(constants[index]),
+          tokenId: constants[index + 1],
+          address: currencies[i++],
+        },
+        amount: BigNumber.from(constants[index + 2]),
+      });
+      index = index + 3;
+    }
+  }
   return prices;
 };
 
-let states: StateConfig[] = []; 
+let states: StateConfig[] = [];
 function generateCanMintHelper(children: conditionObject[]) {
   let error = new ScriptError('Invalid Script parameters.');
   for (let i = 0; i < children.length; i++) { // Loop over children
-// let states: StateConfig[] = []; 
+    // let states: StateConfig[] = []; 
 
     let child = children[i];
     if (child.type === RuleType.CONDITION) { // If it is a condition, then fill sources and constants
@@ -160,34 +160,34 @@ function generateCanMintHelper(children: conditionObject[]) {
       if (condition.type === ConditionType.NONE) { // No condition
         states.push(generateNoneState());
       } else if (condition.type === ConditionType.TIME_IN_BETWEEN) {
-        if(condition.startTimestamp && condition.endTimestamp) states.push(generateInBetweenTimeState(condition.startTimestamp, condition.endTimestamp));
+        if (condition.startTimestamp && condition.endTimestamp) states.push(generateInBetweenTimeState(condition.startTimestamp, condition.endTimestamp));
         else throw error.error("TIME_IN_BETWEEN", "startTImestamp or endTimestamp");
       } else if (condition.type === ConditionType.TIME_AFTER) {
-        if(condition.timestamp)states.push(generateAfterTimeState(condition.timestamp));
+        if (condition.timestamp) states.push(generateAfterTimeState(condition.timestamp));
         else throw error.error("TIME_AFTER", "timestamp")
       } else if (condition.type === ConditionType.TIME_BEFORE) {
-        if(condition.timestamp)states.push(generateBeforeTimeState(condition.timestamp));
+        if (condition.timestamp) states.push(generateBeforeTimeState(condition.timestamp));
         else throw error.error("TIME_AFTER", "timestamp")
       } else if (condition.type === ConditionType.DAYS_FROM_TODAY) {
         // states.push(generateDaysFromTodayState());
       } else if (condition.type === ConditionType.EQ_ERC20) {
-        if(condition.balance && condition.address)states.push(generateERC20State(condition.address, condition.balance,0))
+        if (condition.balance && condition.address) states.push(generateERC20State(condition.address, condition.balance, condition.type))
         else throw error.error("EQ_ERC20", "address or balance")
       } else if (condition.type === ConditionType.LT_ERC20) {
-        if(condition.balance && condition.address)states.push(generateERC20State(condition.address, condition.balance,1))
+        if (condition.balance && condition.address) states.push(generateERC20State(condition.address, condition.balance, condition.type))
         else throw error.error("LT_ERC20", "address or balance")
-      }else if (condition.type === ConditionType.GT_ERC20) {
-        if(condition.balance && condition.address)states.push(generateERC20State(condition.address, condition.balance,2))
+      } else if (condition.type === ConditionType.GT_ERC20) {
+        if (condition.balance && condition.address) states.push(generateERC20State(condition.address, condition.balance, condition.type))
         else throw error.error("GT_ERC20", "address or balance")
       }
     }
     else if (child.type === RuleType.OPERATOR) { // If it is a operator, then call the same function recursively
       // recursive call 
-       generateCanMintHelper(child.children!);
+      generateCanMintHelper(child.children!);
 
       // pushing operator at the end
       if (child.operator === OperatorType.OR) {
-          states.push(generateORState(children.length)) // Last OP as ANY to check any of the above condition group is true
+        states.push(generateORState(children.length)) // Last OP as ANY to check any of the above condition group is true
       }
       else if (child.operator === OperatorType.AND) {
         states.push(generateANDState(children.length)) // Last OP as ANY to check any of the above condition group is true          
@@ -200,7 +200,7 @@ function generateCanMintHelper(children: conditionObject[]) {
  * @param conditions array of conditions
  * @returns [Uint8Array, BigNumberish[]] for canMint
  */
- const generateCanMintScript = (objects: conditionObject): StateConfig => {
+const generateCanMintScript = (objects: conditionObject): StateConfig => {
   generateCanMintHelper(objects.children!);
   // pushing operator at the end
   if (objects.operator === OperatorType.OR) {
@@ -209,9 +209,9 @@ function generateCanMintHelper(children: conditionObject[]) {
   else if (objects.operator === OperatorType.AND) {
     states.push(generateANDState(objects.children!.length)) // Last OP as ANY to check any of the above condition group is true          
   }
-  
+
   let result = VM.pair(states[0], states[1])
-  for(let i=2;i<states.length;i++){
+  for (let i = 2; i < states.length; i++) {
     result = VM.pair(result, states[i])
   }
   return result;
@@ -221,7 +221,7 @@ function generateCanMintHelper(children: conditionObject[]) {
  * @param canMintScript StateConfig generated by generateCanMintScript
  * @returns array of conditions
  */
- const generateCanMintConfig = (canMintScript: StateConfig): condition[][] => {
+const generateCanMintConfig = (canMintScript: StateConfig): condition[][] => {
   let conditions: condition[][] = [];
   let sources = ethers.utils.arrayify(canMintScript.sources[0]); // Convert from BytesArray to Uint8Array
   let constants = canMintScript.constants;
@@ -232,13 +232,13 @@ function generateCanMintHelper(children: conditionObject[]) {
     if (!(i % 2)) {
       if (op == Opcode.EVERY) { // If EVERY opcode found, split the current opcode array and increment the index of sources by 1
         conditions.push(getCanMintConfig(opcodes[opcodeCounter], constants));
-        opcodes[++opcodeCounter] = [];      
+        opcodes[++opcodeCounter] = [];
         i++;
         continue;
       }
-    }    
+    }
     // If a normal opcode, then push it directly.
-    opcodes[opcodeCounter].push(op);        
+    opcodes[opcodeCounter].push(op);
   }
   return conditions;
 };
@@ -306,7 +306,7 @@ export class Rain1155 extends RainContract {
   }
 
   public static readonly subgraph = "https://api.thegraph.com/subgraphs/name/vishalkale151071/blocks";
-  
+
   public static readonly generateScript = generateScript;
   public static readonly generateConfig = generateConfig;
 
@@ -316,7 +316,7 @@ export class Rain1155 extends RainContract {
     _units: BigNumberish,
   ): Promise<price> => {
     let stack = await this.getAssetPrice(_assetId, _paymentToken, _units);
-    if(stack[0].eq(BigNumber.from(CurrencyType.ERC20))){
+    if (stack[0].eq(BigNumber.from(CurrencyType.ERC20))) {
       return {
         currency: {
           type: CurrencyType.ERC20,
@@ -335,30 +335,30 @@ export class Rain1155 extends RainContract {
     }
   }
 
-  public readonly checkAllowance = async (assetId: BigNumberish,prices: price[], units: BigNumberish, rain1155Address: string, signer: string): Promise<allowance[]> => {
+  public readonly checkAllowance = async (assetId: BigNumberish, prices: price[], units: BigNumberish, rain1155Address: string, signer: string): Promise<allowance[]> => {
     let allowances: allowance[] = [];
-    for(let i=0;i<prices.length;i++){
+    for (let i = 0; i < prices.length; i++) {
       let price = prices[i];
-      if(price.currency.type === CurrencyType.ERC20){
+      if (price.currency.type === CurrencyType.ERC20) {
         let ERC20Contract = new ERC20(price.currency.address, this.signer);
         let amount = (await this.getPrice(assetId, price.currency.address, units)).amount;
         let allowed = await ERC20Contract.allowance(signer, rain1155Address);
         allowances.push({
           type: CurrencyType.ERC20,
           address: price.currency.address,
-          allowed: (allowed >= amount)? true: false,
-          amount: (allowed >= amount)? BigNumber.from(0): amount.sub(allowed),
+          allowed: (allowed >= amount) ? true : false,
+          amount: (allowed >= amount) ? BigNumber.from(0) : amount.sub(allowed),
           name: await ERC20Contract.name(),
           symbol: await ERC20Contract.name()
         })
-      }else{
+      } else {
         let ERC1155Contract = new ERC1155(price.currency.address, this.signer);
         let erc1155Price = await this.getPrice(assetId, price.currency.address, units);
         let allowed = await ERC1155Contract.isApprovedForAll(signer, rain1155Address);
-        let tokenURI: string ;
+        let tokenURI: string;
         try {
-          tokenURI = (erc1155Price.currency.tokenId) ? await ERC1155Contract.uri(erc1155Price.currency.tokenId): "";
-          
+          tokenURI = (erc1155Price.currency.tokenId) ? await ERC1155Contract.uri(erc1155Price.currency.tokenId) : "";
+
         } catch (error) {
           tokenURI = `TokenID ${erc1155Price.currency.tokenId} may not exist now`;
         }
@@ -366,7 +366,7 @@ export class Rain1155 extends RainContract {
           type: CurrencyType.ERC1155,
           address: price.currency.address,
           allowed: allowed,
-          amount: (allowed) ? BigNumber.from(0) :erc1155Price.amount,
+          amount: (allowed) ? BigNumber.from(0) : erc1155Price.amount,
           tokenId: erc1155Price.currency.tokenId,
           tokenURI: tokenURI
         })

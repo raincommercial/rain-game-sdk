@@ -1,7 +1,8 @@
 import { VM, StateConfig, SaleDurationInTimestamp } from 'rain-sdk';
-import { concat, op } from 'rain-sdk/src/utils';
+import { concat, op } from './utils';
 import { BigNumber } from 'ethers';
 import { ScriptError } from './utils';
+import { ConditionType } from './rain1155';
 
 /**
  * ConditionType.NONE
@@ -78,7 +79,7 @@ export function generateERC20State(
   type: number
 ): StateConfig {
     let error = new ScriptError("Invalid Script parameters.");
-  if (type == 0) {
+  if (type == ConditionType.EQ_ERC20) {
     return {
       sources: [
         concat([
@@ -91,7 +92,7 @@ export function generateERC20State(
       ],
       constants: [address, amount],
     };
-  } else if (type == 1) {
+  } else if (type == ConditionType.LT_ERC20) {
     return {
         sources: [
           concat([
@@ -104,7 +105,7 @@ export function generateERC20State(
         ],
         constants: [address, amount],
       };
-  } else if (type == 2) {
+  } else if (type == ConditionType.GT_ERC20) {
     return {
         sources: [
           concat([
@@ -112,7 +113,7 @@ export function generateERC20State(
             op(VM.Opcodes.CONTEXT, 0),
             op(VM.Opcodes.IERC20_BALANCE_OF),
             op(VM.Opcodes.CONSTANT, 1),
-            op(VM.Opcodes.EQUAL_TO),
+            op(VM.Opcodes.GREATER_THAN),
           ]),
         ],
         constants: [address, amount],
