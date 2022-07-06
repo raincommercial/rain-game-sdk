@@ -7,7 +7,7 @@ import {
   ContractTransaction,
   ethers,
 } from 'ethers';
-import { TxOverrides, ReadTxOverrides, RainContract, ERC721, ERC20, ERC1155 } from 'rain-sdk';
+import { TxOverrides, ReadTxOverrides, RainContract, ERC721, ERC20, ERC1155, VM } from 'rain-sdk';
 import { Rain1155__factory } from './typechain';
 import { AddressBook } from './addresses';
 import { StateConfigStruct } from './typechain/Rain1155';
