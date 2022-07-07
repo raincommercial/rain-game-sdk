@@ -132,15 +132,6 @@ describe("Rain1155 Test", function () {
   });
  
   it.only("Should construct and evaluate the gating rules", async function () {
-
-    const tierCondition = 4
-    const blockCondition = 15
-
-// IF
-  // Matches all
-    // You minted at least  100 USDT
-    // You minted exact 10 SOL
-
     // ------------------------------------------------- A && B
     let gatingCondition: conditionObject  = {
       "type": RuleType.OPERATOR,
@@ -165,18 +156,12 @@ describe("Rain1155 Test", function () {
       ]
     }
 
-    // const script = Rain1155SDK.generateScript(gatingCondition);
-    // console.log(script);
-    // let rainjs = new RainJS(script, {provider: ethers.provider});
-
-    // console.log(script, "\n", await rainjs.run({context: [buyer1.address]}))
-
     await USDT.connect(buyer1).mintTokens(101);
     await SOL.connect(buyer1).mintTokens(10);
-    
+    let script = Rain1155SDK.generateScript(gatingCondition)
     const assetConfig: AssetConfig = {
       lootBoxId: ethers.BigNumber.from(0),
-      vmStateConfig: Rain1155SDK.generateScript(gatingCondition),
+      vmStateConfig: script,
       currencies: [],
       name: "F1",
       description: "BRUUUUMMM BRUUUMMM",
