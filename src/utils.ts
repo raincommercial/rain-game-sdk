@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { condition, Conditions } from './rain1155';
-import { AllStandardOps } from "rain-sdk";
+import { AllStandardOps } from 'rain-sdk';
 
 const logger = new Logger(version);
 
@@ -14,7 +14,6 @@ export type VMState = StateConfigStruct;
 
 export const eighteenZeros = '000000000000000000';
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
-
 
 // export enum AllStandardOps {
 //   CONSTANT,
@@ -290,7 +289,7 @@ export function bytify(
 }
 
 export function concat(items: ReadonlyArray<BytesLike>): Uint8Array {
-  const objects = items.map(item => arrayify(item));
+  const objects = items.map((item) => arrayify(item));
   const length = objects.reduce((accum, item) => accum + item.length, 0);
 
   const result = new Uint8Array(length);
@@ -486,7 +485,7 @@ export const patternLengths = (): number[] => {
     if (!lengths.includes(len)) lengths.push(len);
   }
 
-  return lengths.sort(function(a, b) {
+  return lengths.sort(function (a, b) {
     return a - b;
   });
 };
@@ -511,7 +510,6 @@ export const getCanMintConfig = (
           patterns[j] // size of pattern
         );
         if (new_start !== start) {
-          console.log("Matched patterns : ", opcodes.slice(start, new_start))
           // update the start and len only if new_start != start
           conditions.push(
             getCondition(opcodes.slice(start, new_start), constants)
@@ -528,8 +526,8 @@ export const getCanMintConfig = (
 
 const checkOpcode = (opcodes: number[], opcode: number): boolean => {
   let stripedOpcodes: number[] = [];
-  for(let i=0;i<opcodes.length; i+=2){
+  for (let i = 0; i < opcodes.length; i += 2) {
     stripedOpcodes.push(opcodes[i]);
   }
-  return (stripedOpcodes.includes(opcode))
-}
+  return stripedOpcodes.includes(opcode);
+};
