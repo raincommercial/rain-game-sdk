@@ -4,14 +4,9 @@ import { BigNumber, BigNumberish } from 'ethers';
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
-import { condition, ConditionType } from './rain1155';
-import { AllStandardOps, StateConfig } from "rain-sdk";
-
+import { VM } from 'rain-sdk';
+import { ConditionType, condition } from './classes/rulesGenerator';
 const logger = new Logger(version);
-
-export const Opcode = {
-  ...AllStandardOps,
-};
 
 export type Bytes = ArrayLike<number>;
 
@@ -315,44 +310,51 @@ export const matchPattern = (
  * List of all patterns
  */
 const patterns = [
-  [Opcode.CONSTANT, 0],
-  [Opcode.BLOCK_NUMBER, 0, Opcode.CONSTANT, 0, Opcode.GREATER_THAN, 0],
+  [VM.Opcodes.CONSTANT, 0],
   [
-    Opcode.CONSTANT,
+    VM.Opcodes.BLOCK_NUMBER,
     0,
-    Opcode.CONTEXT,
+    VM.Opcodes.CONSTANT,
     0,
-    Opcode.IERC20_BALANCE_OF,
-    0,
-    Opcode.CONSTANT,
-    0,
-    Opcode.GREATER_THAN,
+    VM.Opcodes.GREATER_THAN,
     0,
   ],
   [
-    Opcode.CONSTANT,
+    VM.Opcodes.CONSTANT,
     0,
-    Opcode.CONTEXT,
+    VM.Opcodes.CONTEXT,
     0,
-    Opcode.IERC721_BALANCE_OF,
+    VM.Opcodes.IERC20_BALANCE_OF,
     0,
-    Opcode.CONSTANT,
+    VM.Opcodes.CONSTANT,
     0,
-    Opcode.GREATER_THAN,
+    VM.Opcodes.GREATER_THAN,
     0,
   ],
   [
-    Opcode.CONSTANT,
+    VM.Opcodes.CONSTANT,
     0,
-    Opcode.CONTEXT,
+    VM.Opcodes.CONTEXT,
     0,
-    Opcode.CONSTANT,
+    VM.Opcodes.IERC721_BALANCE_OF,
     0,
-    Opcode.IERC1155_BALANCE_OF,
+    VM.Opcodes.CONSTANT,
     0,
-    Opcode.CONSTANT,
+    VM.Opcodes.GREATER_THAN,
     0,
-    Opcode.GREATER_THAN,
+  ],
+  [
+    VM.Opcodes.CONSTANT,
+    0,
+    VM.Opcodes.CONTEXT,
+    0,
+    VM.Opcodes.CONSTANT,
+    0,
+    VM.Opcodes.IERC1155_BALANCE_OF,
+    0,
+    VM.Opcodes.CONSTANT,
+    0,
+    VM.Opcodes.GREATER_THAN,
     0,
   ],
 ];
@@ -383,44 +385,44 @@ export const getCondition = (
   if (opcodes.length === 2) {
     // None condition
     let condition: condition = {
-      type: ConditionType.NONE,
+      conditionType: ConditionType.NONE,
     };
     return condition;
   } else if (opcodes.length === 6) {
     // Block condition
     let condition: condition = {
-      type: ConditionType.NONE,
+      conditionType: ConditionType.NONE,
       blockNumber: parseInt(constants[opcodes[3]].toString()),
     };
     return condition;
-  } else if (checkOpcode(opcodes, Opcode.IERC20_BALANCE_OF)) {
+  } else if (checkOpcode(opcodes, VM.Opcodes.IERC20_BALANCE_OF)) {
     // ERC20 Balance condition
     let condition: condition = {
-      type: ConditionType.NONE,
-      address: constants[opcodes[1]].toString(),
-      balance: BigNumber.from(constants[opcodes[7]]),
+      conditionType: ConditionType.NONE,
+      contractAddress: constants[opcodes[1]].toString(),
+      value: BigNumber.from(constants[opcodes[7]]),
     };
     return condition;
-  } else if (checkOpcode(opcodes, Opcode.IERC721_BALANCE_OF)) {
+  } else if (checkOpcode(opcodes, VM.Opcodes.IERC721_BALANCE_OF)) {
     // ERC721 Balance Condition
     let condition: condition = {
-      type: ConditionType.NONE,
-      address: constants[opcodes[1]].toString(),
-      balance: BigNumber.from(constants[opcodes[7]]),
+      conditionType: ConditionType.NONE,
+      contractAddress: constants[opcodes[1]].toString(),
+      value: BigNumber.from(constants[opcodes[7]]),
     };
     return condition;
-  } else if (checkOpcode(opcodes, Opcode.IERC1155_BALANCE_OF)) {
+  } else if (checkOpcode(opcodes, VM.Opcodes.IERC1155_BALANCE_OF)) {
     // ERC1155 Balance Condition
     let condition: condition = {
-      type: ConditionType.NONE,
-      address: constants[opcodes[1]].toString(),
-      id: BigNumber.from(constants[opcodes[5]]),
-      balance: BigNumber.from(constants[opcodes[9]]),
+      conditionType: ConditionType.NONE,
+      contractAddress: constants[opcodes[1]].toString(),
+      tokenId: BigNumber.from(constants[opcodes[5]]),
+      value: BigNumber.from(constants[opcodes[9]]),
     };
     return condition;
   }
   let condition: condition = {
-    type: ConditionType.NONE,
+    conditionType: ConditionType.NONE,
   };
   return condition;
 };
@@ -457,7 +459,7 @@ export const getCanMintConfig = (
           patterns[j] // size of pattern
         );
         if (new_start !== start) {
-          console.log("Matched patterns : ", opcodes.slice(start, new_start))
+          console.log('Matched patterns : ', opcodes.slice(start, new_start));
           // update the start and len only if new_start != start
           conditions.push(
             getCondition(opcodes.slice(start, new_start), constants)
@@ -474,16 +476,16 @@ export const getCanMintConfig = (
 
 const checkOpcode = (opcodes: number[], opcode: number): boolean => {
   let stripedOpcodes: number[] = [];
-  for(let i=0;i<opcodes.length; i+=2){
+  for (let i = 0; i < opcodes.length; i += 2) {
     stripedOpcodes.push(opcodes[i]);
   }
-  return (stripedOpcodes.includes(opcode))
-}
+  return stripedOpcodes.includes(opcode);
+};
 
 /**
  * Custom error class
  */
- export class ScriptError extends Error {
+export class ScriptError extends Error {
   constructor(msg: string) {
     super(msg);
 
