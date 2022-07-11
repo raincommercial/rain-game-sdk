@@ -56,6 +56,10 @@ export enum ConditionType {
    * for ERC20 token equal to given number
    */
   EQ_ERC20,
+  /**
+   * for a single value to be put onto the stack
+   */
+  CONSTANT,
 }
 
 /**
@@ -164,6 +168,39 @@ export interface conditionObject {
   condition?: condition;
 }
 
+/**
+ * interface for rules [if/then/else]
+ */
+export interface ruleObject {
+  /**
+  * if rules
+  */
+  if: conditionObject;
+  /**
+  * then rules
+  */
+  then: conditionObject;
+
+  /**
+  * else/default rules
+  */
+  else: conditionObject;
+}
+
+/**
+ * interface for gating and pricing rules
+ */
+export interface quantityAndPrice {
+  /**
+   * quantity request object
+   */
+  quantity: ruleObject;
+  /**
+   * price request object
+   */
+  price: ruleObject;
+}
+
 export class RuleGenerator {
   /**
    * ConditionType.NONE
@@ -175,6 +212,13 @@ export class RuleGenerator {
     };
 
     return script;
+  }
+
+  /**
+   * ConditionType.CONSTANT
+   */
+  public static generateConstantState(constant: BigNumber): StateConfig {
+    return VM.constant(constant);
   }
 
   /**
@@ -245,22 +289,25 @@ export class RuleGenerator {
         constants: [address, amount],
       };
     } else if (type == ConditionType.GT_ERC20) {
-      // return {
-      //   sources: [
-      //     concat([
-      //       op(VM.Opcodes.CONSTANT, 0),
-      //       op(VM.Opcodes.CONTEXT, 0),
-      //       op(VM.Opcodes.IERC20_BALANCE_OF),
-      //       op(VM.Opcodes.CONSTANT, 1),
-      //       op(VM.Opcodes.GREATER_THAN),
-      //     ]),
-      //   ],
-      //   constants: [address, amount],
-      // };
-      return VM.gte(
-        new AssetOp("erc20-balance-of", [address]),
-        VM.constant(amount) 
-      )
+      return {
+        sources: [
+          concat([
+            op(VM.Opcodes.CONSTANT, 0),
+            op(VM.Opcodes.CONTEXT, 0),
+            op(VM.Opcodes.IERC20_BALANCE_OF),
+            op(VM.Opcodes.CONSTANT, 1),
+            op(VM.Opcodes.GREATER_THAN),
+          ]),
+        ],
+        constants: [address, amount],
+      };
+
+      // FROM SDK 
+
+      // return VM.gte(
+      //   new AssetOp("erc20-balance-of", [address]),
+      //   VM.constant(amount)
+      // )
     } else {
       throw error.error('Invalid type', '');
     }
@@ -291,4 +338,8 @@ export class RuleGenerator {
       constants: [],
     };
   }
+
+
+
 }
+

@@ -31,6 +31,7 @@ import {
   OperatorType,
   condition,
   allowance,
+  quantityAndPrice,
 } from './classes/rulesGenerator';
 import { getCanMintConfig, ScriptError } from './utils';
 const { op, concat } = utils;
@@ -149,78 +150,104 @@ const generatePriceConfig = (
  */
 const generateCanMintScript = (objects: conditionObject): StateConfig => {
   let states: StateConfig[] = [];
+  let error = new ScriptError('Invalid Script parameters.');
+  let returnStateConfig: StateConfig = { sources: [], constants: [] };
+  // Generate StateObject for a single condition
+  function generateConditionStateObject(condition: condition): StateConfig {
+    let retStateConfig: StateConfig = { sources: [], constants: [] };
+    switch (condition.conditionType) {
+      case ConditionType.NONE: {
+        retStateConfig = RuleGenerator.generateNoneState();
+        break;
+      }
+      case ConditionType.TIME_IN_BETWEEN: {
+        if (condition.startTimestamp && condition.endTimestamp)
+          retStateConfig =
+            RuleGenerator.generateInBetweenTimeState(
+              condition.startTimestamp,
+              condition.endTimestamp
+            );
+
+        else
+          throw error.error(
+            'TIME_IN_BETWEEN',
+            'startTImestamp or endTimestamp'
+          );
+        break;
+      }
+      case ConditionType.TIME_AFTER: {
+        if (condition.startTimestamp)
+          retStateConfig = RuleGenerator.generateAfterTimeState(condition.startTimestamp);
+        else throw error.error('TIME_AFTER', 'startTimestamp');
+        break;
+      }
+      case ConditionType.TIME_BEFORE: {
+        if (condition.endTimestamp)
+          retStateConfig = RuleGenerator.generateAfterTimeState(condition.endTimestamp);
+        else throw error.error('TIME_AFTER', 'endTimestamp');
+        break;
+      }
+      case ConditionType.DAYS_FROM_TODAY: {
+        // retStateConfig = enerateDaysFromTodayState());
+        break;
+      }
+      case ConditionType.EQ_ERC20: {
+        if (condition.value && condition.contractAddress)
+          retStateConfig =
+            RuleGenerator.generateERC20State(
+              condition.contractAddress,
+              condition.value,
+              condition.conditionType
+            );
+        else throw error.error('EQ_ERC20', 'address or balance');
+        break;
+      }
+      case ConditionType.LT_ERC20: {
+        if (condition.value && condition.contractAddress)
+          retStateConfig =
+            RuleGenerator.generateERC20State(
+              condition.contractAddress,
+              condition.value,
+              condition.conditionType
+            );
+        else throw error.error('LT_ERC20', 'address or balance');
+        break;
+      }
+      case ConditionType.GT_ERC20: {
+        if (condition.value && condition.contractAddress)
+          retStateConfig =
+            RuleGenerator.generateERC20State(
+              condition.contractAddress,
+              condition.value,
+              condition.conditionType
+            );
+        else throw error.error('GT_ERC20', 'address or balance');
+        break;
+      }
+      case ConditionType.CONSTANT: {
+        if (condition.value) {
+          retStateConfig = RuleGenerator.generateConstantState(condition.value);
+        } else throw error.error('CONSTANT', 'value required');
+        break;
+      }
+      default:
+        break;
+    }
+    return retStateConfig;
+  }
+
+  // Recursive call to iterate over the childrens to generate StateObject
   function generateCanMintHelper(children: conditionObject[]) {
-    let error = new ScriptError('Invalid Script parameters.');
     for (let i = 0; i < children.length; i++) {
       // Loop over children
-      // let states: StateConfig[] = [];
 
       let child = children[i];
       if (child.type === RuleType.CONDITION) {
         // If it is a condition, then fill sources and constants
         let condition = child.condition!;
-        if (condition.conditionType === ConditionType.NONE) {
-          // No condition
-          states.push(RuleGenerator.generateNoneState());
-        } else if (condition.conditionType === ConditionType.TIME_IN_BETWEEN) {
-          if (condition.startTimestamp && condition.endTimestamp)
-            states.push(
-              RuleGenerator.generateInBetweenTimeState(
-                condition.startTimestamp,
-                condition.endTimestamp
-              )
-            );
-          else
-            throw error.error(
-              'TIME_IN_BETWEEN',
-              'startTImestamp or endTimestamp'
-            );
-        } else if (condition.conditionType === ConditionType.TIME_AFTER) {
-          if (condition.startTimestamp)
-            states.push(
-              RuleGenerator.generateAfterTimeState(condition.startTimestamp)
-            );
-          else throw error.error('TIME_AFTER', 'startTimestamp');
-        } else if (condition.conditionType === ConditionType.TIME_BEFORE) {
-          if (condition.endTimestamp)
-            states.push(
-              RuleGenerator.generateAfterTimeState(condition.endTimestamp)
-            );
-          else throw error.error('TIME_AFTER', 'endTimestamp');
-        } else if (condition.conditionType === ConditionType.DAYS_FROM_TODAY) {
-          // states.push(generateDaysFromTodayState());
-        } else if (condition.conditionType === ConditionType.EQ_ERC20) {
-          if (condition.value && condition.contractAddress)
-            states.push(
-              RuleGenerator.generateERC20State(
-                condition.contractAddress,
-                condition.value,
-                condition.conditionType
-              )
-            );
-          else throw error.error('EQ_ERC20', 'address or balance');
-        } else if (condition.conditionType === ConditionType.LT_ERC20) {
-          if (condition.value && condition.contractAddress)
-            states.push(
-              RuleGenerator.generateERC20State(
-                condition.contractAddress,
-                condition.value,
-                condition.conditionType
-              )
-            );
-          else throw error.error('LT_ERC20', 'address or balance');
-        } else if (condition.conditionType === ConditionType.GT_ERC20) {
-          if (condition.value && condition.contractAddress)
-            states.push(
-              RuleGenerator.generateERC20State(
-                condition.contractAddress,
-                condition.value,
-                condition.conditionType
-              )
-            );
-          else throw error.error('GT_ERC20', 'address or balance');
-        }
-      } else if (child.type === RuleType.OPERATOR) {
+        states.push(generateConditionStateObject(condition));
+      }
+      else if (child.type === RuleType.OPERATOR) {
         // If it is a operator, then call the same function recursively
         // recursive call
         generateCanMintHelper(child.children!);
@@ -234,19 +261,27 @@ const generateCanMintScript = (objects: conditionObject): StateConfig => {
       }
     }
   }
-  generateCanMintHelper(objects.children!);
-  // pushing operator at the end
-  if (objects.operator === OperatorType.OR) {
-    states.push(RuleGenerator.generateORState(objects.children!.length)); // Last OP as ANY to check any of the above condition group is true
-  } else if (objects.operator === OperatorType.AND) {
-    states.push(RuleGenerator.generateANDState(objects.children!.length)); // Last OP as ANY to check any of the above condition group is true
-  }
 
-  let result = VM.pair(states[0], states[1]);
-  for (let i = 2; i < states.length; i++) {
-    result = VM.pair(result, states[i]);
+  // Checking type
+  if (objects.type == RuleType.CONDITION) {
+    returnStateConfig = generateConditionStateObject(objects.condition!);
+  } else if (objects.type == RuleType.OPERATOR) {
+    generateCanMintHelper(objects.children!);
+
+    // pushing operator at the end
+    if (objects.operator === OperatorType.OR) {
+      states.push(RuleGenerator.generateORState(objects.children!.length)); // Last OP as ANY to check any of the above condition group is true
+    } else if (objects.operator === OperatorType.AND) {
+      states.push(RuleGenerator.generateANDState(objects.children!.length)); // Last OP as ANY to check any of the above condition group is true
+    }
+
+    returnStateConfig = VM.pair(states[0], states[1]);
+    for (let i = 2; i < states.length; i++) {
+      returnStateConfig = VM.pair(returnStateConfig, states[i]);
+    }
   }
-  return result;
+  return returnStateConfig;
+
 };
 /**
  *
@@ -277,22 +312,34 @@ const generateCanMintConfig = (canMintScript: StateConfig): condition[][] => {
   return conditions;
 };
 
-const generateScript = (condition: conditionObject): StateConfig => {
-  const script = generateCanMintScript(condition);
+const generateScript = (ruleObject: quantityAndPrice): StateConfig => {
 
-  // const [ priceSources, priceConstants, currencies ] = generatePriceScript(prices, canMintConstants.length - 1);
+  let { quantity, price } = ruleObject;
+  // Building Quantity script
+  let quantity_if_Script = generateCanMintScript(quantity.if);
+  let quantity_then_Script = generateCanMintScript(quantity.then);
+  let quantity_else_Script = generateCanMintScript(quantity.else);
+  let quantity_script = VM.ifelse(quantity_if_Script, quantity_then_Script, quantity_else_Script);
+  // Building Price script
+  
+  let price_if_Script = generateCanMintScript(price.if);
+  let price_then_Script = generateCanMintScript(price.then);
+  let price_else_Script = generateCanMintScript(price.else);
+  let price_script = VM.ifelse(price_if_Script, price_then_Script, price_else_Script);
+  
+  let debugScript:StateConfig = {
+    sources: [
+      concat([
+        op(VM.Opcodes.DEBUG)
+      ])
+    ],
+    constants: []
+  };
 
-  // const sources = [canMintSource, priceSources];
-  // const constants = [...canMintConstants, ...priceConstants];
 
-  // return [
-  //   {
-  //     sources: sources,
-  //     constants: constants
-  //   },
-  //   currencies
-  // ];
-  return script;
+  return VM.pair(quantity_script, price_script);
+  
+
 };
 
 const generateConfig = (
@@ -454,7 +501,7 @@ export class Rain1155 extends RainContract {
     _assetId: BigNumberish,
     _account: string,
     overrides?: ReadTxOverrides
-  ) => Promise<boolean>;
+  ) => Promise<BigNumber[]>;
 
   public readonly createNewAsset: (
     _config: AssetConfig,

@@ -15,6 +15,7 @@ import { AllStandardOpsStateBuilder } from '../typechain';
 import { RainJS, StateConfig, VM } from 'rain-sdk';
 import { conditionObject, ConditionType, OperatorType, price, RuleType } from '../src/classes/rulesGenerator';
 import { concat, op } from '../src/utils';
+import { BigNumber } from 'ethers';
 
 export let rain1155: Rain1155;
 export let rain1155Config: Rain1155ConfigStruct;
@@ -48,6 +49,8 @@ export let owner: SignerWithAddress,
   admin: SignerWithAddress;
 
 export let prices: price[];
+
+
 
 before('Deploy Rain1155 Contract and subgraph', async function () {
   const signers = await ethers.getSigners();
@@ -136,137 +139,8 @@ describe('Rain1155 Test', function () {
     expect(XRP.address).to.be.not.null;
   });
 
-  it.only('([Condition, FailScript, PassScript], EAGER_IF)', async function () {
-    let ifObject: conditionObject = {
-      type: RuleType.OPERATOR,
-      operator: OperatorType.AND,
-      children: [
-        {
-          type: RuleType.CONDITION,
-          condition: {
-            conditionType: ConditionType.NONE,
-          },
-        }
-      ],
-    };
-
-    const passPrice: StateConfig = {
-      sources: [concat(
-        [
-          op(VM.Opcodes.CONSTANT, 0)
-        ]
-      )],
-      constants: [10]
-    };
-
-    const failPrice: StateConfig = {
-      sources: [concat(
-        [
-          op(VM.Opcodes.CONSTANT, 0),
-          op(VM.Opcodes.DEBUG)
-        ]
-      )],
-      constants: [5]
-    };
-
-    const passQty: StateConfig = {
-      sources: [concat(
-        [
-          op(VM.Opcodes.CONSTANT, 0)
-        ]
-      )],
-      constants: [20]
-    };
-
-    const failQty: StateConfig = {
-      sources: [concat(
-        [
-          op(VM.Opcodes.CONSTANT, 0)
-        ]
-      )],
-      constants: [7]
-    };
-
-
-    let ruleScript = Rain1155SDK.generateScript(ifObject);
-    let PassScript = VM.pair(passQty, passPrice);
-    let FailScript = VM.pair(failQty, failPrice);
-
-    let script = VM.ifelse(ruleScript, PassScript, FailScript);
-
-    const rainJs = new RainJS(script);
-    const result = await rainJs.run();
-
-    console.log("\n Result : \n", result);
-  });
-
-  it.only('([scriptQty, scriptPrice], PAIR)', async function () {
-    let ifObject: conditionObject = {
-      type: RuleType.OPERATOR,
-      operator: OperatorType.AND,
-      children: [
-        {
-          type: RuleType.CONDITION,
-          condition: {
-            conditionType: ConditionType.NONE,
-          },
-        }
-      ],
-    };
-
-    const passPrice: StateConfig = {
-      sources: [concat(
-        [
-          op(VM.Opcodes.CONSTANT, 0)
-        ]
-      )],
-      constants: [10]
-    };
-
-    const failPrice: StateConfig = {
-      sources: [concat(
-        [
-          op(VM.Opcodes.CONSTANT, 0),
-        ]
-      )],
-      constants: [5]
-    };
-
-    const passQty: StateConfig = {
-      sources: [concat(
-        [
-          op(VM.Opcodes.CONSTANT, 0)
-        ]
-      )],
-      constants: [20]
-    };
-
-    const failQty: StateConfig = {
-      sources: [concat(
-        [
-          op(VM.Opcodes.CONSTANT, 0)
-        ]
-      )],
-      constants: [7]
-    };
-
-
-    let ruleScript1 = Rain1155SDK.generateScript(ifObject);
-    let ruleScript2 = Rain1155SDK.generateScript(ifObject);
-
-    let scriptQty = VM.ifelse(ruleScript1, passQty, failQty);
-    let scriptPrice = VM.ifelse(ruleScript2, passPrice, failPrice);
-
-    let mulScript = VM.pair(scriptQty, scriptPrice);
-
-    const rainJs = new RainJS(mulScript);
-    const result = await rainJs.run();
-    console.log("\n\nResult : \n", result)
-  });
-
-  it.only('Should construct and evaluate the gating rules', async function () {
-    // ------------------------------------------------- A && B
-    let gatingCondition: conditionObject = {
+  it.only('Build and evaluate the script using ', async function () {
+    const ifConditionERC20: conditionObject = {
       type: RuleType.OPERATOR,
       operator: OperatorType.AND,
       children: [
@@ -275,7 +149,7 @@ describe('Rain1155 Test', function () {
           condition: {
             conditionType: ConditionType.GT_ERC20,
             contractAddress: USDT.address,
-            value: ethers.BigNumber.from('100'),
+            value: ethers.BigNumber.from('100' + eighteenZeros),
           },
         },
         {
@@ -289,13 +163,67 @@ describe('Rain1155 Test', function () {
       ],
     };
 
+    const ifConditionNONE: conditionObject = {
+      type: RuleType.OPERATOR,
+      operator: OperatorType.AND,
+      children: [
+        {
+          type: RuleType.CONDITION,
+          condition: {
+            conditionType: ConditionType.NONE
+          }
+        }
+      ]
+    }
+
+    let ifCondition = ifConditionERC20;
+
+    let ruleObject = {
+      quantity: {
+        if: ifCondition,
+        then: {
+          type: RuleType.CONDITION,
+          condition: {
+            conditionType: ConditionType.CONSTANT,
+            value: BigNumber.from(20)
+          }
+        },
+        else: {
+          type: RuleType.CONDITION,
+          condition: {
+            conditionType: ConditionType.CONSTANT,
+            value: BigNumber.from(7)
+          }
+        }
+      },
+      price: {
+        if: ifCondition,
+        then: {
+          type: RuleType.CONDITION,
+          condition: {
+            conditionType: ConditionType.CONSTANT,
+            value: BigNumber.from(10)
+          }
+        },
+        else: {
+          type: RuleType.CONDITION,
+          condition: {
+            conditionType: ConditionType.CONSTANT,
+            value: BigNumber.from(1)
+          }
+        }
+      }
+    }
+
+    let ruleScript = Rain1155SDK.generateScript(ruleObject);
+    console.log("\nRULE SCRIPT : ---------------------\n", ruleScript, "\n------------------------\n");
+
+    // Run using RainJS
     await USDT.connect(buyer1).mintTokens(101);
     await SOL.connect(buyer1).mintTokens(10);
-    let script = Rain1155SDK.generateScript(gatingCondition);
-    console.log("SCRIPT : \n\n", script);
     const assetConfig: AssetConfig = {
       lootBoxId: ethers.BigNumber.from(0),
-      vmStateConfig: script,
+      vmStateConfig: ruleScript,
       currencies: [],
       name: 'F1',
       description: 'BRUUUUMMM BRUUUMMM',
@@ -303,10 +231,60 @@ describe('Rain1155 Test', function () {
       tokenURI:
         'https://ipfs.io/ipfs/QmVfbKBM7XxqZMRFzRGPGkWT8oUFNYY1DeK5dcoTgLuV8H',
     };
+
     // console.log(assetConfig.vmStateConfig);
     await rain1155.connect(creator).createNewAsset(assetConfig);
     console.log(await rain1155.canMint(1, buyer1.address));
+
+    // Run using JSVM
+    // const rainJs = new RainJS(ruleScript);
+    // const result = await rainJs.run();
+    // console.log("\n\nResult : \n", result)
   });
+  
+  // it('Shoule use the AssetOp SDK Function to generate script', async function () {
+  //   // ------------------------------------------------- A && B
+  //   let gatingCondition: conditionObject = {
+  //     type: RuleType.OPERATOR,
+  //     operator: OperatorType.AND,
+  //     children: [
+  //       {
+  //         type: RuleType.CONDITION,
+  //         condition: {
+  //           conditionType: ConditionType.GT_ERC20,
+  //           contractAddress: USDT.address,
+  //           value: ethers.BigNumber.from('100'),
+  //         },
+  //       },
+  //       {
+  //         type: RuleType.CONDITION,
+  //         condition: {
+  //           conditionType: ConditionType.EQ_ERC20,
+  //           contractAddress: SOL.address,
+  //           value: ethers.BigNumber.from('10' + eighteenZeros),
+  //         },
+  //       },
+  //     ],
+  //   };
+
+  //   await USDT.connect(buyer1).mintTokens(101);
+  //   await SOL.connect(buyer1).mintTokens(10);
+  //   let script = Rain1155SDK.generateScript(gatingCondition);
+  //   console.log("SCRIPT : \n\n", script);
+  //   const assetConfig: AssetConfig = {
+  //     lootBoxId: ethers.BigNumber.from(0),
+  //     vmStateConfig: script,
+  //     currencies: [],
+  //     name: 'F1',
+  //     description: 'BRUUUUMMM BRUUUMMM',
+  //     recipient: creator.address,
+  //     tokenURI:
+  //       'https://ipfs.io/ipfs/QmVfbKBM7XxqZMRFzRGPGkWT8oUFNYY1DeK5dcoTgLuV8H',
+  //   };
+  //   // console.log(assetConfig.vmStateConfig);
+  //   await rain1155.connect(creator).createNewAsset(assetConfig);
+  //   console.log(await rain1155.canMint(1, buyer1.address));
+  // });
 
   // await USDT.connect(buyer1).mintTokens(101);
   // await SOL.connect(buyer1).mintTokens(10);
