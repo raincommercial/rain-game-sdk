@@ -1,4 +1,4 @@
-import { VM, StateConfig, SaleDurationInTimestamp } from 'rain-sdk';
+import { VM, StateConfig, BetweenTimestamps, AssetOp } from 'rain-sdk';
 import { concat, op } from '../utils';
 import { BigNumber, BigNumberish } from 'ethers';
 import { ScriptError } from '../utils';
@@ -184,43 +184,21 @@ export class RuleGenerator {
     startTimestamp: number,
     endTimestamp: number
   ): StateConfig {
-    return new SaleDurationInTimestamp(startTimestamp, endTimestamp);
+    return new BetweenTimestamps(startTimestamp, endTimestamp);
   }
 
   /**
    * ConditionType.TIME_AFTER
    */
   public static generateAfterTimeState(timestamp: number): StateConfig {
-    const script: StateConfig = {
-      constants: [timestamp],
-      sources: [
-        concat([
-          op(VM.Opcodes.BLOCK_TIMESTAMP),
-          op(VM.Opcodes.CONSTANT, 0),
-          op(VM.Opcodes.GREATER_THAN),
-        ]),
-      ],
-    };
-
-    return script;
+    return VM.beforeAfterTime(timestamp, "lt")
   }
 
   /**
    * ConditionType.TIME_BEFORE
    */
   public static generateBeforeTimeState(timestamp: number): StateConfig {
-    const script: StateConfig = {
-      constants: [timestamp],
-      sources: [
-        concat([
-          op(VM.Opcodes.BLOCK_TIMESTAMP),
-          op(VM.Opcodes.CONSTANT, 0),
-          op(VM.Opcodes.LESS_THAN),
-        ]),
-      ],
-    };
-
-    return script;
+    return VM.beforeAfterTime(timestamp, "gt")
   }
 
   /**
@@ -267,18 +245,22 @@ export class RuleGenerator {
         constants: [address, amount],
       };
     } else if (type == ConditionType.GT_ERC20) {
-      return {
-        sources: [
-          concat([
-            op(VM.Opcodes.CONSTANT, 0),
-            op(VM.Opcodes.CONTEXT, 0),
-            op(VM.Opcodes.IERC20_BALANCE_OF),
-            op(VM.Opcodes.CONSTANT, 1),
-            op(VM.Opcodes.GREATER_THAN),
-          ]),
-        ],
-        constants: [address, amount],
-      };
+      // return {
+      //   sources: [
+      //     concat([
+      //       op(VM.Opcodes.CONSTANT, 0),
+      //       op(VM.Opcodes.CONTEXT, 0),
+      //       op(VM.Opcodes.IERC20_BALANCE_OF),
+      //       op(VM.Opcodes.CONSTANT, 1),
+      //       op(VM.Opcodes.GREATER_THAN),
+      //     ]),
+      //   ],
+      //   constants: [address, amount],
+      // };
+      return VM.gte(
+        new AssetOp("erc20-balance-of", [address]),
+        VM.constant(amount) 
+      )
     } else {
       throw error.error('Invalid type', '');
     }
@@ -292,6 +274,7 @@ export class RuleGenerator {
    * OperatorType.OR
    */
   public static generateORState(n: number): StateConfig {
+    // VM.or
     return {
       sources: [concat([op(VM.Opcodes.ANY, n)])],
       constants: [],
@@ -302,6 +285,7 @@ export class RuleGenerator {
    * OperatorType.AND
    */
   public static generateANDState(n: number): StateConfig {
+    // VM.and
     return {
       sources: [concat([op(VM.Opcodes.EVERY, n)])],
       constants: [],

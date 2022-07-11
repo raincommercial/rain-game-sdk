@@ -76,7 +76,7 @@
     "hardhat": "^2.7.0",
     "husky": "^7.0.4",
     "mustache": "^4.2.0",
-    "rain-sdk": "2.0.0",
+    "rain-sdk": "git+https://github.com/beehive-innovation/rain-sdk#49ab0eaa553f15fe8f526dbb595716951f17671a",
     "size-limit": "^6.0.4",
     "standardx": "3.0.0",
     "ts-node": "^10.4.0",

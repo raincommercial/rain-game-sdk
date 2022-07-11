@@ -7,13 +7,14 @@ import type { Token } from '../typechain/Token';
 import type { ReserveToken } from '../typechain/ReserveToken';
 import type { ReserveTokenERC1155 } from '../typechain/ReserveTokenERC1155';
 import type { ReserveTokenERC721 } from '../typechain/ReserveTokenERC721';
-import { Rain1155 as Rain1155SDK, AssetConfig} from '../dist';
+import { Rain1155 as Rain1155SDK, AssetConfig } from '../dist';
 
 import { eighteenZeros, fetchFile, writeFile } from './utils';
 import path from 'path';
 import { AllStandardOpsStateBuilder } from '../typechain';
-import { RainJS } from 'rain-sdk';
+import { RainJS, StateConfig, VM } from 'rain-sdk';
 import { conditionObject, ConditionType, OperatorType, price, RuleType } from '../src/classes/rulesGenerator';
+import { concat, op } from '../src/utils';
 
 export let rain1155: Rain1155;
 export let rain1155Config: Rain1155ConfigStruct;
@@ -135,6 +136,134 @@ describe('Rain1155 Test', function () {
     expect(XRP.address).to.be.not.null;
   });
 
+  it.only('([Condition, FailScript, PassScript], EAGER_IF)', async function () {
+    let ifObject: conditionObject = {
+      type: RuleType.OPERATOR,
+      operator: OperatorType.AND,
+      children: [
+        {
+          type: RuleType.CONDITION,
+          condition: {
+            conditionType: ConditionType.NONE,
+          },
+        }
+      ],
+    };
+
+    const passPrice: StateConfig = {
+      sources: [concat(
+        [
+          op(VM.Opcodes.CONSTANT, 0)
+        ]
+      )],
+      constants: [10]
+    };
+
+    const failPrice: StateConfig = {
+      sources: [concat(
+        [
+          op(VM.Opcodes.CONSTANT, 0),
+          op(VM.Opcodes.DEBUG)
+        ]
+      )],
+      constants: [5]
+    };
+
+    const passQty: StateConfig = {
+      sources: [concat(
+        [
+          op(VM.Opcodes.CONSTANT, 0)
+        ]
+      )],
+      constants: [20]
+    };
+
+    const failQty: StateConfig = {
+      sources: [concat(
+        [
+          op(VM.Opcodes.CONSTANT, 0)
+        ]
+      )],
+      constants: [7]
+    };
+
+
+    let ruleScript = Rain1155SDK.generateScript(ifObject);
+    let PassScript = VM.pair(passQty, passPrice);
+    let FailScript = VM.pair(failQty, failPrice);
+
+    let script = VM.ifelse(ruleScript, PassScript, FailScript);
+
+    const rainJs = new RainJS(script);
+    const result = await rainJs.run();
+
+    console.log("\n Result : \n", result);
+  });
+
+  it.only('([scriptQty, scriptPrice], PAIR)', async function () {
+    let ifObject: conditionObject = {
+      type: RuleType.OPERATOR,
+      operator: OperatorType.AND,
+      children: [
+        {
+          type: RuleType.CONDITION,
+          condition: {
+            conditionType: ConditionType.NONE,
+          },
+        }
+      ],
+    };
+
+    const passPrice: StateConfig = {
+      sources: [concat(
+        [
+          op(VM.Opcodes.CONSTANT, 0)
+        ]
+      )],
+      constants: [10]
+    };
+
+    const failPrice: StateConfig = {
+      sources: [concat(
+        [
+          op(VM.Opcodes.CONSTANT, 0),
+        ]
+      )],
+      constants: [5]
+    };
+
+    const passQty: StateConfig = {
+      sources: [concat(
+        [
+          op(VM.Opcodes.CONSTANT, 0)
+        ]
+      )],
+      constants: [20]
+    };
+
+    const failQty: StateConfig = {
+      sources: [concat(
+        [
+          op(VM.Opcodes.CONSTANT, 0)
+        ]
+      )],
+      constants: [7]
+    };
+
+
+    let ruleScript1 = Rain1155SDK.generateScript(ifObject);
+    let ruleScript2 = Rain1155SDK.generateScript(ifObject);
+
+    let scriptQty = VM.ifelse(ruleScript1, passQty, failQty);
+    let scriptPrice = VM.ifelse(ruleScript2, passPrice, failPrice);
+
+    let mulScript = VM.pair(scriptQty, scriptPrice);
+
+    const rainJs = new RainJS(mulScript);
+    const result = await rainJs.run();
+    console.log("\n\nResult : \n", result)
+  });
+
   it.only('Should construct and evaluate the gating rules', async function () {
     // ------------------------------------------------- A && B
     let gatingCondition: conditionObject = {
@@ -163,6 +292,7 @@ describe('Rain1155 Test', function () {
     await USDT.connect(buyer1).mintTokens(101);
     await SOL.connect(buyer1).mintTokens(10);
     let script = Rain1155SDK.generateScript(gatingCondition);
+    console.log("SCRIPT : \n\n", script);
     const assetConfig: AssetConfig = {
       lootBoxId: ethers.BigNumber.from(0),
       vmStateConfig: script,
@@ -173,178 +303,26 @@ describe('Rain1155 Test', function () {
       tokenURI:
         'https://ipfs.io/ipfs/QmVfbKBM7XxqZMRFzRGPGkWT8oUFNYY1DeK5dcoTgLuV8H',
     };
-    console.log(assetConfig.vmStateConfig);
+    // console.log(assetConfig.vmStateConfig);
     await rain1155.connect(creator).createNewAsset(assetConfig);
     console.log(await rain1155.canMint(1, buyer1.address));
-
-    // // ------------------------------------------------- A && B
-    // gatingCondition = {
-    //   "type": RuleType.OPERATOR,
-    //   "operator": OperatorType.AND,
-    //   "children": [
-    //     {
-    //       "type": RuleType.CONDITION,
-    //       "condition": {
-    //         type: ConditionType.BALANCE_TIER,
-    //         tierAddress: erc20BalanceTier.address,
-    //         tierCondition: tierCondition
-    //       }
-    //     },
-    //     {
-    //       "type": RuleType.CONDITION,
-    //       "condition": {
-    //         type: ConditionType.ERC20BALANCE,
-    //         address: SOL.address,
-    //         balance: ethers.BigNumber.from("10" + eighteenZeros)
-    //       }
-    //     },
-    //   ]
-    // }
-
-    // deconstructedConfig = Rain1155SDK.generateCanMintConfig(Rain1155SDK.generateCanMintScript(gatingCondition));
-    // expect(deconstructedConfig).to.deep.equalInAnyOrder(gatingCondition);
-
-    // // ------------------------------------------------- A && B
-    // gatingCondition = {
-    //   "type": RuleType.OPERATOR,
-    //   "operator": OperatorType.AND,
-    //   "children": [
-    //     {
-    //       "type": RuleType.CONDITION,
-    //       "condition": {
-    //         type: ConditionType.BALANCE_TIER,
-    //         tierAddress: erc20BalanceTier.address,
-    //         tierCondition: tierCondition
-    //       }
-    //     },
-    //     {
-    //       "type": RuleType.CONDITION,
-    //       "condition": {
-    //         type: ConditionType.ERC20BALANCE,
-    //         address: SOL.address,
-    //         balance: ethers.BigNumber.from("10" + eighteenZeros)
-    //       }
-    //     },
-    //   ]
-    // }
-    // deconstructedConfig = Rain1155SDK.generateCanMintConfig(Rain1155SDK.generateCanMintScript(gatingCondition));
-    // expect(deconstructedConfig).to.deep.equalInAnyOrder(gatingCondition);
-
-    // // ------------------------------------------------- (A &&)
-    // gatingCondition = {
-    //   "type": RuleType.OPERATOR,
-    //   "operator": OperatorType.AND,
-    //   "children": [
-    //     {
-    //       "type": RuleType.CONDITION,
-    //       "condition": {
-    //         type: ConditionType.BALANCE_TIER,
-    //         tierAddress: erc20BalanceTier.address,
-    //         tierCondition: tierCondition
-    //       }
-    //     }
-    //   ]
-    // }
-    // deconstructedConfig = Rain1155SDK.generateCanMintConfig(Rain1155SDK.generateCanMintScript(gatingCondition));
-    // expect(deconstructedConfig).to.deep.equalInAnyOrder(gatingCondition);
-
-    // // ------------------------------------------------- (A OR)
-    // gatingCondition = {
-    //   "type": RuleType.OPERATOR,
-    //   "operator": OperatorType.OR,
-    //   "children": [
-    //     {
-    //       "type": RuleType.CONDITION,
-    //       "condition": {
-    //         type: ConditionType.BALANCE_TIER,
-    //         tierAddress: erc20BalanceTier.address,
-    //         tierCondition: tierCondition
-    //       }
-    //     }
-    //   ]
-    // }
-    // deconstructedConfig = Rain1155SDK.generateCanMintConfig(Rain1155SDK.generateCanMintScript(gatingCondition));
-    // expect(deconstructedConfig).to.deep.equalInAnyOrder(gatingCondition);
-
-    // // ------------------------------------------------- (A && B && (C && (D || E) && (G || H)))
-    // gatingCondition = {
-    //   "type": RuleType.OPERATOR,
-    //   "operator": OperatorType.AND,
-    //   "children": [
-    //     {
-    //       "type": RuleType.CONDITION,
-    //       "condition": {
-    //         type: ConditionType.ERC20BALANCE,
-    //         address: USDT.address,
-    //         balance: ethers.BigNumber.from("10" + eighteenZeros)
-    //       },
-    //     },
-    //     {
-    //       "type": RuleType.CONDITION,
-    //       "condition": {
-    //         type: ConditionType.ERC20BALANCE,
-    //         address: SOL.address,
-    //         balance: ethers.BigNumber.from("10" + eighteenZeros)
-    //       },
-    //     },
-    //     {
-    //       "type": RuleType.OPERATOR,
-    //       "operator": OperatorType.AND,
-    //       "children": [
-    //         {
-    //           "type": RuleType.CONDITION,
-    //           "condition": {
-    //             type: ConditionType.BALANCE_TIER,
-    //             tierAddress: erc20BalanceTier.address,
-    //             tierCondition: tierCondition
-    //           },
-    //         },
-    //         {
-    //           "type": RuleType.OPERATOR,
-    //           "operator": OperatorType.OR,
-    //           "children": [
-    //             {
-    //               "type": RuleType.CONDITION,
-    //               "condition": {
-    //                 type: ConditionType.BLOCK_NUMBER,
-    //                 blockNumber: blockCondition
-    //               },
-    //             },
-    //             {
-    //               "type": RuleType.CONDITION,
-    //               "condition": {
-    //                 type: ConditionType.NONE
-    //               },
-    //             }
-    //           ]
-    //         }
-    //       ]
-    //     },
-    //     {
-    //       "type": RuleType.OPERATOR,
-    //       "operator": OperatorType.OR,
-    //       "children": [
-    //         {
-    //           "type": RuleType.CONDITION,
-    //           "condition": {
-    //             type: ConditionType.BLOCK_NUMBER,
-    //             blockNumber: blockCondition
-    //           },
-    //         },
-    //         {
-    //           "type": RuleType.CONDITION,
-    //           "condition": {
-    //             type: ConditionType.BALANCE_TIER,
-    //             tierAddress: erc20BalanceTier.address,
-    //             tierCondition: tierCondition
-    //           }
-    //         }
-    //       ]
-    //     }
-    //   ]
-    // }
-
-    // deconstructedConfig = Rain1155SDK.generateCanMintConfig(Rain1155SDK.generateCanMintScript(gatingCondition));
-    // expect(deconstructedConfig).to.deep.equalInAnyOrder(gatingCondition);
   });
+
+  // await USDT.connect(buyer1).mintTokens(101);
+  // await SOL.connect(buyer1).mintTokens(10);
+  // let script = Rain1155SDK.generateScript(gatingCondition);
+  // const assetConfig: AssetConfig = {
+  //   lootBoxId: ethers.BigNumber.from(0),
+  //   vmStateConfig: script,
+  //   currencies: [],
+  //   name: 'F1',
+  //   description: 'BRUUUUMMM BRUUUMMM',
+  //   recipient: creator.address,
+  //   tokenURI:
+  //     'https://ipfs.io/ipfs/QmVfbKBM7XxqZMRFzRGPGkWT8oUFNYY1DeK5dcoTgLuV8H',
+  // };
+  // console.log(assetConfig.vmStateConfig);
+  // await rain1155.connect(creator).createNewAsset(assetConfig);
+  // console.log(await rain1155.canMint(1, buyer1.address));
+
 });
