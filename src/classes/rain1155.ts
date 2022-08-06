@@ -21,7 +21,11 @@ import {
   ERC1155,
   StateConfig,
   RuleBuilder,
-  Currency
+  Currency,
+  Condition,
+  ConditionGroup,
+  Quantity,
+  Price
 } from 'rain-sdk';
 
 
@@ -68,11 +72,36 @@ export class Rain1155 extends RainContract {
   public static readonly subgraph =
     'https://api.thegraph.com/subgraphs/name/vishalkale151071/blocks';
 
-  public static readonly generateScript = (
+
+  public static readonly generateStateConfig = (
     currencies: Currency[]
   ): RuleBuilder => {
     return new RuleBuilder(currencies);
   };
+
+  public static readonly getConditionGroupConfig = (
+    conditionGroup: ConditionGroup
+  ): StateConfig => {
+    return RuleBuilder.getConditionGroupConfig(conditionGroup);
+  }
+
+  public static readonly getConditionConfig = (
+    condition: Condition
+  ): StateConfig => {
+    return RuleBuilder.getConditionConfig(condition);
+  }
+
+  public static readonly getQuantityConfig = (
+    quantity: Quantity
+  ): StateConfig => {
+    return RuleBuilder.getQPConfig(quantity);
+  }
+
+  public static readonly getPriceConfig = (
+    price: Price
+  ): StateConfig => {
+    return RuleBuilder.getQPConfig(price);
+  }
 
   public readonly getPrice = async (
     _assetId: BigNumberish,

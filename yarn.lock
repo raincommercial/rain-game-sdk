@@ -951,9 +951,9 @@
     "@openzeppelin/contracts" "^4.3.3"
     "@openzeppelin/contracts-upgradeable" "^4.4.1"
 
-"@beehiveinnovation/rain1155@git+https://github.com/beehive-innovation/rain1155.git#ca1d4f4ae4dee37811ceb3817d017b94bf3a5fae":
+"@beehiveinnovation/rain1155@git+https://github.com/beehive-innovation/rain1155.git#b9df2133fc2368661f208f5e2c51c627d514d43a":
   version "0.0.1"
-  resolved "git+https://github.com/beehive-innovation/rain1155.git#ca1d4f4ae4dee37811ceb3817d017b94bf3a5fae"
+  resolved "git+https://github.com/beehive-innovation/rain1155.git#b9df2133fc2368661f208f5e2c51c627d514d43a"
   dependencies:
     "@beehiveinnovation/rain-protocol" "git+https://github.com/beehive-innovation/rain-protocol.git#5a35b097475d37fd5f44446922a32025708c1f8c"
     "@graphprotocol/graph-cli" "0.31.0"
@@ -963,7 +963,7 @@
     dotenv "^16.0.0"
     gluegun "^5.1.2"
     mustache "^4.2.0"
-    rain-sdk "git+https://github.com/beehive-innovation/rain-sdk.git#ca8908eaa569b0cc3a3e1a23611b9b818614afa0"
+    rain-sdk "git+https://github.com/beehive-innovation/rain-sdk.git#63f7bafe1baf0425232cf2050aeca7ed37d570ad"
 
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
@@ -13159,17 +13159,17 @@ queue-microtask@^1.2.2:
   resolved "https://registry.yarnpkg.com/queue-microtask/-/queue-microtask-1.2.3.tgz#4929228bbc724dfac43e0efb058caf7b6cfb6243"
   integrity sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==
 
-"rain-sdk@git+https://github.com/beehive-innovation/rain-sdk#ca8908eaa569b0cc3a3e1a23611b9b818614afa0":
+"rain-sdk@git+https://github.com/beehive-innovation/rain-sdk#63f7bafe1baf0425232cf2050aeca7ed37d570ad":
   version "2.1.1-beta"
-  uid ca8908eaa569b0cc3a3e1a23611b9b818614afa0
-  resolved "git+https://github.com/beehive-innovation/rain-sdk#ca8908eaa569b0cc3a3e1a23611b9b818614afa0"
+  uid "63f7bafe1baf0425232cf2050aeca7ed37d570ad"
+  resolved "git+https://github.com/beehive-innovation/rain-sdk#63f7bafe1baf0425232cf2050aeca7ed37d570ad"
   dependencies:
     ethers "^5.5.2"
     prettier "^2.6.2"
 
-"rain-sdk@git+https://github.com/beehive-innovation/rain-sdk.git#ca8908eaa569b0cc3a3e1a23611b9b818614afa0":
+"rain-sdk@git+https://github.com/beehive-innovation/rain-sdk.git#63f7bafe1baf0425232cf2050aeca7ed37d570ad":
   version "2.1.1-beta"
-  resolved "git+https://github.com/beehive-innovation/rain-sdk.git#ca8908eaa569b0cc3a3e1a23611b9b818614afa0"
+  resolved "git+https://github.com/beehive-innovation/rain-sdk.git#63f7bafe1baf0425232cf2050aeca7ed37d570ad"
   dependencies:
     ethers "^5.5.2"
     prettier "^2.6.2"

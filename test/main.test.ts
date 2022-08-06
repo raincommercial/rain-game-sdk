@@ -286,7 +286,7 @@ describe('Rain1155 Test', function () {
         }
       }
     ]
-    let ruleScript = Rain1155SDK.generateScript(currencyObject)
+    let ruleScript = Rain1155SDK.generateStateConfig(currencyObject)
 
     console.log("\nRULE SCRIPT : ---------------------\n", ruleScript, "\n------------------------\n");
 
