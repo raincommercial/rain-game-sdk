@@ -58,7 +58,7 @@
     }
   ],
   "devDependencies": {
-    "@beehiveinnovation/rain1155": "git+https://github.com/beehive-innovation/rain1155.git#45fb1f8ec237d747d13b5657c4c4e92cb8248388",
+    "@beehiveinnovation/rain1155": "git+https://github.com/beehive-innovation/rain1155.git#ca1d4f4ae4dee37811ceb3817d017b94bf3a5fae",
     "@graphprotocol/graph-cli": "0.26.0",
     "@graphprotocol/graph-ts": "0.26.0",
     "@microsoft/api-documenter": "^7.17.9",
@@ -76,7 +76,7 @@
     "hardhat": "^2.7.0",
     "husky": "^7.0.4",
     "mustache": "^4.2.0",
-    "rain-sdk": "git+https://github.com/beehive-innovation/rain-sdk#49ab0eaa553f15fe8f526dbb595716951f17671a",
+    "rain-sdk": "git+https://github.com/beehive-innovation/rain-sdk#ca8908eaa569b0cc3a3e1a23611b9b818614afa0",
     "size-limit": "^6.0.4",
     "standardx": "3.0.0",
     "ts-node": "^10.4.0",

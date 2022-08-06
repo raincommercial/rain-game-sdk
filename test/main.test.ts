@@ -1,21 +1,19 @@
+import path from 'path';
+import { it } from 'mocha';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { it } from 'mocha';
-import type { Rain1155, Rain1155ConfigStruct } from '../typechain/Rain1155';
+import { BigNumber } from 'ethers';
+import { price } from '../src/classes/types';
 import type { Token } from '../typechain/Token';
+import { Currency, RuleBuilder } from 'rain-sdk';
+import { AllStandardOpsStateBuilder } from '../typechain';
+import { eighteenZeros, fetchFile, writeFile } from './utils';
 import type { ReserveToken } from '../typechain/ReserveToken';
+import { Rain1155 as Rain1155SDK, AssetConfig } from '../src/classes/rain1155';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import type { Rain1155, Rain1155ConfigStruct } from '../typechain/Rain1155';
 import type { ReserveTokenERC1155 } from '../typechain/ReserveTokenERC1155';
 import type { ReserveTokenERC721 } from '../typechain/ReserveTokenERC721';
-import { Rain1155 as Rain1155SDK, AssetConfig } from '../dist';
-
-import { eighteenZeros, fetchFile, writeFile } from './utils';
-import path from 'path';
-import { AllStandardOpsStateBuilder } from '../typechain';
-import { RainJS, StateConfig, VM } from 'rain-sdk';
-import { conditionObject, ConditionType, OperatorType, price, RuleType } from '../src/classes/rulesGenerator';
-import { concat, op } from '../src/utils';
-import { BigNumber } from 'ethers';
 
 export let rain1155: Rain1155;
 export let rain1155Config: Rain1155ConfigStruct;
@@ -51,7 +49,6 @@ export let owner: SignerWithAddress,
 export let prices: price[];
 
 
-
 before('Deploy Rain1155 Contract and subgraph', async function () {
   const signers = await ethers.getSigners();
   owner = signers[0];
@@ -71,6 +68,7 @@ before('Deploy Rain1155 Contract and subgraph', async function () {
   );
   stateBuilder =
     (await stateBuilderFactory.deploy()) as AllStandardOpsStateBuilder;
+
   await stateBuilder.deployed();
 
   let Rain1155 = await ethers.getContractFactory('Rain1155');
@@ -83,7 +81,7 @@ before('Deploy Rain1155 Contract and subgraph', async function () {
 
   await rain1155.deployed();
 
-  rain1155SDK = new Rain1155SDK(rain1155.address, owner);
+  rain1155SDK = new Rain1155SDK(rain1155.address, buyer1);
 
   const Erc20 = await ethers.getContractFactory('Token');
   const stableCoins = await ethers.getContractFactory('ReserveToken');
@@ -115,16 +113,16 @@ before('Deploy Rain1155 Contract and subgraph', async function () {
   rTKN = (await Erc20.deploy('Rain Token', 'rTKN')) as Token;
   await rTKN.deployed();
 
-  const pathExampleConfig = path.resolve(__dirname, '../config/localhost.json');
-  const config = JSON.parse(fetchFile(pathExampleConfig));
+  // const pathExampleConfig = path.resolve(__dirname, '../config/localhost.json');
+  // const config = JSON.parse(fetchFile(pathExampleConfig));
 
-  config.network = 'localhost';
+  // config.network = 'localhost';
 
-  config.rain1155 = rain1155.address;
-  config.rain1155Block = rain1155.deployTransaction.blockNumber;
+  // config.rain1155 = rain1155.address;
+  // config.rain1155Block = rain1155.deployTransaction.blockNumber;
 
-  const pathConfigLocal = path.resolve(__dirname, '../config/localhost.json');
-  writeFile(pathConfigLocal, JSON.stringify(config, null, 2));
+  // const pathConfigLocal = path.resolve(__dirname, '../config/localhost.json');
+  // writeFile(pathConfigLocal, JSON.stringify(config, null, 2));
 });
 
 describe('Rain1155 Test', function () {
@@ -139,168 +137,206 @@ describe('Rain1155 Test', function () {
     expect(XRP.address).to.be.not.null;
   });
 
-  it.only('Build and evaluate the script using ', async function () {
-    const ifConditionERC20: conditionObject = {
-      type: RuleType.OPERATOR,
-      operator: OperatorType.AND,
-      children: [
-        {
-          type: RuleType.CONDITION,
-          condition: {
-            conditionType: ConditionType.GT_ERC20,
-            contractAddress: USDT.address,
-            value: ethers.BigNumber.from('100' + eighteenZeros),
+  it('it should correctly build the StateConfig from RuleBuilder and deploy the asset and buy', async function () {
+    const currencyObject: Currency[] = [
+      // currency 1
+      {
+        rules: [
+          {
+            quantityConditions: {
+              conditions: [
+                {
+                  struct: {
+                    subject: 'constant',
+                    args: {
+                      value: BigNumber.from(1)
+                    }
+                  },
+                  operator: 'true'
+                },
+              ],
+              operator: 'true'
+            },
+            priceConditions: {
+              conditions: [
+                {
+                  struct: {
+                    subject: 'constant',
+                    args: {
+                      value: BigNumber.from(1)
+                    }
+                  },
+                  operator: 'true'
+                }
+              ],
+              operator: 'true'
+            },
+            quantity: {
+              struct: {
+                subject: 'constant',
+                args: {
+                  value: BigNumber.from("10")
+                }
+              }
+            },
+            price: {
+              struct: {
+                subject: 'constant',
+                args: {
+                  value: BigNumber.from("1" + eighteenZeros)
+                }
+              }
+            }
           },
-        },
-        {
-          type: RuleType.CONDITION,
-          condition: {
-            conditionType: ConditionType.EQ_ERC20,
-            contractAddress: SOL.address,
-            value: ethers.BigNumber.from('10' + eighteenZeros),
+        ],
+        default: {
+          quantity: {
+            struct: {
+              subject: 'constant',
+              args: {
+                value: ethers.constants.Zero
+              }
+            }
           },
-        },
-      ],
-    };
-
-    const ifConditionNONE: conditionObject = {
-      type: RuleType.OPERATOR,
-      operator: OperatorType.AND,
-      children: [
-        {
-          type: RuleType.CONDITION,
-          condition: {
-            conditionType: ConditionType.NONE
-          }
-        }
-      ]
-    }
-
-    let ifCondition = ifConditionERC20;
-
-    let ruleObject = {
-      quantity: {
-        if: ifCondition,
-        then: {
-          type: RuleType.CONDITION,
-          condition: {
-            conditionType: ConditionType.CONSTANT,
-            value: BigNumber.from(20)
+          price: {
+            struct: {
+              subject: 'constant',
+              args: {
+                value: ethers.constants.MaxUint256
+              }
+            }
           }
         },
-        else: {
-          type: RuleType.CONDITION,
-          condition: {
-            conditionType: ConditionType.CONSTANT,
-            value: BigNumber.from(7)
-          }
+        pick: {
+          quantities: 'max',
+          prices: 'min'
         }
       },
-      price: {
-        if: ifCondition,
-        then: {
-          type: RuleType.CONDITION,
-          condition: {
-            conditionType: ConditionType.CONSTANT,
-            value: BigNumber.from(10)
+      // currency 2
+      {
+        rules: [
+          {
+            quantityConditions: {
+              conditions: [
+                {
+                  struct: {
+                    subject: 'constant',
+                    args: {
+                      value: BigNumber.from(1)
+                    }
+                  },
+                  operator: 'true'
+                },
+              ],
+              operator: 'true'
+            },
+            priceConditions: {
+              conditions: [
+                {
+                  struct: {
+                    subject: 'constant',
+                    args: {
+                      value: BigNumber.from(1)
+                    }
+                  },
+                  operator: 'true'
+                }
+              ],
+              operator: 'true'
+            },
+            quantity: {
+              struct: {
+                subject: 'constant',
+                args: {
+                  value: BigNumber.from("10")
+                }
+              }
+            },
+            price: {
+              struct: {
+                subject: 'constant',
+                args: {
+                  value: BigNumber.from("25" + eighteenZeros)
+                }
+              }
+            }
+          },
+        ],
+        default: {
+          quantity: {
+            struct: {
+              subject: 'constant',
+              args: {
+                value: ethers.constants.Zero
+              }
+            }
+          },
+          price: {
+            struct: {
+              subject: 'constant',
+              args: {
+                value: ethers.constants.MaxUint256
+              }
+            }
           }
         },
-        else: {
-          type: RuleType.CONDITION,
-          condition: {
-            conditionType: ConditionType.CONSTANT,
-            value: BigNumber.from(1)
-          }
+        pick: {
+          quantities: 'max',
+          prices: 'min'
         }
       }
-    }
+    ]
+    let ruleScript = Rain1155SDK.generateScript(currencyObject)
 
-    let ruleScript = Rain1155SDK.generateScript(ruleObject);
     console.log("\nRULE SCRIPT : ---------------------\n", ruleScript, "\n------------------------\n");
 
-    // Run using RainJS
-    await USDT.connect(buyer1).mintTokens(101);
-    await SOL.connect(buyer1).mintTokens(10);
     const assetConfig: AssetConfig = {
-      lootBoxId: ethers.BigNumber.from(0),
+      lootBoxId: 0,
       vmStateConfig: ruleScript,
-      currencies: [],
-      name: 'F1',
-      description: 'BRUUUUMMM BRUUUMMM',
+      currencies: {
+        token: [USDT.address, BNB.address],
+        tokenType: [0, 0],
+        tokenId: [0, 0]
+      },
+      name: "F1",
+      description: "BRUUUUMMM BRUUUMMM",
       recipient: creator.address,
-      tokenURI:
-        'https://ipfs.io/ipfs/QmVfbKBM7XxqZMRFzRGPGkWT8oUFNYY1DeK5dcoTgLuV8H',
-    };
+      tokenURI: "https://ipfs.io/ipfs/QmVfbKBM7XxqZMRFzRGPGkWT8oUFNYY1DeK5dcoTgLuV8H",
+    }
 
-    // console.log(assetConfig.vmStateConfig);
-    await rain1155.connect(creator).createNewAsset(assetConfig);
-    console.log(await rain1155.canMint(1, buyer1.address));
+    await rain1155.connect(gameAsstesOwner).createNewAsset(assetConfig);
 
-    // Run using JSVM
-    // const rainJs = new RainJS(ruleScript);
-    // const result = await rainJs.run();
-    // console.log("\n\nResult : \n", result)
+    let assetData = await rain1155.assets(1)
+    let expectAsset = {
+      lootBoxId: assetData.lootBoxId,
+      tokenURI: assetData.tokenURI,
+      creator: assetData.recipient,
+    }
+
+    expect(expectAsset).to.deep.equals({
+      lootBoxId: ethers.BigNumber.from("0"),
+      tokenURI: "https://ipfs.io/ipfs/QmVfbKBM7XxqZMRFzRGPGkWT8oUFNYY1DeK5dcoTgLuV8H",
+      creator: creator.address,
+    },'Something is not rught, asset data is wrong');
+
+    await USDT.connect(buyer1).mintTokens(1);
+    await BNB.connect(buyer1).mintTokens(25);
+
+    let USDTPrice = (await rain1155.getCurrencyPrice(1, USDT.address, buyer1.address, 1))[0]
+    let BNBPrice = (await rain1155.getCurrencyPrice(1, BNB.address, buyer1.address, 1))[0]
+
+    await USDT.connect(buyer1).approve(rain1155.address, USDTPrice);
+    await BNB.connect(buyer1).approve(rain1155.address, BNBPrice);
+
+    await rain1155.connect(buyer1).mintAssets(1,1);
+
+    expect(await rain1155.balanceOf(buyer1.address, 1)).to.deep.equals(ethers.BigNumber.from("1"))
+
+    expect(await USDT.balanceOf(creator.address)).to.deep.equals(ethers.BigNumber.from("1" + eighteenZeros))
+    expect(await BNB.balanceOf(creator.address)).to.deep.equals(ethers.BigNumber.from("25" + eighteenZeros)
+    )
+    expect(await USDT.balanceOf(buyer1.address)).to.deep.equals(ethers.BigNumber.from("0" + eighteenZeros))
+    expect(await BNB.balanceOf(buyer1.address)).to.deep.equals(ethers.BigNumber.from("0" + eighteenZeros))
+
   });
-  
-  // it('Shoule use the AssetOp SDK Function to generate script', async function () {
-  //   // ------------------------------------------------- A && B
-  //   let gatingCondition: conditionObject = {
-  //     type: RuleType.OPERATOR,
-  //     operator: OperatorType.AND,
-  //     children: [
-  //       {
-  //         type: RuleType.CONDITION,
-  //         condition: {
-  //           conditionType: ConditionType.GT_ERC20,
-  //           contractAddress: USDT.address,
-  //           value: ethers.BigNumber.from('100'),
-  //         },
-  //       },
-  //       {
-  //         type: RuleType.CONDITION,
-  //         condition: {
-  //           conditionType: ConditionType.EQ_ERC20,
-  //           contractAddress: SOL.address,
-  //           value: ethers.BigNumber.from('10' + eighteenZeros),
-  //         },
-  //       },
-  //     ],
-  //   };
-
-  //   await USDT.connect(buyer1).mintTokens(101);
-  //   await SOL.connect(buyer1).mintTokens(10);
-  //   let script = Rain1155SDK.generateScript(gatingCondition);
-  //   console.log("SCRIPT : \n\n", script);
-  //   const assetConfig: AssetConfig = {
-  //     lootBoxId: ethers.BigNumber.from(0),
-  //     vmStateConfig: script,
-  //     currencies: [],
-  //     name: 'F1',
-  //     description: 'BRUUUUMMM BRUUUMMM',
-  //     recipient: creator.address,
-  //     tokenURI:
-  //       'https://ipfs.io/ipfs/QmVfbKBM7XxqZMRFzRGPGkWT8oUFNYY1DeK5dcoTgLuV8H',
-  //   };
-  //   // console.log(assetConfig.vmStateConfig);
-  //   await rain1155.connect(creator).createNewAsset(assetConfig);
-  //   console.log(await rain1155.canMint(1, buyer1.address));
-  // });
-
-  // await USDT.connect(buyer1).mintTokens(101);
-  // await SOL.connect(buyer1).mintTokens(10);
-  // let script = Rain1155SDK.generateScript(gatingCondition);
-  // const assetConfig: AssetConfig = {
-  //   lootBoxId: ethers.BigNumber.from(0),
-  //   vmStateConfig: script,
-  //   currencies: [],
-  //   name: 'F1',
-  //   description: 'BRUUUUMMM BRUUUMMM',
-  //   recipient: creator.address,
-  //   tokenURI:
-  //     'https://ipfs.io/ipfs/QmVfbKBM7XxqZMRFzRGPGkWT8oUFNYY1DeK5dcoTgLuV8H',
-  // };
-  // console.log(assetConfig.vmStateConfig);
-  // await rain1155.connect(creator).createNewAsset(assetConfig);
-  // console.log(await rain1155.canMint(1, buyer1.address));
-
 });

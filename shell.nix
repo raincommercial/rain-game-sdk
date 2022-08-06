@@ -45,6 +45,7 @@ in
 pkgs.stdenv.mkDerivation {
  name = "shell";
  buildInputs = [
+  pkgs.yarn
   pkgs.nodejs-14_x
   copy-contracts
   generate-typechain
@@ -59,6 +60,5 @@ pkgs.stdenv.mkDerivation {
   export PATH=$( npm bin ):$PATH
   # keep it fresh
   yarn install --ignore-scripts
-  build-sdk
  '';
 }
