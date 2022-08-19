@@ -20,7 +20,7 @@ jobs:
           nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Build
-        run: nix-shell --run build-sdk
+        run: nix-shell --run build-sdk2
 
       - name: Lint
         run: nix-shell --run lint-sdk

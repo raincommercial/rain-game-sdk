@@ -15,6 +15,12 @@ let
   yarn lint
  '';
 
+ build-sdk = pkgs.writeShellScriptBin "build-sdk2" ''
+  while ! yarn install --network-timeout 1000000 --skip-integrity-check --network-concurrency 1; do echo --- ; done
+  copy-typechain
+  yarn build
+ '';
+
  build-sdk = pkgs.writeShellScriptBin "build-sdk" ''
   copy-typechain
   yarn build
@@ -53,6 +59,7 @@ pkgs.stdenv.mkDerivation {
   generate-docs
   lint-sdk
   build-sdk
+  build-sdk2
   test-sdk
  ];
 
