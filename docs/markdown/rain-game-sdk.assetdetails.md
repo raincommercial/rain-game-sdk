@@ -4,18 +4,20 @@
 
 ## AssetDetails type
 
+Type of asset details returned by Rain1155.assets method
+
 <b>Signature:</b>
 
 ```typescript
 export declare type AssetDetails = {
-    lootBoxId: BigNumber;
-    id: BigNumber;
-    priceConfig: State;
-    canMintConfig: State;
-    assetClass: BigNumber;
-    rarity: number;
-    creator: string;
+    lootBoxId: BigNumberish;
+    id: BigNumberish;
+    vmStateConfig: StateConfig;
+    vmStatePointer: string;
+    currencies: CurrencyConfig;
+    recipient: string;
+    tokenURI: string;
 };
 ```
-<b>References:</b> [State](./rain-game-sdk.state.md)
+<b>References:</b> [CurrencyConfig](./rain-game-sdk.currencyconfig.md)
 

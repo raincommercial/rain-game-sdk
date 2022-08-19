@@ -1,6 +1,7 @@
 import { BigNumber, BigNumberish } from 'ethers';
 
 /**
+ * @public
  * enum for type of payment currency
  */
 export enum CurrencyType {
@@ -9,16 +10,21 @@ export enum CurrencyType {
    */
   NATIVE,
   /**
-   * for ERC20 TOkens
+   * for ERC20 tokens
    */
   ERC20,
   /**
-   * for ERC1155  Tokens
+   * for ERC721 tokens
+   */
+  ERC721,
+  /**
+   * for ERC1155 tokens
    */
   ERC1155,
 }
 
 /**
+ * @public
  * Type for token used in price type
  */
 export type token = {
@@ -28,6 +34,7 @@ export type token = {
 };
 
 /**
+ * @public
  * Type for price as a result of Rain1155 contract call
  */
 export type price = {
@@ -36,6 +43,7 @@ export type price = {
 };
 
 /**
+ * @public
  * Type for allowence
  */
 export type allowance = {

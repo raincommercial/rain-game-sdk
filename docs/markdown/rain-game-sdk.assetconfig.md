@@ -4,6 +4,8 @@
 
 ## AssetConfig type
 
+Type of asset's config used for creating new assets
+
 <b>Signature:</b>
 
 ```typescript
@@ -11,10 +13,11 @@ export declare type AssetConfig = {
     name: string;
     description: string;
     lootBoxId: BigNumberish;
-    priceConfig: StateConfig;
-    canMintConfig: StateConfig;
-    currencies: string[];
-    assetClass: BigNumberish;
-    rarity: BigNumberish;
+    vmStateConfig: StateConfig;
+    currencies: CurrencyConfig;
+    recipient: string;
+    tokenURI: string;
 };
 ```
+<b>References:</b> [CurrencyConfig](./rain-game-sdk.currencyconfig.md)
+

@@ -1,13 +1,12 @@
-import path from 'path';
 import { it } from 'mocha';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { BigNumber } from 'ethers';
 import { price } from '../src/classes/types';
 import type { Token } from '../typechain/Token';
-import { Currency, RuleBuilder } from 'rain-sdk';
+import { Currency } from 'rain-sdk';
 import { AllStandardOpsStateBuilder } from '../typechain';
-import { eighteenZeros, fetchFile, writeFile } from './utils';
+import { eighteenZeros } from './utils';
 import type { ReserveToken } from '../typechain/ReserveToken';
 import { Rain1155 as Rain1155SDK, AssetConfig } from '../src/classes/rain1155';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -81,7 +80,7 @@ before('Deploy Rain1155 Contract and subgraph', async function () {
 
   await rain1155.deployed();
 
-  rain1155SDK = new Rain1155SDK(rain1155.address, buyer1);
+  rain1155SDK = new Rain1155SDK(buyer1, rain1155.address);
 
   const Erc20 = await ethers.getContractFactory('Token');
   const stableCoins = await ethers.getContractFactory('ReserveToken');
@@ -295,8 +294,7 @@ describe('Rain1155 Test', function () {
       vmStateConfig: ruleScript,
       currencies: {
         token: [USDT.address, BNB.address],
-        tokenType: [0, 0],
-        tokenId: [0, 0]
+        tokenId: []
       },
       name: "F1",
       description: "BRUUUUMMM BRUUUMMM",
@@ -322,8 +320,8 @@ describe('Rain1155 Test', function () {
     await USDT.connect(buyer1).mintTokens(1);
     await BNB.connect(buyer1).mintTokens(25);
 
-    let USDTPrice = (await rain1155.getCurrencyPrice(1, USDT.address, buyer1.address, 1))[0]
-    let BNBPrice = (await rain1155.getCurrencyPrice(1, BNB.address, buyer1.address, 1))[0]
+    let USDTPrice = await rain1155.getCurrencyPrice(1, USDT.address, buyer1.address, 1)
+    let BNBPrice = await rain1155.getCurrencyPrice(1, BNB.address, buyer1.address, 1)
 
     await USDT.connect(buyer1).approve(rain1155.address, USDTPrice);
     await BNB.connect(buyer1).approve(rain1155.address, BNBPrice);

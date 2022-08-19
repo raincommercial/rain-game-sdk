@@ -31,3 +31,6 @@ jobs:
 
       - name: Test
         run: nix-shell --run test-sdk
+
+      - name: Test Doc Generation
+        run: nix-shell --run generate-docs

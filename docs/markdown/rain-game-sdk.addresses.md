@@ -11,6 +11,6 @@ Type for all the addresses stored in the Book
 ```typescript
 export declare type Addresses = {
     [key: string]: string;
-    gameAssetsFactory: string;
+    rain1155: string;
 };
 ```

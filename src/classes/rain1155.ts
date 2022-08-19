@@ -4,7 +4,7 @@ import { Rain1155__factory } from '../typechain';
 import {
   CurrencyType,
   price,
-  allowance,
+  allowance
 } from './types';
 import {
   Signer,
@@ -25,24 +25,52 @@ import {
   Condition,
   ConditionGroup,
   Quantity,
-  Price
+  Price,
+  ERC721
 } from 'rain-sdk';
 
-
+/**
+ * @public
+ * Class to interact with Rain1155 contract methods and crreate assets with rules
+ * 
+ * ```typescript
+ * // To instantiate a Rain1155 contract:
+ * import { Rain1155 } from 'rain-game-sdk';
+ * const newRain1155contract = new Rain1155(signer [, address])
+ * 
+ * // To get the price of minting for a currency:
+ * const price = await Rain1155.getPrice(assetId, paymentTokenAddress, buyerAddress, targetUnits)
+ * 
+ * // To get an Asset's asset details:
+ * const assetDetails = await Rain1155.assets(assetId)
+ * 
+ * // To generate the vm StateConfig from an array of Currency object(s):
+ * const vmStateConfig = Rain1155.getStateConfig([currency1, currency2, ...])
+ * ```
+ */
 export class Rain1155 extends RainContract {
   protected static readonly nameBookReference = 'Rain1155';
 
   /**
    * Constructs a new Rain1155 from a known address.
    *
-   * @param address - The address of the Rain1155 contract
    * @param signer - An ethers.js Signer
+   * @param address - (optional) The address of the Rain1155 contract, originally is 
+   * fetched from the addressbook, but if passed it will ignore the addressbook
    * @returns A new Rain1155 instance
    *
    */
-  constructor(address: string, signer: Signer) {
-    super(address, signer);
-    const _rain1155 = Rain1155__factory.connect(address, signer);
+  constructor(signer: Signer, address?: string) {
+    if (address === undefined) {
+      (async() => {      
+        address =  AddressBook.getAddressesForChainId(
+          await signer.getChainId()
+        ).rain1155
+      })()
+    }
+
+    super(address!, signer);
+    const _rain1155 = Rain1155__factory.connect(address!, signer);
 
     this.assets = _rain1155.assets;
     this.balanceOf = _rain1155.balanceOf;
@@ -62,7 +90,7 @@ export class Rain1155 extends RainContract {
   }
 
   public readonly connect = (signer: Signer): Rain1155 => {
-    return new Rain1155(this.address, signer);
+    return new Rain1155(signer, this.address);
   };
 
   public static getBookAddress(chainId: number): string {
@@ -109,31 +137,45 @@ export class Rain1155 extends RainContract {
     _account: string,
     _units: BigNumberish
   ): Promise<price> => {
-    let price, type, tokenId; 
-    [price, type, tokenId] = await this.getCurrencyPrice(
+    let price = await this.getCurrencyPrice(
       _assetId,
       _paymentToken,
       _account,
       _units
     );
 
-    if (type.eq(BigNumber.from(CurrencyType.ERC20))) {
-      return {
-        token: {
+    let rawCurrencies = (await this.assets(_assetId)).currencies;
+    let currencies = [];
+    let count = 0;
+    for (let i = 0; i < rawCurrencies.token.length; i++) {
+      if (await ERC721.isERC721(rawCurrencies.token[i], this.signer)) {
+        currencies[i] = {
+          tokenType: CurrencyType.ERC721,
+          tokenAddress: rawCurrencies.token[i],
+          tokenId: rawCurrencies.tokenId[count]
+        }
+        count++;
+      }
+      if (await ERC1155.isERC1155(rawCurrencies.token[i], this.signer)) {
+        currencies[i] = {
+          tokenType: CurrencyType.ERC1155,
+          tokenAddress: rawCurrencies.token[i],
+          tokenId: rawCurrencies.tokenId[count]
+        }
+        count++;
+      }
+      if (await ERC20.isERC20(rawCurrencies.token[i], this.signer)){
+        currencies[i] = {
           tokenType: CurrencyType.ERC20,
-          tokenAddress: _paymentToken,
-        },
-        units: price,
-      };
+          tokenAddress: rawCurrencies.token[i]
+        }
+      }
     }
+
     return {
-      token: {
-        tokenType: CurrencyType.ERC1155,
-        tokenAddress: _paymentToken,
-        tokenId,
-      },
-      units: price,
-    };
+      token: currencies.filter(e => e.tokenAddress === _paymentToken)[0],
+      units: price
+    } as price
   };
 
   public readonly checkAllowance = async (
@@ -232,7 +274,7 @@ export class Rain1155 extends RainContract {
     _account: string,
     _units: BigNumberish,
     overrides?: ReadTxOverrides
-  ) => Promise<[BigNumber, BigNumber, BigNumber]>;
+  ) => Promise<BigNumber>;
 
   public readonly getAssetCost: (
     _assetId: BigNumberish,
@@ -292,13 +334,19 @@ export class Rain1155 extends RainContract {
   ) => Promise<string>;
 }
 
-
+/**
+ * @public
+ * Type for valid currencies config
+ */
 export type CurrencyConfig = {
   token: string[];
-  tokenType: BigNumberish[];
   tokenId: BigNumberish[];
 };
 
+/**
+ * @public
+ * Type of asset details returned by Rain1155.assets method
+ */
 export type AssetDetails = {
   lootBoxId: BigNumberish;
   id: BigNumberish;
@@ -309,6 +357,10 @@ export type AssetDetails = {
   tokenURI: string;
 };
 
+/**
+ * @public
+ * Type of asset's config used for creating new assets
+ */
 export type AssetConfig = {
   name: string;
   description: string;
