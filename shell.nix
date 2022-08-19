@@ -27,8 +27,7 @@ let
  '';
 
  test-sdk = pkgs.writeShellScriptBin "test-sdk" ''
-  yarn build
-  yarn test
+  hardhat node & yarn test
  '';
 
  copy-contracts = pkgs.writeShellScriptBin "copy-contracts" ''
