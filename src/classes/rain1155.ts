@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { AddressBook } from '../addresses';
-import { Rain1155__factory } from '../typechain';
+import { Rain1155__factory, Rain1155 as Rain1155Contract } from '../typechain';
 import {
   CurrencyType,
   price,
@@ -12,6 +12,7 @@ import {
   BigNumber,
   BigNumberish,
   ContractTransaction,
+  Contract,
 } from 'ethers';
 import {
   TxOverrides,
@@ -62,8 +63,8 @@ export class Rain1155 extends RainContract {
    */
   constructor(signer: Signer, address?: string) {
     if (address === undefined) {
-      (async() => {      
-        address =  AddressBook.getAddressesForChainId(
+      (async () => {
+        address = AddressBook.getAddressesForChainId(
           await signer.getChainId()
         ).rain1155
       })()
@@ -87,6 +88,7 @@ export class Rain1155 extends RainContract {
     this.supportsInterface = _rain1155.supportsInterface;
     this.totalAssets = _rain1155.totalAssets;
     this.uri = _rain1155.uri;
+    this.contract = _rain1155;
   }
 
   public readonly connect = (signer: Signer): Rain1155 => {
@@ -164,7 +166,7 @@ export class Rain1155 extends RainContract {
         }
         count++;
       }
-      if (await ERC20.isERC20(rawCurrencies.token[i], this.signer)){
+      if (await ERC20.isERC20(rawCurrencies.token[i], this.signer)) {
         currencies[i] = {
           tokenType: CurrencyType.ERC20,
           tokenAddress: rawCurrencies.token[i]
@@ -238,6 +240,8 @@ export class Rain1155 extends RainContract {
 
     return allowances;
   };
+
+  public readonly contract: Rain1155Contract
 
   public readonly assets: (
     arg0: BigNumberish,
