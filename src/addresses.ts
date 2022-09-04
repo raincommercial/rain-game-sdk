@@ -23,7 +23,7 @@ const subgraphBook: Record<number, string> = {
   /**
    * Mumbai subgraph endpoint
    */
-  8001: 'https://api.thegraph.com/subgraphs/name/rouzwelt/rain1155',
+  8001: 'https://api.thegraph.com/subgraphs/name/beehive-innovation/vapour-game-1155',
 };
 
 /**
