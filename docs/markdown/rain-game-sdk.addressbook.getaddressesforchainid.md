@@ -4,6 +4,8 @@
 
 ## AddressBook.getAddressesForChainId property
 
+Obtain all the addresses deployed in a specific network with a chain ID.
+
 <b>Signature:</b>
 
 ```typescript

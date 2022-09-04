@@ -8,16 +8,39 @@
 
 |  Class | Description |
 |  --- | --- |
-|  [AddressBook](./rain-game-sdk.addressbook.md) |  |
-|  [GameAssets](./rain-game-sdk.gameassets.md) | A class for deploying and calling methods in GameAssets contract. |
+|  [AddressBook](./rain-game-sdk.addressbook.md) | Class related to handle and obtain all the addresses and tools (like Subgraph) deployed by chain and stored in the SDK. |
+|  [Rain1155](./rain-game-sdk.rain1155.md) | <p>Class to interact with Rain1155 contract methods and crreate assets with rules</p>
+```typescript
+// To instantiate a Rain1155 contract:
+import { Rain1155 } from 'rain-game-sdk';
+const newRain1155contract = new Rain1155(signer [, address])
+
+// To get the price of minting for a currency:
+const price = await Rain1155.getPrice(assetId, paymentTokenAddress, buyerAddress, targetUnits)
+
+// To get an Asset's asset details:
+const assetDetails = await Rain1155.assets(assetId)
+
+// To generate the vm StateConfig from an array of Currency object(s):
+const vmStateConfig = Rain1155.getStateConfig([currency1, currency2, ...])
+```
+ |
+
+## Enumerations
+
+|  Enumeration | Description |
+|  --- | --- |
+|  [CurrencyType](./rain-game-sdk.currencytype.md) | enum for type of payment currency |
 
 ## Type Aliases
 
 |  Type Alias | Description |
 |  --- | --- |
 |  [Addresses](./rain-game-sdk.addresses.md) | Type for all the addresses stored in the Book |
-|  [AssetConfig](./rain-game-sdk.assetconfig.md) |  |
-|  [AssetDetails](./rain-game-sdk.assetdetails.md) |  |
-|  [GameAssetsDeployArgs](./rain-game-sdk.gameassetsdeployargs.md) |  |
-|  [State](./rain-game-sdk.state.md) |  |
+|  [allowance](./rain-game-sdk.allowance.md) | Type for allowence |
+|  [AssetConfig](./rain-game-sdk.assetconfig.md) | Type of asset's config used for creating new assets |
+|  [AssetDetails](./rain-game-sdk.assetdetails.md) | Type of asset details returned by Rain1155.assets method |
+|  [CurrencyConfig](./rain-game-sdk.currencyconfig.md) | Type for valid currencies config |
+|  [price](./rain-game-sdk.price.md) | Type for price as a result of Rain1155 contract call |
+|  [token](./rain-game-sdk.token.md) | Type for token used in price type |
 

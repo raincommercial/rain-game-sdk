@@ -1,43 +1,10 @@
-import { Logger } from '@ethersproject/logger';
-import { version } from './_version';
-import { StateConfigStruct } from './typechain/Rain1155';
-import { BigNumber, BigNumberish } from 'ethers';
 import fs from 'fs';
 import path from 'path';
+import { version } from './_version';
+import { BigNumber } from 'ethers';
 import { execSync } from 'child_process';
-import { AllStandardOps } from 'rain-sdk';
-import { condition } from './rain1155';
-
+import { Logger } from '@ethersproject/logger';
 const logger = new Logger(version);
-
-export type VMState = StateConfigStruct;
-
-export const eighteenZeros = '000000000000000000';
-export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
-
-export enum Type {
-  ERC20,
-  ERC1155,
-}
-
-export enum Conditions {
-  NONE,
-  BLOCK_NUMBER,
-  BALANCE_TIER,
-  ERC20BALANCE,
-  ERC721BALANCE,
-  ERC1155BALANCE,
-}
-
-enum GameAssetsOpcode {
-  REPORT_AT_BLOCK = 0 + AllStandardOps.length,
-  ACCOUNT,
-  CURRENT_UNITS,
-}
-export const Opcode = {
-  ...AllStandardOps,
-  ...GameAssetsOpcode,
-};
 
 export type Bytes = ArrayLike<number>;
 
@@ -310,213 +277,17 @@ export const exec = (cmd: string): string | Buffer => {
 };
 
 /**
- * @param opcodes All opcodes as number[]
- * @param start start index to start matching from
- * @param size size of pattern to match with
- * @returns new_start index
+ * Custom error class
  */
-export const matchPattern = (
-  opcodes: number[],
-  start: number,
-  size: number
-): number => {
-  const arr = opcodes.slice(start, opcodes.length); // take subarray from start index
-  let patterns = getPattern(size); // get patterns of size length
-  let next_start = start; // set nex_start to start to chjeck if opcodes matched or not
-  patternLoop: for (let j = 0; j < patterns.length; j++) {
-    // loop over all retrived patterns
-    let pattern = patterns[j];
-    for (let i = 0; i < size; i += 2) {
-      if (arr[i] !== pattern[i]) {
-        continue patternLoop; // if any opcode doesnot match goto pattern loop
-      }
-    } // pattern matched
-    next_start = start + size; // update the next_start
-    return next_start; //return new_start
-  }
-  return next_start; // retrun start
-};
+export class ScriptError extends Error {
+  constructor(msg: string) {
+    super(msg);
 
-/**
- * List of all patterns
- */
-const patterns = [
-  [Opcode.VAL, 0],
-  [Opcode.BLOCK_NUMBER, 0, Opcode.VAL, 0, Opcode.GREATER_THAN, 0],
-  [
-    Opcode.VAL,
-    0,
-    Opcode.ACCOUNT,
-    0,
-    Opcode.IERC20_BALANCE_OF,
-    0,
-    Opcode.VAL,
-    0,
-    Opcode.GREATER_THAN,
-    0,
-  ],
-  [
-    Opcode.VAL,
-    0,
-    Opcode.ACCOUNT,
-    0,
-    Opcode.IERC721_BALANCE_OF,
-    0,
-    Opcode.VAL,
-    0,
-    Opcode.GREATER_THAN,
-    0,
-  ],
-  [
-    Opcode.VAL,
-    0,
-    Opcode.ACCOUNT,
-    0,
-    Opcode.VAL,
-    0,
-    Opcode.IERC1155_BALANCE_OF,
-    0,
-    Opcode.VAL,
-    0,
-    Opcode.GREATER_THAN,
-    0,
-  ],
-  [
-    Opcode.VAL,
-    0,
-    Opcode.ACCOUNT,
-    0,
-    Opcode.REPORT,
-    0,
-    Opcode.BLOCK_NUMBER,
-    0,
-    Opcode.REPORT_AT_BLOCK,
-    0,
-    Opcode.VAL,
-    0,
-    Opcode.GREATER_THAN,
-    0,
-  ],
-];
-
-/**
- * @param size Length of pattern
- * @returns array of patterns
- */
-const getPattern = (size: number): number[][] => {
-  let pattern = [];
-  for (let i = 0; i < patterns.length; i++) {
-    if (patterns[i].length === size) {
-      pattern.push(patterns[i]);
-    }
-  }
-  return pattern;
-};
-
-/**
- * @param opcodes Opcode pattern
- * @param constants array of consttants
- * @returns condition object
- */
-export const getCondition = (
-  opcodes: number[],
-  constants: BigNumberish[]
-): condition => {
-  if (opcodes.length === 2) {
-    // None condition
-    let condition: condition = {
-      type: Conditions.NONE,
-    };
-    return condition;
-  } else if (opcodes.length === 6) {
-    // Block condition
-    let condition: condition = {
-      type: Conditions.BLOCK_NUMBER,
-      blockNumber: parseInt(constants[opcodes[3]].toString()),
-    };
-    return condition;
-  } else if (opcodes.includes(Opcode.IERC20_BALANCE_OF)) {
-    // ERC20 Balance condition
-    let condition: condition = {
-      type: Conditions.ERC20BALANCE,
-      address: constants[opcodes[1]].toString(),
-      balance: BigNumber.from(constants[opcodes[7]]),
-    };
-    return condition;
-  } else if (opcodes.includes(Opcode.IERC721_BALANCE_OF)) {
-    // ERC721 Balance Condition
-    let condition: condition = {
-      type: Conditions.ERC721BALANCE,
-      address: constants[opcodes[1]].toString(),
-      balance: BigNumber.from(constants[opcodes[7]]),
-    };
-    return condition;
-  } else if (opcodes.includes(Opcode.IERC1155_BALANCE_OF)) {
-    // ERC1155 Balance Condition
-    let condition: condition = {
-      type: Conditions.ERC1155BALANCE,
-      address: constants[opcodes[1]].toString(),
-      id: BigNumber.from(constants[opcodes[5]]),
-      balance: BigNumber.from(constants[opcodes[9]]),
-    };
-    return condition;
-  } else if (opcodes.includes(Opcode.REPORT_AT_BLOCK)) {
-    // ERC20BalanceTier condition
-    let condition: condition = {
-      type: Conditions.BALANCE_TIER,
-      tierAddress: constants[opcodes[1]].toString(),
-      tierCondition: parseInt(constants[opcodes[11]].toString()),
-    };
-    return condition;
-  }
-  let condition: condition = {
-    type: Conditions.NONE,
-  };
-  return condition;
-};
-
-export const patternLengths = (): number[] => {
-  let lengths: number[] = [];
-  for (let i = 0; i < patterns.length; i++) {
-    let len = patterns[i].length;
-    if (!lengths.includes(len)) lengths.push(len);
+    // Set the prototype explicitly.
+    Object.setPrototypeOf(this, ScriptError.prototype);
   }
 
-  return lengths.sort(function(a, b) {
-    return a - b;
-  });
-};
-
-export const getCanMintConfig = (
-  opcodes: number[],
-  constants: BigNumberish[]
-): condition[] => {
-  let conditions: condition[] = [];
-  let len = opcodes.length;
-  let start = 0; // Start index to start matching the pattern
-  let patterns = patternLengths(); // get lengths of all patternsa
-  while (len > 0) {
-    // repet untill opcod length becomes 0
-    for (let j = patterns.length - 1; j >= 0; j--) {
-      // loop over all diff pattern length
-      if (opcodes.length >= patterns[j]) {
-        const new_start = matchPattern(
-          // get the matching pattern
-          opcodes, // opcodes
-          start, // start Index
-          patterns[j] // size of pattern
-        );
-        if (new_start !== start) {
-          // update the start and len only if new_start != start
-          conditions.push(
-            getCondition(opcodes.slice(start, new_start), constants)
-          ); // get the condition and push it in array.
-          start = new_start;
-          len = len - patterns[j];
-          break; // break the forloop so next pattern can start from max size.
-        }
-      }
-    }
+  error(type: string, attribute: string) {
+    return `ScriptError: type "${type}" is missing "${attribute}".`;
   }
-  return conditions;
-};
+}

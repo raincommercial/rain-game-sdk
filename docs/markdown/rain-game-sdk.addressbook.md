@@ -4,6 +4,7 @@
 
 ## AddressBook class
 
+Class related to handle and obtain all the addresses and tools (like Subgraph) deployed by chain and stored in the SDK.
 
 <b>Signature:</b>
 
@@ -11,9 +12,14 @@
 export declare class AddressBook 
 ```
 
+## Remarks
+
+It will get all the addresses deployed and added at the time of the current version. If the class and methods are used directly, the chain ID should be provided directly too.
+
 ## Properties
 
 |  Property | Modifiers | Type | Description |
 |  --- | --- | --- | --- |
-|  [getAddressesForChainId](./rain-game-sdk.addressbook.getaddressesforchainid.md) | <code>static</code> | (chainId: number) =&gt; [Addresses](./rain-game-sdk.addresses.md) |  |
+|  [getAddressesForChainId](./rain-game-sdk.addressbook.getaddressesforchainid.md) | <code>static</code> | (chainId: number) =&gt; [Addresses](./rain-game-sdk.addresses.md) | Obtain all the addresses deployed in a specific network with a chain ID. |
+|  [getSubgraphEndpoint](./rain-game-sdk.addressbook.getsubgraphendpoint.md) | <code>static</code> | (chainId: number) =&gt; string | Obtain the latest subgraph endpoint related to the version that use the SDK. |
 

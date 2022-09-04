@@ -1,5 +1,9 @@
 name: CI
 on: [push, pull_request]
+
+env:
+  PRIVATE_KEY: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+
 jobs:
   build:
     name: Build, lint, and test
@@ -20,10 +24,13 @@ jobs:
           nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Build
-        run: nix-shell --run build-sdk
+        run: nix-shell --run build-sdk2
 
       - name: Lint
         run: nix-shell --run lint-sdk
 
       - name: Test
         run: nix-shell --run test-sdk
+
+      - name: Test Doc Generation
+        run: nix-shell --run generate-docs

@@ -17,34 +17,33 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export type StateStruct = {
-  stackIndex: BigNumberish;
-  stack: BigNumberish[];
+export type Rain1155ConfigStruct = { vmStateBuilder: string };
+
+export type Rain1155ConfigStructOutput = [string] & { vmStateBuilder: string };
+
+export type StateConfigStruct = {
   sources: BytesLike[];
   constants: BigNumberish[];
-  arguments: BigNumberish[];
 };
 
-export type StateStructOutput = [
-  BigNumber,
-  BigNumber[],
-  string[],
-  BigNumber[],
-  BigNumber[]
-] & {
-  stackIndex: BigNumber;
-  stack: BigNumber[];
+export type StateConfigStructOutput = [string[], BigNumber[]] & {
   sources: string[];
   constants: BigNumber[];
-  arguments: BigNumber[];
+};
+
+export type CurrencyConfigStruct = { token: string[]; tokenId: BigNumberish[] };
+
+export type CurrencyConfigStructOutput = [string[], BigNumber[]] & {
+  token: string[];
+  tokenId: BigNumber[];
 };
 
 export type AssetDetailsStruct = {
   lootBoxId: BigNumberish;
   id: BigNumberish;
-  priceScript: StateStruct;
-  canMintScript: StateStruct;
-  currencies: string[];
+  vmStateConfig: StateConfigStruct;
+  vmStatePointer: string;
+  currencies: CurrencyConfigStruct;
   recipient: string;
   tokenURI: string;
 };
@@ -52,47 +51,27 @@ export type AssetDetailsStruct = {
 export type AssetDetailsStructOutput = [
   BigNumber,
   BigNumber,
-  StateStructOutput,
-  StateStructOutput,
-  string[],
+  StateConfigStructOutput,
+  string,
+  CurrencyConfigStructOutput,
   string,
   string
 ] & {
   lootBoxId: BigNumber;
   id: BigNumber;
-  priceScript: StateStructOutput;
-  canMintScript: StateStructOutput;
-  currencies: string[];
+  vmStateConfig: StateConfigStructOutput;
+  vmStatePointer: string;
+  currencies: CurrencyConfigStructOutput;
   recipient: string;
   tokenURI: string;
-};
-
-export type StateConfigStruct = {
-  sources: BytesLike[];
-  constants: BigNumberish[];
-  stackLength: BigNumberish;
-  argumentsLength: BigNumberish;
-};
-
-export type StateConfigStructOutput = [
-  string[],
-  BigNumber[],
-  BigNumber,
-  BigNumber
-] & {
-  sources: string[];
-  constants: BigNumber[];
-  stackLength: BigNumber;
-  argumentsLength: BigNumber;
 };
 
 export type AssetConfigStruct = {
   name: string;
   description: string;
   lootBoxId: BigNumberish;
-  priceScript: StateConfigStruct;
-  canMintScript: StateConfigStruct;
-  currencies: string[];
+  vmStateConfig: StateConfigStruct;
+  currencies: CurrencyConfigStruct;
   recipient: string;
   tokenURI: string;
 };
@@ -102,19 +81,27 @@ export type AssetConfigStructOutput = [
   string,
   BigNumber,
   StateConfigStructOutput,
-  StateConfigStructOutput,
-  string[],
+  CurrencyConfigStructOutput,
   string,
   string
 ] & {
   name: string;
   description: string;
   lootBoxId: BigNumber;
-  priceScript: StateConfigStructOutput;
-  canMintScript: StateConfigStructOutput;
-  currencies: string[];
+  vmStateConfig: StateConfigStructOutput;
+  currencies: CurrencyConfigStructOutput;
   recipient: string;
   tokenURI: string;
+};
+
+export type StorageOpcodesRangeStruct = {
+  pointer: BigNumberish;
+  length: BigNumberish;
+};
+
+export type StorageOpcodesRangeStructOutput = [BigNumber, BigNumber] & {
+  pointer: BigNumber;
+  length: BigNumber;
 };
 
 export interface Rain1155Interface extends utils.Interface {
@@ -122,15 +109,18 @@ export interface Rain1155Interface extends utils.Interface {
     "assets(uint256)": FunctionFragment;
     "balanceOf(address,uint256)": FunctionFragment;
     "balanceOfBatch(address[],uint256[])": FunctionFragment;
-    "canMint(uint256,address)": FunctionFragment;
-    "createNewAsset((string,string,uint256,(bytes[],uint256[],uint256,uint256),(bytes[],uint256[],uint256,uint256),address[],address,string))": FunctionFragment;
+    "createNewAsset((string,string,uint256,(bytes[],uint256[]),(address[],uint256[]),address,string))": FunctionFragment;
     "exists(uint256)": FunctionFragment;
-    "getAssetPrice(uint256,address,uint256)": FunctionFragment;
+    "fnPtrs()": FunctionFragment;
+    "getAssetCost(uint256,address,uint256)": FunctionFragment;
+    "getAssetMaxUnits(uint256,address,uint256)": FunctionFragment;
+    "getCurrencyPrice(uint256,address,address,uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "mintAssets(uint256,uint256)": FunctionFragment;
     "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
+    "storageOpcodesRange()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "totalAssets()": FunctionFragment;
     "totalSupply(uint256)": FunctionFragment;
@@ -150,10 +140,6 @@ export interface Rain1155Interface extends utils.Interface {
     values: [string[], BigNumberish[]]
   ): string;
   encodeFunctionData(
-    functionFragment: "canMint",
-    values: [BigNumberish, string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "createNewAsset",
     values: [AssetConfigStruct]
   ): string;
@@ -161,9 +147,18 @@ export interface Rain1155Interface extends utils.Interface {
     functionFragment: "exists",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "fnPtrs", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "getAssetPrice",
+    functionFragment: "getAssetCost",
     values: [BigNumberish, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getAssetMaxUnits",
+    values: [BigNumberish, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getCurrencyPrice",
+    values: [BigNumberish, string, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
@@ -186,6 +181,10 @@ export interface Rain1155Interface extends utils.Interface {
     values: [string, boolean]
   ): string;
   encodeFunctionData(
+    functionFragment: "storageOpcodesRange",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
@@ -205,14 +204,22 @@ export interface Rain1155Interface extends utils.Interface {
     functionFragment: "balanceOfBatch",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "canMint", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "createNewAsset",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "exists", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "fnPtrs", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getAssetPrice",
+    functionFragment: "getAssetCost",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getAssetMaxUnits",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getCurrencyPrice",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -233,6 +240,10 @@ export interface Rain1155Interface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "storageOpcodesRange",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
@@ -248,9 +259,8 @@ export interface Rain1155Interface extends utils.Interface {
 
   events: {
     "ApprovalForAll(address,address,bool)": EventFragment;
-    "AssetCreated(uint256,tuple,tuple,tuple,string,string)": EventFragment;
-    "Initialize(address)": EventFragment;
-    "Snapshot(address,address,tuple)": EventFragment;
+    "AssetCreated(uint256,tuple,string,string)": EventFragment;
+    "Initialize(address,tuple)": EventFragment;
     "TransferBatch(address,address,address,uint256[],uint256[])": EventFragment;
     "TransferSingle(address,address,address,uint256,uint256)": EventFragment;
     "URI(string,uint256)": EventFragment;
@@ -259,7 +269,6 @@ export interface Rain1155Interface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "AssetCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialize"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Snapshot"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferBatch"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferSingle"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "URI"): EventFragment;
@@ -273,19 +282,10 @@ export type ApprovalForAllEvent = TypedEvent<
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 
 export type AssetCreatedEvent = TypedEvent<
-  [
-    BigNumber,
-    AssetDetailsStructOutput,
-    StateConfigStructOutput,
-    StateConfigStructOutput,
-    string,
-    string
-  ],
+  [BigNumber, AssetDetailsStructOutput, string, string],
   {
     assetId_: BigNumber;
     asset_: AssetDetailsStructOutput;
-    priceScript_: StateConfigStructOutput;
-    canMintScript_: StateConfigStructOutput;
     name_: string;
     description_: string;
   }
@@ -293,16 +293,12 @@ export type AssetCreatedEvent = TypedEvent<
 
 export type AssetCreatedEventFilter = TypedEventFilter<AssetCreatedEvent>;
 
-export type InitializeEvent = TypedEvent<[string], { deployer_: string }>;
-
-export type InitializeEventFilter = TypedEventFilter<InitializeEvent>;
-
-export type SnapshotEvent = TypedEvent<
-  [string, string, StateStructOutput],
-  { sender: string; pointer: string; state: StateStructOutput }
+export type InitializeEvent = TypedEvent<
+  [string, Rain1155ConfigStructOutput],
+  { deployer_: string; config_: Rain1155ConfigStructOutput }
 >;
 
-export type SnapshotEventFilter = TypedEventFilter<SnapshotEvent>;
+export type InitializeEventFilter = TypedEventFilter<InitializeEvent>;
 
 export type TransferBatchEvent = TypedEvent<
   [string, string, string, BigNumber[], BigNumber[]],
@@ -371,15 +367,17 @@ export interface Rain1155 extends BaseContract {
       [
         BigNumber,
         BigNumber,
-        StateStructOutput,
-        StateStructOutput,
+        StateConfigStructOutput,
+        string,
+        CurrencyConfigStructOutput,
         string,
         string
       ] & {
         lootBoxId: BigNumber;
         id: BigNumber;
-        priceScript: StateStructOutput;
-        canMintScript: StateStructOutput;
+        vmStateConfig: StateConfigStructOutput;
+        vmStatePointer: string;
+        currencies: CurrencyConfigStructOutput;
         recipient: string;
         tokenURI: string;
       }
@@ -397,12 +395,6 @@ export interface Rain1155 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber[]]>;
 
-    canMint(
-      assetId_: BigNumberish,
-      account_: string,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
     createNewAsset(
       config_: AssetConfigStruct,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -410,12 +402,29 @@ export interface Rain1155 extends BaseContract {
 
     exists(id: BigNumberish, overrides?: CallOverrides): Promise<[boolean]>;
 
-    getAssetPrice(
+    fnPtrs(overrides?: CallOverrides): Promise<[string]>;
+
+    getAssetCost(
       assetId_: BigNumberish,
-      paymentToken_: string,
+      account_: string,
       units_: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber[]]>;
+    ): Promise<[BigNumber, BigNumber[]]>;
+
+    getAssetMaxUnits(
+      assetId_: BigNumberish,
+      account_: string,
+      units_: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    getCurrencyPrice(
+      assetId_: BigNumberish,
+      paymentToken_: string,
+      account_: string,
+      units_: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     isApprovedForAll(
       account: string,
@@ -453,6 +462,10 @@ export interface Rain1155 extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    storageOpcodesRange(
+      overrides?: CallOverrides
+    ): Promise<[StorageOpcodesRangeStructOutput]>;
+
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
@@ -475,15 +488,17 @@ export interface Rain1155 extends BaseContract {
     [
       BigNumber,
       BigNumber,
-      StateStructOutput,
-      StateStructOutput,
+      StateConfigStructOutput,
+      string,
+      CurrencyConfigStructOutput,
       string,
       string
     ] & {
       lootBoxId: BigNumber;
       id: BigNumber;
-      priceScript: StateStructOutput;
-      canMintScript: StateStructOutput;
+      vmStateConfig: StateConfigStructOutput;
+      vmStatePointer: string;
+      currencies: CurrencyConfigStructOutput;
       recipient: string;
       tokenURI: string;
     }
@@ -501,12 +516,6 @@ export interface Rain1155 extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
 
-  canMint(
-    assetId_: BigNumberish,
-    account_: string,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
   createNewAsset(
     config_: AssetConfigStruct,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -514,12 +523,29 @@ export interface Rain1155 extends BaseContract {
 
   exists(id: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
-  getAssetPrice(
+  fnPtrs(overrides?: CallOverrides): Promise<string>;
+
+  getAssetCost(
     assetId_: BigNumberish,
-    paymentToken_: string,
+    account_: string,
     units_: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<BigNumber[]>;
+  ): Promise<[BigNumber, BigNumber[]]>;
+
+  getAssetMaxUnits(
+    assetId_: BigNumberish,
+    account_: string,
+    units_: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getCurrencyPrice(
+    assetId_: BigNumberish,
+    paymentToken_: string,
+    account_: string,
+    units_: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   isApprovedForAll(
     account: string,
@@ -557,6 +583,10 @@ export interface Rain1155 extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  storageOpcodesRange(
+    overrides?: CallOverrides
+  ): Promise<StorageOpcodesRangeStructOutput>;
+
   supportsInterface(
     interfaceId: BytesLike,
     overrides?: CallOverrides
@@ -576,15 +606,17 @@ export interface Rain1155 extends BaseContract {
       [
         BigNumber,
         BigNumber,
-        StateStructOutput,
-        StateStructOutput,
+        StateConfigStructOutput,
+        string,
+        CurrencyConfigStructOutput,
         string,
         string
       ] & {
         lootBoxId: BigNumber;
         id: BigNumber;
-        priceScript: StateStructOutput;
-        canMintScript: StateStructOutput;
+        vmStateConfig: StateConfigStructOutput;
+        vmStatePointer: string;
+        currencies: CurrencyConfigStructOutput;
         recipient: string;
         tokenURI: string;
       }
@@ -602,12 +634,6 @@ export interface Rain1155 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
 
-    canMint(
-      assetId_: BigNumberish,
-      account_: string,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
     createNewAsset(
       config_: AssetConfigStruct,
       overrides?: CallOverrides
@@ -615,12 +641,29 @@ export interface Rain1155 extends BaseContract {
 
     exists(id: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
-    getAssetPrice(
+    fnPtrs(overrides?: CallOverrides): Promise<string>;
+
+    getAssetCost(
       assetId_: BigNumberish,
-      paymentToken_: string,
+      account_: string,
       units_: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber[]>;
+    ): Promise<[BigNumber, BigNumber[]]>;
+
+    getAssetMaxUnits(
+      assetId_: BigNumberish,
+      account_: string,
+      units_: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getCurrencyPrice(
+      assetId_: BigNumberish,
+      paymentToken_: string,
+      account_: string,
+      units_: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     isApprovedForAll(
       account: string,
@@ -658,6 +701,10 @@ export interface Rain1155 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    storageOpcodesRange(
+      overrides?: CallOverrides
+    ): Promise<StorageOpcodesRangeStructOutput>;
+
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
@@ -685,32 +732,24 @@ export interface Rain1155 extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
-    "AssetCreated(uint256,tuple,tuple,tuple,string,string)"(
+    "AssetCreated(uint256,tuple,string,string)"(
       assetId_?: null,
       asset_?: null,
-      priceScript_?: null,
-      canMintScript_?: null,
       name_?: null,
       description_?: null
     ): AssetCreatedEventFilter;
     AssetCreated(
       assetId_?: null,
       asset_?: null,
-      priceScript_?: null,
-      canMintScript_?: null,
       name_?: null,
       description_?: null
     ): AssetCreatedEventFilter;
 
-    "Initialize(address)"(deployer_?: null): InitializeEventFilter;
-    Initialize(deployer_?: null): InitializeEventFilter;
-
-    "Snapshot(address,address,tuple)"(
-      sender?: null,
-      pointer?: null,
-      state?: null
-    ): SnapshotEventFilter;
-    Snapshot(sender?: null, pointer?: null, state?: null): SnapshotEventFilter;
+    "Initialize(address,tuple)"(
+      deployer_?: null,
+      config_?: null
+    ): InitializeEventFilter;
+    Initialize(deployer_?: null, config_?: null): InitializeEventFilter;
 
     "TransferBatch(address,address,address,uint256[],uint256[])"(
       operator?: string | null,
@@ -764,12 +803,6 @@ export interface Rain1155 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    canMint(
-      assetId_: BigNumberish,
-      account_: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     createNewAsset(
       config_: AssetConfigStruct,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -777,9 +810,26 @@ export interface Rain1155 extends BaseContract {
 
     exists(id: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
-    getAssetPrice(
+    fnPtrs(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getAssetCost(
+      assetId_: BigNumberish,
+      account_: string,
+      units_: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getAssetMaxUnits(
+      assetId_: BigNumberish,
+      account_: string,
+      units_: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getCurrencyPrice(
       assetId_: BigNumberish,
       paymentToken_: string,
+      account_: string,
       units_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -819,6 +869,8 @@ export interface Rain1155 extends BaseContract {
       approved: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    storageOpcodesRange(overrides?: CallOverrides): Promise<BigNumber>;
 
     supportsInterface(
       interfaceId: BytesLike,
@@ -853,12 +905,6 @@ export interface Rain1155 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    canMint(
-      assetId_: BigNumberish,
-      account_: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     createNewAsset(
       config_: AssetConfigStruct,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -869,9 +915,26 @@ export interface Rain1155 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getAssetPrice(
+    fnPtrs(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getAssetCost(
+      assetId_: BigNumberish,
+      account_: string,
+      units_: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getAssetMaxUnits(
+      assetId_: BigNumberish,
+      account_: string,
+      units_: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getCurrencyPrice(
       assetId_: BigNumberish,
       paymentToken_: string,
+      account_: string,
       units_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -910,6 +973,10 @@ export interface Rain1155 extends BaseContract {
       operator: string,
       approved: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    storageOpcodesRange(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     supportsInterface(

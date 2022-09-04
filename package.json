@@ -1,5 +1,5 @@
 {
-  "version": "0.0.6-alpha.1",
+  "version": "2.0.1-beta",
   "license": "CAL",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -58,7 +58,7 @@
     }
   ],
   "devDependencies": {
-    "@beehiveinnovation/rain1155": "git+https://github.com/beehive-innovation/rain1155.git#7ee572a8327b2e46ad34019b0211c478437a1910",
+    "@beehiveinnovation/rain1155": "git+https://github.com/beehive-innovation/rain1155.git#b29f90c701a7782f08a3c10d38293895371f73f3",
     "@graphprotocol/graph-cli": "0.26.0",
     "@graphprotocol/graph-ts": "0.26.0",
     "@microsoft/api-documenter": "^7.17.9",
@@ -76,17 +76,17 @@
     "hardhat": "^2.7.0",
     "husky": "^7.0.4",
     "mustache": "^4.2.0",
-    "rain-sdk": "^0.0.2-alpha.1",
+    "rain-sdk": "git+https://github.com/beehive-innovation/rain-sdk#34755e83b860f3e45f48bfe9b0457d78b467a067",
     "size-limit": "^6.0.4",
     "standardx": "3.0.0",
     "ts-node": "^10.4.0",
     "tsdx": "^0.14.1",
     "tslib": "^2.3.1",
     "typechain": "^6.0.2",
-    "typescript": "^4.5.2"
+    "typescript": "^4.5.2",
+    "@openzeppelin/test-helpers": "^0.5.15"
   },
   "dependencies": {
-    "@openzeppelin/test-helpers": "^0.5.15",
     "apollo-fetch": "^0.7.0",
     "ethers": "^5.5.2"
   },

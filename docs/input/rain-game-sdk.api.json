@@ -1,8 +1,8 @@
 {
   "metadata": {
     "toolPackage": "@microsoft/api-extractor",
-    "toolVersion": "7.22.2",
-    "schemaVersion": 1005,
+    "toolVersion": "7.28.6",
+    "schemaVersion": 1009,
     "oldestForwardsCompatibleVersion": 1001,
     "tsdocConfig": {
       "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
@@ -164,16 +164,18 @@
   "canonicalReference": "rain-game-sdk!",
   "docComment": "",
   "name": "rain-game-sdk",
+  "preserveMemberOrder": false,
   "members": [
     {
       "kind": "EntryPoint",
       "canonicalReference": "rain-game-sdk!",
       "name": "",
+      "preserveMemberOrder": false,
       "members": [
         {
           "kind": "Class",
           "canonicalReference": "rain-game-sdk!AddressBook:class",
-          "docComment": "/**\n * @public\n */\n",
+          "docComment": "/**\n * Class related to handle and obtain all the addresses and tools (like Subgraph) deployed by chain and stored in the SDK.\n *\n * @remarks\n *\n * It will get all the addresses deployed and added at the time of the current version. If the class and methods are used directly, the chain ID should be provided directly too.\n *\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -182,11 +184,12 @@
           ],
           "releaseTag": "Public",
           "name": "AddressBook",
+          "preserveMemberOrder": false,
           "members": [
             {
               "kind": "Property",
               "canonicalReference": "rain-game-sdk!AddressBook.getAddressesForChainId:member",
-              "docComment": "",
+              "docComment": "/**\n * Obtain all the addresses deployed in a specific network with a chain ID.\n *\n * @param chainId - The chain ID to get all the adddresses deployed in that network.\n *\n * @returns All the addresses for the network provided.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -206,6 +209,7 @@
                   "text": ";"
                 }
               ],
+              "isReadonly": false,
               "isOptional": false,
               "releaseTag": "Public",
               "name": "getAddressesForChainId",
@@ -213,7 +217,37 @@
                 "startIndex": 1,
                 "endIndex": 3
               },
-              "isStatic": true
+              "isStatic": true,
+              "isProtected": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "rain-game-sdk!AddressBook.getSubgraphEndpoint:member",
+              "docComment": "/**\n * Obtain the latest subgraph endpoint related to the version that use the SDK.\n *\n * @remarks\n *\n * The reason of get just one endpoint by version is correctly match with the contract addresses provided by the SDK.\n *\n * You can search all the rain protocol subgraphs deployed using the search bar in https://thegraph.com/hosted-service/. Remember to look by subgraph deployed by beehive-innovation or trusted deployers.\n *\n * @param chainId - The chain ID related to the Subgraph.\n *\n * @returns The subgraph URL API endpoint.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "static getSubgraphEndpoint: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(chainId: number) => string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "getSubgraphEndpoint",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": true,
+              "isProtected": false
             }
           ],
           "implementsTokenRanges": []
@@ -229,7 +263,7 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    [key: string]: string;\n    gameAssetsFactory: string;\n}"
+              "text": "{\n    [key: string]: string;\n    rain1155: string;\n}"
             },
             {
               "kind": "Content",
@@ -245,8 +279,51 @@
         },
         {
           "kind": "TypeAlias",
+          "canonicalReference": "rain-game-sdk!allowance:type",
+          "docComment": "/**\n * Type for allowence\n *\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type allowance = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    type: number;\n    address: string;\n    allowed: boolean;\n    amount?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "BigNumber",
+              "canonicalReference": "@ethersproject/bignumber!BigNumber:class"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    tokenId?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "BigNumberish",
+              "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    tokenURI?: string;\n    name?: string;\n    symbol?: string;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "allowance",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
           "canonicalReference": "rain-game-sdk!AssetConfig:type",
-          "docComment": "",
+          "docComment": "/**\n * Type of asset's config used for creating new assets\n *\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -263,43 +340,25 @@
             },
             {
               "kind": "Content",
-              "text": ";\n    priceConfig: "
+              "text": ";\n    vmStateConfig: "
             },
             {
               "kind": "Reference",
               "text": "StateConfig",
-              "canonicalReference": "rain-sdk!State:interface"
+              "canonicalReference": "rain-sdk!StateConfig:interface"
             },
             {
               "kind": "Content",
-              "text": ";\n    canMintConfig: "
+              "text": ";\n    currencies: "
             },
             {
               "kind": "Reference",
-              "text": "StateConfig",
-              "canonicalReference": "rain-sdk!State:interface"
+              "text": "CurrencyConfig",
+              "canonicalReference": "rain-game-sdk!CurrencyConfig:type"
             },
             {
               "kind": "Content",
-              "text": ";\n    currencies: string[];\n    assetClass: "
-            },
-            {
-              "kind": "Reference",
-              "text": "BigNumberish",
-              "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
-            },
-            {
-              "kind": "Content",
-              "text": ";\n    rarity: "
-            },
-            {
-              "kind": "Reference",
-              "text": "BigNumberish",
-              "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
-            },
-            {
-              "kind": "Content",
-              "text": ";\n}"
+              "text": ";\n    recipient: string;\n    tokenURI: string;\n}"
             },
             {
               "kind": "Content",
@@ -310,13 +369,13 @@
           "name": "AssetConfig",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 12
+            "endIndex": 8
           }
         },
         {
           "kind": "TypeAlias",
           "canonicalReference": "rain-game-sdk!AssetDetails:type",
-          "docComment": "",
+          "docComment": "/**\n * Type of asset details returned by Rain1155.assets method\n *\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -328,8 +387,8 @@
             },
             {
               "kind": "Reference",
-              "text": "BigNumber",
-              "canonicalReference": "@ethersproject/bignumber!BigNumber:class"
+              "text": "BigNumberish",
+              "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
             },
             {
               "kind": "Content",
@@ -337,39 +396,30 @@
             },
             {
               "kind": "Reference",
-              "text": "BigNumber",
-              "canonicalReference": "@ethersproject/bignumber!BigNumber:class"
+              "text": "BigNumberish",
+              "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
             },
             {
               "kind": "Content",
-              "text": ";\n    priceConfig: "
+              "text": ";\n    vmStateConfig: "
             },
             {
               "kind": "Reference",
-              "text": "State",
-              "canonicalReference": "rain-game-sdk!State:type"
+              "text": "StateConfig",
+              "canonicalReference": "rain-sdk!StateConfig:interface"
             },
             {
               "kind": "Content",
-              "text": ";\n    canMintConfig: "
+              "text": ";\n    vmStatePointer: string;\n    currencies: "
             },
             {
               "kind": "Reference",
-              "text": "State",
-              "canonicalReference": "rain-game-sdk!State:type"
+              "text": "CurrencyConfig",
+              "canonicalReference": "rain-game-sdk!CurrencyConfig:type"
             },
             {
               "kind": "Content",
-              "text": ";\n    assetClass: "
-            },
-            {
-              "kind": "Reference",
-              "text": "BigNumber",
-              "canonicalReference": "@ethersproject/bignumber!BigNumber:class"
-            },
-            {
-              "kind": "Content",
-              "text": ";\n    rarity: number;\n    creator: string;\n}"
+              "text": ";\n    recipient: string;\n    tokenURI: string;\n}"
             },
             {
               "kind": "Content",
@@ -380,22 +430,199 @@
           "name": "AssetDetails",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 12
+            "endIndex": 10
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "rain-game-sdk!CurrencyConfig:type",
+          "docComment": "/**\n * Type for valid currencies config\n *\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type CurrencyConfig = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    token: string[];\n    tokenId: "
+            },
+            {
+              "kind": "Reference",
+              "text": "BigNumberish",
+              "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
+            },
+            {
+              "kind": "Content",
+              "text": "[];\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "CurrencyConfig",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Enum",
+          "canonicalReference": "rain-game-sdk!CurrencyType:enum",
+          "docComment": "/**\n * enum for type of payment currency\n *\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare enum CurrencyType "
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "CurrencyType",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "rain-game-sdk!CurrencyType.ERC1155:member",
+              "docComment": "/**\n * for ERC1155 tokens\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "ERC1155 = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "3"
+                }
+              ],
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "name": "ERC1155"
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "rain-game-sdk!CurrencyType.ERC20:member",
+              "docComment": "/**\n * for ERC20 tokens\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "ERC20 = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "1"
+                }
+              ],
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "name": "ERC20"
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "rain-game-sdk!CurrencyType.ERC721:member",
+              "docComment": "/**\n * for ERC721 tokens\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "ERC721 = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "2"
+                }
+              ],
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "name": "ERC721"
+            },
+            {
+              "kind": "EnumMember",
+              "canonicalReference": "rain-game-sdk!CurrencyType.NATIVE:member",
+              "docComment": "/**\n * for native token\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "NATIVE = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "0"
+                }
+              ],
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "name": "NATIVE"
+            }
+          ]
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "rain-game-sdk!price:type",
+          "docComment": "/**\n * Type for price as a result of Rain1155 contract call\n *\n * @public\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare type price = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    token: "
+            },
+            {
+              "kind": "Reference",
+              "text": "token",
+              "canonicalReference": "rain-game-sdk!token:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    units: "
+            },
+            {
+              "kind": "Reference",
+              "text": "BigNumber",
+              "canonicalReference": "@ethersproject/bignumber!BigNumber:class"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "releaseTag": "Public",
+          "name": "price",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
           }
         },
         {
           "kind": "Class",
-          "canonicalReference": "rain-game-sdk!GameAssets:class",
-          "docComment": "/**\n * A class for deploying and calling methods in GameAssets contract.\n *\n * @remarks\n *\n * This class provides an easy way to deploy and interact with GameAsset contracts\n *\n * @example\n * ```typescript\n * import { GameAssets } from 'rain-sdk'\n *\n * // To deploy a new GameAssets, pass an ethers.js Signerand the config for the GameAsset.\n * const newGameAssets = await GameAssets.deploy(signer, args)\n *\n * // To connect to an existing GameAssets just pass the address and an ethers.js Signer.\n * const existingGameAssets = new GameAssets(address, signer)\n *\n * // Once you have a GameAssets, you can call the smart contract methods:\n * ```\n *\n * @public\n */\n",
+          "canonicalReference": "rain-game-sdk!Rain1155:class",
+          "docComment": "/**\n * Class to interact with Rain1155 contract methods and crreate assets with rules\n * ```typescript\n * // To instantiate a Rain1155 contract:\n * import { Rain1155 } from 'rain-game-sdk';\n * const newRain1155contract = new Rain1155(signer [, address])\n *\n * // To get the price of minting for a currency:\n * const price = await Rain1155.getPrice(assetId, paymentTokenAddress, buyerAddress, targetUnits)\n *\n * // To get an Asset's asset details:\n * const assetDetails = await Rain1155.assets(assetId)\n *\n * // To generate the vm StateConfig from an array of Currency object(s):\n * const vmStateConfig = Rain1155.getStateConfig([currency1, currency2, ...])\n * ```\n *\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare class GameAssets extends "
+              "text": "export declare class Rain1155 extends "
             },
             {
               "kind": "Reference",
-              "text": "FactoryContract",
-              "canonicalReference": "rain-sdk!FactoryContract:class"
+              "text": "RainContract",
+              "canonicalReference": "rain-sdk!RainContract:class"
             },
             {
               "kind": "Content",
@@ -403,24 +630,17 @@
             }
           ],
           "releaseTag": "Public",
-          "name": "GameAssets",
+          "name": "Rain1155",
+          "preserveMemberOrder": false,
           "members": [
             {
               "kind": "Constructor",
-              "canonicalReference": "rain-game-sdk!GameAssets:constructor(1)",
-              "docComment": "/**\n * Constructs a new GameAssets from a known address.\n *\n * @param address - The address of the GameAssets contract\n *\n * @param signer - An ethers.js Signer\n *\n * @returns A new GameAssets instance\n */\n",
+              "canonicalReference": "rain-game-sdk!Rain1155:constructor(1)",
+              "docComment": "/**\n * Constructs a new Rain1155 from a known address.\n *\n * @param signer - An ethers.js Signer\n *\n * @param address - (optional) The address of the Rain1155 contract, originally is fetched from the addressbook, but if passed it will ignore the addressbook\n *\n * @returns A new Rain1155 instance\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "constructor(address: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", signer: "
+                  "text": "constructor(signer: "
                 },
                 {
                   "kind": "Reference",
@@ -429,14 +649,23 @@
                 },
                 {
                   "kind": "Content",
+                  "text": ", address?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
                   "text": ");"
                 }
               ],
               "releaseTag": "Public",
+              "isProtected": false,
               "overloadIndex": 1,
               "parameters": [
                 {
-                  "parameterName": "address",
+                  "parameterName": "signer",
                   "parameterTypeTokenRange": {
                     "startIndex": 1,
                     "endIndex": 2
@@ -444,162 +673,18 @@
                   "isOptional": false
                 },
                 {
-                  "parameterName": "signer",
+                  "parameterName": "address",
                   "parameterTypeTokenRange": {
                     "startIndex": 3,
                     "endIndex": 4
                   },
-                  "isOptional": false
+                  "isOptional": true
                 }
               ]
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#addCreator:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly addCreator: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(_creator: string, overrides?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "TxOverrides",
-                  "canonicalReference": "rain-sdk!TxOverrides:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ContractTransaction",
-                  "canonicalReference": "@ethersproject/contracts!ContractTransaction:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "addCreator",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 8
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#Admin:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly Admin: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(overrides?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ReadTxOverrides",
-                  "canonicalReference": "rain-sdk!ReadTxOverrides:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "Admin",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 6
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#Admin2:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly Admin2: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(overrides?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ReadTxOverrides",
-                  "canonicalReference": "rain-sdk!ReadTxOverrides:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<[string]>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "Admin2",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 6
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#assets:member",
+              "canonicalReference": "rain-game-sdk!Rain1155#assets:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -651,6 +736,7 @@
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
               "name": "assets",
@@ -658,11 +744,12 @@
                 "startIndex": 1,
                 "endIndex": 10
               },
-              "isStatic": false
+              "isStatic": false,
+              "isProtected": false
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#balanceOf:member",
+              "canonicalReference": "rain-game-sdk!Rain1155#balanceOf:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -714,6 +801,7 @@
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
               "name": "balanceOf",
@@ -721,11 +809,12 @@
                 "startIndex": 1,
                 "endIndex": 10
               },
-              "isStatic": false
+              "isStatic": false,
+              "isProtected": false
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#balanceOfBatch:member",
+              "canonicalReference": "rain-game-sdk!Rain1155#balanceOfBatch:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -777,6 +866,7 @@
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
               "name": "balanceOfBatch",
@@ -784,29 +874,48 @@
                 "startIndex": 1,
                 "endIndex": 10
               },
-              "isStatic": false
+              "isStatic": false,
+              "isProtected": false
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#createClass:member",
+              "canonicalReference": "rain-game-sdk!Rain1155#checkAllowance:member",
               "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "readonly createClass: "
+                  "text": "readonly checkAllowance: "
                 },
                 {
                   "kind": "Content",
-                  "text": "(_name: string, _description: string, _attributes: string[], overrides?: "
+                  "text": "(assetId: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "TxOverrides",
-                  "canonicalReference": "rain-sdk!TxOverrides:interface"
+                  "text": "BigNumberish",
+                  "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
                 },
                 {
                   "kind": "Content",
-                  "text": ") => "
+                  "text": ", prices: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "price",
+                  "canonicalReference": "rain-game-sdk!price:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[], units: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "BigNumberish",
+                  "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", rain1155Address: string, signer: string) => "
                 },
                 {
                   "kind": "Reference",
@@ -819,30 +928,75 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "ContractTransaction",
-                  "canonicalReference": "@ethersproject/contracts!ContractTransaction:interface"
+                  "text": "allowance",
+                  "canonicalReference": "rain-game-sdk!allowance:type"
                 },
                 {
                   "kind": "Content",
-                  "text": ">"
+                  "text": "[]>"
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
-              "name": "createClass",
+              "name": "checkAllowance",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 8
+                "endIndex": 12
               },
-              "isStatic": false
+              "isStatic": false,
+              "isProtected": false
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#createNewAsset:member",
+              "canonicalReference": "rain-game-sdk!Rain1155#connect:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly connect: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(signer: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Signer",
+                  "canonicalReference": "@ethersproject/abstract-signer!Signer:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Rain1155",
+                  "canonicalReference": "rain-game-sdk!Rain1155:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "connect",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "isStatic": false,
+              "isProtected": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "rain-game-sdk!Rain1155#createNewAsset:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -894,6 +1048,7 @@
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
               "name": "createNewAsset",
@@ -901,34 +1056,78 @@
                 "startIndex": 1,
                 "endIndex": 10
               },
-              "isStatic": false
+              "isStatic": false,
+              "isProtected": false
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets.deploy:member",
-              "docComment": "/**\n * Deploys a new GameAssets.\n *\n * @param signer - An ethers.js Signer\n *\n * @param args - Arguments for deploying a GameAssets\n *\n * @param overrides - Specific transaction values to send it (e.g gasLimit, nonce or gasPrice)\n *\n * @returns A new GameAssets instance\n *\n * @see\n *\n * GameAssetsDeployArgs\n */\n",
+              "canonicalReference": "rain-game-sdk!Rain1155.generateStateConfig:member",
+              "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "static deploy: "
+                  "text": "static readonly generateStateConfig: "
                 },
                 {
                   "kind": "Content",
-                  "text": "(signer: "
+                  "text": "(currencies: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Signer",
-                  "canonicalReference": "@ethersproject/abstract-signer!Signer:class"
+                  "text": "Currency",
+                  "canonicalReference": "rain-sdk!Currency:type"
                 },
                 {
                   "kind": "Content",
-                  "text": ", args: "
+                  "text": "[]) => "
                 },
                 {
                   "kind": "Reference",
-                  "text": "GameAssetsDeployArgs",
-                  "canonicalReference": "rain-game-sdk!GameAssetsDeployArgs:type"
+                  "text": "RuleBuilder",
+                  "canonicalReference": "rain-sdk!RuleBuilder:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "generateStateConfig",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "isStatic": true,
+              "isProtected": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "rain-game-sdk!Rain1155#getAssetCost:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly getAssetCost: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(_assetId: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "BigNumberish",
+                  "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", _account: string, _units: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "BigNumberish",
+                  "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
                 },
                 {
                   "kind": "Content",
@@ -950,39 +1149,50 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": "<["
                 },
                 {
                   "kind": "Reference",
-                  "text": "GameAssets",
-                  "canonicalReference": "rain-game-sdk!GameAssets:class"
+                  "text": "BigNumber",
+                  "canonicalReference": "@ethersproject/bignumber!BigNumber:class"
                 },
                 {
                   "kind": "Content",
-                  "text": ">"
+                  "text": ", "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "BigNumber",
+                  "canonicalReference": "@ethersproject/bignumber!BigNumber:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]]>"
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
-              "name": "deploy",
+              "name": "getAssetCost",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 12
+                "endIndex": 14
               },
-              "isStatic": true
+              "isStatic": false,
+              "isProtected": false
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#getAssetPrice:member",
+              "canonicalReference": "rain-game-sdk!Rain1155#getAssetMaxUnits:member",
               "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "readonly getAssetPrice: "
+                  "text": "readonly getAssetMaxUnits: "
                 },
                 {
                   "kind": "Content",
@@ -995,7 +1205,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": ", _paymentToken: string, _units: "
+                  "text": ", _account: string, _units: "
                 },
                 {
                   "kind": "Reference",
@@ -1031,25 +1241,27 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "[]>"
+                  "text": ">"
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
-              "name": "getAssetPrice",
+              "name": "getAssetMaxUnits",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 12
               },
-              "isStatic": false
+              "isStatic": false,
+              "isProtected": false
             },
             {
               "kind": "Method",
-              "canonicalReference": "rain-game-sdk!GameAssets.getBookAddress:member(1)",
+              "canonicalReference": "rain-game-sdk!Rain1155.getBookAddress:member(1)",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -1073,13 +1285,13 @@
                   "text": ";"
                 }
               ],
-              "isOptional": false,
               "isStatic": true,
               "returnTypeTokenRange": {
                 "startIndex": 3,
                 "endIndex": 4
               },
               "releaseTag": "Public",
+              "isProtected": false,
               "overloadIndex": 1,
               "parameters": [
                 {
@@ -1091,20 +1303,125 @@
                   "isOptional": false
                 }
               ],
+              "isOptional": false,
               "name": "getBookAddress"
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#getClasses:member",
+              "canonicalReference": "rain-game-sdk!Rain1155.getConditionConfig:member",
               "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "readonly getClasses: "
+                  "text": "static readonly getConditionConfig: "
                 },
                 {
                   "kind": "Content",
-                  "text": "(overrides?: "
+                  "text": "(condition: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Condition",
+                  "canonicalReference": "rain-sdk!Condition:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "StateConfig",
+                  "canonicalReference": "rain-sdk!StateConfig:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "getConditionConfig",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "isStatic": true,
+              "isProtected": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "rain-game-sdk!Rain1155.getConditionGroupConfig:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "static readonly getConditionGroupConfig: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(conditionGroup: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ConditionGroup",
+                  "canonicalReference": "rain-sdk!ConditionGroup:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "StateConfig",
+                  "canonicalReference": "rain-sdk!StateConfig:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "getConditionGroupConfig",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "isStatic": true,
+              "isProtected": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "rain-game-sdk!Rain1155#getCurrencyPrice:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly getCurrencyPrice: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(_assetId: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "BigNumberish",
+                  "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", _paymentToken: string, _account: string, _units: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "BigNumberish",
+                  "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", overrides?: "
                 },
                 {
                   "kind": "Reference",
@@ -1131,39 +1448,50 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "[]>"
+                  "text": ">"
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
-              "name": "getClasses",
+              "name": "getCurrencyPrice",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 8
+                "endIndex": 12
               },
-              "isStatic": false
+              "isStatic": false,
+              "isProtected": false
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#getCreators:member",
+              "canonicalReference": "rain-game-sdk!Rain1155#getPrice:member",
               "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "readonly getCreators: "
+                  "text": "readonly getPrice: "
                 },
                 {
                   "kind": "Content",
-                  "text": "(overrides?: "
+                  "text": "(_assetId: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ReadTxOverrides",
-                  "canonicalReference": "rain-sdk!ReadTxOverrides:interface"
+                  "text": "BigNumberish",
+                  "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", _paymentToken: string, _account: string, _units: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "BigNumberish",
+                  "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
                 },
                 {
                   "kind": "Content",
@@ -1176,25 +1504,122 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<string[]>"
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "price",
+                  "canonicalReference": "rain-game-sdk!price:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">"
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
-              "name": "getCreators",
+              "name": "getPrice",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 6
+                "endIndex": 10
               },
-              "isStatic": false
+              "isStatic": false,
+              "isProtected": false
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#isApprovedForAll:member",
+              "canonicalReference": "rain-game-sdk!Rain1155.getPriceConfig:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "static readonly getPriceConfig: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(price: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Price",
+                  "canonicalReference": "rain-sdk!Price:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "StateConfig",
+                  "canonicalReference": "rain-sdk!StateConfig:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "getPriceConfig",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "isStatic": true,
+              "isProtected": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "rain-game-sdk!Rain1155.getQuantityConfig:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "static readonly getQuantityConfig: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(quantity: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Quantity",
+                  "canonicalReference": "rain-sdk!Quantity:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "StateConfig",
+                  "canonicalReference": "rain-sdk!StateConfig:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "getQuantityConfig",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "isStatic": true,
+              "isProtected": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "rain-game-sdk!Rain1155#isApprovedForAll:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -1228,6 +1653,7 @@
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
               "name": "isApprovedForAll",
@@ -1235,56 +1661,12 @@
                 "startIndex": 1,
                 "endIndex": 6
               },
-              "isStatic": false
+              "isStatic": false,
+              "isProtected": false
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets.isChild:member",
-              "docComment": "/**\n * Checks if address is registered as a child contract of this GameAssetsFactory on a specific network\n *\n * @param signer - An ethers.js Signer\n *\n * @param maybeChild - Address to check registration for.\n *\n * @returns `true` if address was deployed by this contract factory, otherwise `false`\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "static isChild: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(signer: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Signer",
-                  "canonicalReference": "@ethersproject/abstract-signer!Signer:class"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", maybeChild: string) => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<boolean>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "isChild",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 6
-              },
-              "isStatic": true
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#mintAssets:member",
+              "canonicalReference": "rain-game-sdk!Rain1155#mintAssets:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -1345,6 +1727,7 @@
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
               "name": "mintAssets",
@@ -1352,18 +1735,28 @@
                 "startIndex": 1,
                 "endIndex": 12
               },
-              "isStatic": false
+              "isStatic": false,
+              "isProtected": false
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets.nameBookReference:member",
+              "canonicalReference": "rain-game-sdk!Rain1155.nameBookReference:member",
               "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "protected static readonly nameBookReference = \"gameAssetsFactory\";"
+                  "text": "protected static readonly nameBookReference = "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"Rain1155\""
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
               "name": "nameBookReference",
@@ -1371,326 +1764,16 @@
                 "startIndex": 0,
                 "endIndex": 0
               },
-              "isStatic": true
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#onERC1155BatchReceived:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly onERC1155BatchReceived: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(arg0: string, arg1: string, arg2: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "BigNumberish",
-                  "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[], arg3: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "BigNumberish",
-                  "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[], arg4: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "BytesLike",
-                  "canonicalReference": "@ethersproject/bytes!BytesLike:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", overrides?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "TxOverrides",
-                  "canonicalReference": "rain-sdk!TxOverrides:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ContractTransaction",
-                  "canonicalReference": "@ethersproject/contracts!ContractTransaction:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "onERC1155BatchReceived",
-              "propertyTypeTokenRange": {
+              "initializerTokenRange": {
                 "startIndex": 1,
-                "endIndex": 14
+                "endIndex": 2
               },
-              "isStatic": false
+              "isStatic": true,
+              "isProtected": true
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#onERC1155Received:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly onERC1155Received: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(arg0: string, arg1: string, arg2: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "BigNumberish",
-                  "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", arg3: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "BigNumberish",
-                  "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", arg4: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "BytesLike",
-                  "canonicalReference": "@ethersproject/bytes!BytesLike:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", overrides?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "TxOverrides",
-                  "canonicalReference": "rain-sdk!TxOverrides:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ContractTransaction",
-                  "canonicalReference": "@ethersproject/contracts!ContractTransaction:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "onERC1155Received",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 14
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#owner:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly owner: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(overrides?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ReadTxOverrides",
-                  "canonicalReference": "rain-sdk!ReadTxOverrides:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "owner",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 6
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#RemoveCreator:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly RemoveCreator: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(_creator: string, overrides?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "TxOverrides",
-                  "canonicalReference": "rain-sdk!TxOverrides:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ContractTransaction",
-                  "canonicalReference": "@ethersproject/contracts!ContractTransaction:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "RemoveCreator",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 8
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#renounceOwnership:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly renounceOwnership: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(overrides?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "TxOverrides",
-                  "canonicalReference": "rain-sdk!TxOverrides:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ContractTransaction",
-                  "canonicalReference": "@ethersproject/contracts!ContractTransaction:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "renounceOwnership",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 8
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#safeBatchTransferFrom:member",
+              "canonicalReference": "rain-game-sdk!Rain1155#safeBatchTransferFrom:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -1760,6 +1843,7 @@
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
               "name": "safeBatchTransferFrom",
@@ -1767,11 +1851,12 @@
                 "startIndex": 1,
                 "endIndex": 14
               },
-              "isStatic": false
+              "isStatic": false,
+              "isProtected": false
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#safeTransferFrom:member",
+              "canonicalReference": "rain-game-sdk!Rain1155#safeTransferFrom:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -1841,6 +1926,7 @@
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
               "name": "safeTransferFrom",
@@ -1848,65 +1934,12 @@
                 "startIndex": 1,
                 "endIndex": 14
               },
-              "isStatic": false
+              "isStatic": false,
+              "isProtected": false
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#setAdmin:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly setAdmin: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(_admin: string, overrides?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "TxOverrides",
-                  "canonicalReference": "rain-sdk!TxOverrides:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ContractTransaction",
-                  "canonicalReference": "@ethersproject/contracts!ContractTransaction:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "setAdmin",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 8
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#setApprovalForAll:member",
+              "canonicalReference": "rain-game-sdk!Rain1155#setApprovalForAll:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -1949,6 +1982,7 @@
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
               "name": "setApprovalForAll",
@@ -1956,65 +1990,45 @@
                 "startIndex": 1,
                 "endIndex": 8
               },
-              "isStatic": false
+              "isStatic": false,
+              "isProtected": false
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#setBaseURI:member",
+              "canonicalReference": "rain-game-sdk!Rain1155.subgraph:member",
               "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "readonly setBaseURI: "
+                  "text": "static readonly subgraph = "
                 },
                 {
                   "kind": "Content",
-                  "text": "(_baseURI: string, overrides?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "TxOverrides",
-                  "canonicalReference": "rain-sdk!TxOverrides:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ContractTransaction",
-                  "canonicalReference": "@ethersproject/contracts!ContractTransaction:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">"
+                  "text": "\"https://api.thegraph.com/subgraphs/name/vishalkale151071/blocks\""
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
-              "name": "setBaseURI",
+              "name": "subgraph",
               "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 8
+                "startIndex": 0,
+                "endIndex": 0
               },
-              "isStatic": false
+              "initializerTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": true,
+              "isProtected": false
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#supportsInterface:member",
+              "canonicalReference": "rain-game-sdk!Rain1155#supportsInterface:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -2057,6 +2071,7 @@
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
               "name": "supportsInterface",
@@ -2064,11 +2079,12 @@
                 "startIndex": 1,
                 "endIndex": 8
               },
-              "isStatic": false
+              "isStatic": false,
+              "isProtected": false
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#totalAssets:member",
+              "canonicalReference": "rain-game-sdk!Rain1155#totalAssets:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -2111,6 +2127,7 @@
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
               "name": "totalAssets",
@@ -2118,146 +2135,12 @@
                 "startIndex": 1,
                 "endIndex": 8
               },
-              "isStatic": false
+              "isStatic": false,
+              "isProtected": false
             },
             {
               "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#transferOwnership:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly transferOwnership: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(newOwner: string, overrides?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "TxOverrides",
-                  "canonicalReference": "rain-sdk!TxOverrides:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ContractTransaction",
-                  "canonicalReference": "@ethersproject/contracts!ContractTransaction:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "transferOwnership",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 8
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#updateAsset:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly updateAsset: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(_assetId: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "BigNumberish",
-                  "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", _lootBoxId: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "BigNumberish",
-                  "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", _canMintConfig: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "StateConfig",
-                  "canonicalReference": "rain-sdk!State:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", overrides?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "TxOverrides",
-                  "canonicalReference": "rain-sdk!TxOverrides:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ContractTransaction",
-                  "canonicalReference": "@ethersproject/contracts!ContractTransaction:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "updateAsset",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 14
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#uri:member",
+              "canonicalReference": "rain-game-sdk!Rain1155#uri:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -2300,6 +2183,7 @@
                   "text": ";"
                 }
               ],
+              "isReadonly": true,
               "isOptional": false,
               "releaseTag": "Public",
               "name": "uri",
@@ -2307,124 +2191,8 @@
                 "startIndex": 1,
                 "endIndex": 8
               },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#withdraw:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly withdraw: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(_tokenAddresses: string[], overrides?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "TxOverrides",
-                  "canonicalReference": "rain-sdk!TxOverrides:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ContractTransaction",
-                  "canonicalReference": "@ethersproject/contracts!ContractTransaction:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "withdraw",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 8
-              },
-              "isStatic": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "rain-game-sdk!GameAssets#withdrawERC1155:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "readonly withdrawERC1155: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(_tokenAddresses: string[], _ids: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "BigNumberish",
-                  "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[], overrides?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "TxOverrides",
-                  "canonicalReference": "rain-sdk!TxOverrides:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ContractTransaction",
-                  "canonicalReference": "@ethersproject/contracts!ContractTransaction:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "withdrawERC1155",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 10
-              },
-              "isStatic": false
+              "isStatic": false,
+              "isProtected": false
             }
           ],
           "extendsTokenRange": {
@@ -2435,16 +2203,25 @@
         },
         {
           "kind": "TypeAlias",
-          "canonicalReference": "rain-game-sdk!GameAssetsDeployArgs:type",
-          "docComment": "",
+          "canonicalReference": "rain-game-sdk!token:type",
+          "docComment": "/**\n * Type for token used in price type\n *\n * @public\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare type GameAssetsDeployArgs = "
+              "text": "export declare type token = "
             },
             {
               "kind": "Content",
-              "text": "{\n    _creator: string;\n    _baseURI: string;\n}"
+              "text": "{\n    tokenType: number;\n    tokenAddress: string;\n    tokenId?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "BigNumberish",
+              "canonicalReference": "@ethersproject/bignumber!BigNumberish:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
             },
             {
               "kind": "Content",
@@ -2452,71 +2229,10 @@
             }
           ],
           "releaseTag": "Public",
-          "name": "GameAssetsDeployArgs",
+          "name": "token",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 2
-          }
-        },
-        {
-          "kind": "TypeAlias",
-          "canonicalReference": "rain-game-sdk!State:type",
-          "docComment": "",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export declare type State = "
-            },
-            {
-              "kind": "Content",
-              "text": "{\n    stackIndex: "
-            },
-            {
-              "kind": "Reference",
-              "text": "BigNumber",
-              "canonicalReference": "@ethersproject/bignumber!BigNumber:class"
-            },
-            {
-              "kind": "Content",
-              "text": ";\n    stack: "
-            },
-            {
-              "kind": "Reference",
-              "text": "BigNumber",
-              "canonicalReference": "@ethersproject/bignumber!BigNumber:class"
-            },
-            {
-              "kind": "Content",
-              "text": "[];\n    sources: string[];\n    constants: "
-            },
-            {
-              "kind": "Reference",
-              "text": "BigNumber",
-              "canonicalReference": "@ethersproject/bignumber!BigNumber:class"
-            },
-            {
-              "kind": "Content",
-              "text": "[];\n    arguments: "
-            },
-            {
-              "kind": "Reference",
-              "text": "BigNumber",
-              "canonicalReference": "@ethersproject/bignumber!BigNumber:class"
-            },
-            {
-              "kind": "Content",
-              "text": "[];\n}"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
-            }
-          ],
-          "releaseTag": "Public",
-          "name": "State",
-          "typeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 10
+            "endIndex": 4
           }
         }
       ]

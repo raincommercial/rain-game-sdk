@@ -13,14 +13,6 @@ import * as Contracts from ".";
 declare module "hardhat/types/runtime" {
   interface HardhatEthersHelpers extends HardhatEthersHelpersBase {
     getContractFactory(
-      name: "Factory",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Factory__factory>;
-    getContractFactory(
-      name: "IFactory",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IFactory__factory>;
-    getContractFactory(
       name: "SSTORE2",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.SSTORE2__factory>;
@@ -29,25 +21,17 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Bytecode__factory>;
     getContractFactory(
-      name: "ITier",
+      name: "ITierV2",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ITier__factory>;
+    ): Promise<Contracts.ITierV2__factory>;
     getContractFactory(
-      name: "ReadOnlyTier",
+      name: "RainVM",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ReadOnlyTier__factory>;
+    ): Promise<Contracts.RainVM__factory>;
     getContractFactory(
-      name: "ValueTier",
+      name: "VMStateBuilder",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ValueTier__factory>;
-    getContractFactory(
-      name: "VMState",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.VMState__factory>;
-    getContractFactory(
-      name: "Initializable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Initializable__factory>;
+    ): Promise<Contracts.VMStateBuilder__factory>;
     getContractFactory(
       name: "ERC1155",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -76,6 +60,10 @@ declare module "hardhat/types/runtime" {
       name: "ERC20Burnable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC20Burnable__factory>;
+    getContractFactory(
+      name: "ERC20Snapshot",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ERC20Snapshot__factory>;
     getContractFactory(
       name: "IERC20Metadata",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -113,6 +101,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC165__factory>;
     getContractFactory(
+      name: "AllStandardOpsStateBuilder",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AllStandardOpsStateBuilder__factory>;
+    getContractFactory(
       name: "Token",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Token__factory>;
@@ -136,25 +128,7 @@ declare module "hardhat/types/runtime" {
       name: "Rain1155",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Rain1155__factory>;
-    getContractFactory(
-      name: "ERC20BalanceTier",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ERC20BalanceTier__factory>;
-    getContractFactory(
-      name: "ERC20BalanceTierFactory",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ERC20BalanceTierFactory__factory>;
 
-    getContractAt(
-      name: "Factory",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Factory>;
-    getContractAt(
-      name: "IFactory",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IFactory>;
     getContractAt(
       name: "SSTORE2",
       address: string,
@@ -166,30 +140,20 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.Bytecode>;
     getContractAt(
-      name: "ITier",
+      name: "ITierV2",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.ITier>;
+    ): Promise<Contracts.ITierV2>;
     getContractAt(
-      name: "ReadOnlyTier",
+      name: "RainVM",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.ReadOnlyTier>;
+    ): Promise<Contracts.RainVM>;
     getContractAt(
-      name: "ValueTier",
+      name: "VMStateBuilder",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.ValueTier>;
-    getContractAt(
-      name: "VMState",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.VMState>;
-    getContractAt(
-      name: "Initializable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Initializable>;
+    ): Promise<Contracts.VMStateBuilder>;
     getContractAt(
       name: "ERC1155",
       address: string,
@@ -225,6 +189,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.ERC20Burnable>;
+    getContractAt(
+      name: "ERC20Snapshot",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ERC20Snapshot>;
     getContractAt(
       name: "IERC20Metadata",
       address: string,
@@ -271,6 +240,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC165>;
     getContractAt(
+      name: "AllStandardOpsStateBuilder",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AllStandardOpsStateBuilder>;
+    getContractAt(
       name: "Token",
       address: string,
       signer?: ethers.Signer
@@ -300,16 +274,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Rain1155>;
-    getContractAt(
-      name: "ERC20BalanceTier",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ERC20BalanceTier>;
-    getContractAt(
-      name: "ERC20BalanceTierFactory",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ERC20BalanceTierFactory>;
 
     // default types
     getContractFactory(

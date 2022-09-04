@@ -15,19 +15,24 @@ let
   yarn lint
  '';
 
+ build-sdk2 = pkgs.writeShellScriptBin "build-sdk2" ''
+  while ! yarn install --network-timeout 1000000 --skip-integrity-check --network-concurrency 1; do echo --- ; done
+  copy-typechain
+  yarn build
+ '';
+
  build-sdk = pkgs.writeShellScriptBin "build-sdk" ''
   copy-typechain
   yarn build
  '';
 
  test-sdk = pkgs.writeShellScriptBin "test-sdk" ''
-  yarn build
-  yarn test
+  hardhat node & yarn test
  '';
 
  copy-contracts = pkgs.writeShellScriptBin "copy-contracts" ''
   mkdir -p contracts && cp -r node_modules/@beehiveinnovation/rain1155/contracts .
-  hardhat compile --no-typechain
+    hardhat compile --no-typechain
  '';
 
  generate-typechain = pkgs.writeShellScriptBin "generate-typechain" ''
@@ -45,6 +50,7 @@ in
 pkgs.stdenv.mkDerivation {
  name = "shell";
  buildInputs = [
+  pkgs.yarn
   pkgs.nodejs-14_x
   copy-contracts
   generate-typechain
@@ -52,6 +58,7 @@ pkgs.stdenv.mkDerivation {
   generate-docs
   lint-sdk
   build-sdk
+  build-sdk2
   test-sdk
  ];
 
@@ -59,6 +66,5 @@ pkgs.stdenv.mkDerivation {
   export PATH=$( npm bin ):$PATH
   # keep it fresh
   yarn install --ignore-scripts
-  build-sdk
  '';
 }
