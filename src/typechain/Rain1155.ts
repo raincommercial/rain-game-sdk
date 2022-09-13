@@ -31,12 +31,17 @@ export type StateConfigStructOutput = [string[], BigNumber[]] & {
   constants: BigNumber[];
 };
 
-export type CurrencyConfigStruct = { token: string[]; tokenId: BigNumberish[] };
-
-export type CurrencyConfigStructOutput = [string[], BigNumber[]] & {
+export type CurrencyConfigStruct = {
   token: string[];
-  tokenId: BigNumber[];
+  tokenType: BigNumberish[];
+  tokenId: BigNumberish[];
 };
+
+export type CurrencyConfigStructOutput = [
+  string[],
+  BigNumber[],
+  BigNumber[]
+] & { token: string[]; tokenType: BigNumber[]; tokenId: BigNumber[] };
 
 export type AssetDetailsStruct = {
   lootBoxId: BigNumberish;
@@ -109,12 +114,12 @@ export interface Rain1155Interface extends utils.Interface {
     "assets(uint256)": FunctionFragment;
     "balanceOf(address,uint256)": FunctionFragment;
     "balanceOfBatch(address[],uint256[])": FunctionFragment;
-    "createNewAsset((string,string,uint256,(bytes[],uint256[]),(address[],uint256[]),address,string))": FunctionFragment;
+    "createNewAsset((string,string,uint256,(bytes[],uint256[]),(address[],uint256[],uint256[]),address,string))": FunctionFragment;
     "exists(uint256)": FunctionFragment;
     "fnPtrs()": FunctionFragment;
     "getAssetCost(uint256,address,uint256)": FunctionFragment;
     "getAssetMaxUnits(uint256,address,uint256)": FunctionFragment;
-    "getCurrencyPrice(uint256,address,address,uint256)": FunctionFragment;
+    "getCurrencyPrice(uint256,uint256,address,uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "mintAssets(uint256,uint256)": FunctionFragment;
     "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)": FunctionFragment;
@@ -158,7 +163,7 @@ export interface Rain1155Interface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getCurrencyPrice",
-    values: [BigNumberish, string, string, BigNumberish]
+    values: [BigNumberish, BigNumberish, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
@@ -420,7 +425,7 @@ export interface Rain1155 extends BaseContract {
 
     getCurrencyPrice(
       assetId_: BigNumberish,
-      paymentToken_: string,
+      paymentToken_: BigNumberish,
       account_: string,
       units_: BigNumberish,
       overrides?: CallOverrides
@@ -541,7 +546,7 @@ export interface Rain1155 extends BaseContract {
 
   getCurrencyPrice(
     assetId_: BigNumberish,
-    paymentToken_: string,
+    paymentToken_: BigNumberish,
     account_: string,
     units_: BigNumberish,
     overrides?: CallOverrides
@@ -659,7 +664,7 @@ export interface Rain1155 extends BaseContract {
 
     getCurrencyPrice(
       assetId_: BigNumberish,
-      paymentToken_: string,
+      paymentToken_: BigNumberish,
       account_: string,
       units_: BigNumberish,
       overrides?: CallOverrides
@@ -828,7 +833,7 @@ export interface Rain1155 extends BaseContract {
 
     getCurrencyPrice(
       assetId_: BigNumberish,
-      paymentToken_: string,
+      paymentToken_: BigNumberish,
       account_: string,
       units_: BigNumberish,
       overrides?: CallOverrides
@@ -933,7 +938,7 @@ export interface Rain1155 extends BaseContract {
 
     getCurrencyPrice(
       assetId_: BigNumberish,
-      paymentToken_: string,
+      paymentToken_: BigNumberish,
       account_: string,
       units_: BigNumberish,
       overrides?: CallOverrides

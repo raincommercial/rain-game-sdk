@@ -12,6 +12,7 @@ Type for token used in price type
 export declare type token = {
     tokenType: number;
     tokenAddress: string;
-    tokenId?: BigNumberish;
+    tokenId: BigNumberish;
+    index: number;
 };
 ```

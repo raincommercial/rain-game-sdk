@@ -11,8 +11,7 @@ import {
   BytesLike,
   BigNumber,
   BigNumberish,
-  ContractTransaction,
-  Contract,
+  ContractTransaction
 } from 'ethers';
 import {
   TxOverrides,
@@ -26,8 +25,7 @@ import {
   Condition,
   ConditionGroup,
   Quantity,
-  Price,
-  ERC721
+  Price
 } from 'rain-sdk';
 
 /**
@@ -100,7 +98,7 @@ export class Rain1155 extends RainContract {
   }
 
   public static readonly subgraph =
-    'https://api.thegraph.com/subgraphs/name/vishalkale151071/blocks';
+    'https://api.thegraph.com/subgraphs/name/beehive-innovation/vapour-game-1155';
 
 
   public static readonly generateStateConfig = (
@@ -135,47 +133,41 @@ export class Rain1155 extends RainContract {
 
   public readonly getPrice = async (
     _assetId: BigNumberish,
-    _paymentToken: string,
+    _paymentTokenIndex: BigNumberish,
     _account: string,
     _units: BigNumberish
   ): Promise<price> => {
     let price = await this.getCurrencyPrice(
       _assetId,
-      _paymentToken,
+      _paymentTokenIndex,
       _account,
       _units
     );
 
     let rawCurrencies = (await this.assets(_assetId)).currencies;
     let currencies = [];
-    let count = 0;
     for (let i = 0; i < rawCurrencies.token.length; i++) {
-      if (await ERC721.isERC721(rawCurrencies.token[i], this.signer)) {
+      if (rawCurrencies.tokenType[i].eq(0)) {
         currencies[i] = {
-          tokenType: CurrencyType.ERC721,
+          tokenType: CurrencyType.ERC20,
           tokenAddress: rawCurrencies.token[i],
-          tokenId: rawCurrencies.tokenId[count]
+          tokenId: rawCurrencies.tokenId[i],
+          index: i,
         }
-        count++;
-      }
-      if (await ERC1155.isERC1155(rawCurrencies.token[i], this.signer)) {
+      } else if (rawCurrencies.tokenType[i].eq(1)) {
         currencies[i] = {
           tokenType: CurrencyType.ERC1155,
           tokenAddress: rawCurrencies.token[i],
-          tokenId: rawCurrencies.tokenId[count]
+          tokenId: rawCurrencies.tokenId[i],
+          index: i,
         }
-        count++;
-      }
-      if (await ERC20.isERC20(rawCurrencies.token[i], this.signer)) {
-        currencies[i] = {
-          tokenType: CurrencyType.ERC20,
-          tokenAddress: rawCurrencies.token[i]
-        }
+      } else {
+        throw new Error("unknown token type")
       }
     }
 
     return {
-      token: currencies.filter(e => e.tokenAddress === _paymentToken)[0],
+      token: currencies[Number(_paymentTokenIndex)],
       units: price
     } as price
   };
@@ -193,7 +185,7 @@ export class Rain1155 extends RainContract {
       if (price.token.tokenType === CurrencyType.ERC20) {
         let ERC20Contract = new ERC20(price.token.tokenAddress, this.signer);
         let amount = (
-          await this.getPrice(assetId, price.token.tokenAddress, await this.signer.getAddress(), units)
+          await this.getPrice(assetId, price.token.index, await this.signer.getAddress(), units)
         ).units;
         let allowed = await ERC20Contract.allowance(signer, rain1155Address);
         allowances.push({
@@ -211,7 +203,7 @@ export class Rain1155 extends RainContract {
         );
         let erc1155Price = await this.getPrice(
           assetId,
-          price.token.tokenAddress,
+          price.token.index,
           await this.signer.getAddress(),
           units
         );
@@ -274,7 +266,7 @@ export class Rain1155 extends RainContract {
 
   public readonly getCurrencyPrice: (
     _assetId: BigNumberish,
-    _paymentToken: string,
+    _paymentToken: BigNumberish,
     _account: string,
     _units: BigNumberish,
     overrides?: ReadTxOverrides
@@ -345,6 +337,17 @@ export class Rain1155 extends RainContract {
 export type CurrencyConfig = {
   token: string[];
   tokenId: BigNumberish[];
+  tokenType: BigNumberish[];
+};
+
+/**
+ * @public
+ * Type of output of Currencies
+ */
+export type CurrencyDetail = {
+  token: string[];
+  tokenType: BigNumber[];
+  tokenId: BigNumber[] 
 };
 
 /**
@@ -352,11 +355,11 @@ export type CurrencyConfig = {
  * Type of asset details returned by Rain1155.assets method
  */
 export type AssetDetails = {
-  lootBoxId: BigNumberish;
-  id: BigNumberish;
+  lootBoxId: BigNumber;
+  id: BigNumber;
   vmStateConfig: StateConfig;
   vmStatePointer: string;
-  currencies: CurrencyConfig;
+  currencies: CurrencyDetail;
   recipient: string;
   tokenURI: string;
 };

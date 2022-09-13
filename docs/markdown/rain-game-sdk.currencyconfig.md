@@ -12,5 +12,6 @@ Type for valid currencies config
 export declare type CurrencyConfig = {
     token: string[];
     tokenId: BigNumberish[];
+    tokenType: BigNumberish[];
 };
 ```

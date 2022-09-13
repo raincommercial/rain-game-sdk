@@ -5,7 +5,7 @@ const addressBook = [
      */
     chainId: 80001,
     addresses: {
-      rain1155: '0xb800313e8dAf245FAD28743590C7016a25248A90',
+      rain1155: '0x657d4F5A8ca3EdCC146F8c449135B4Eb4e8863A8',
     },
   },
   {

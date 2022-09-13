@@ -7,5 +7,5 @@
 <b>Signature:</b>
 
 ```typescript
-readonly getCurrencyPrice: (_assetId: BigNumberish, _paymentToken: string, _account: string, _units: BigNumberish, overrides?: ReadTxOverrides) => Promise<BigNumber>;
+readonly getCurrencyPrice: (_assetId: BigNumberish, _paymentToken: BigNumberish, _account: string, _units: BigNumberish, overrides?: ReadTxOverrides) => Promise<BigNumber>;
 ```

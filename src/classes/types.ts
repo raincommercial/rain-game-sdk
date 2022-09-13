@@ -30,7 +30,8 @@ export enum CurrencyType {
 export type token = {
   tokenType: number;
   tokenAddress: string;
-  tokenId?: BigNumberish;
+  tokenId: BigNumberish;
+  index: number;
 };
 
 /**

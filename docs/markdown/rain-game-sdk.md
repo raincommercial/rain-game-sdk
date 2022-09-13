@@ -41,6 +41,7 @@ const vmStateConfig = Rain1155.getStateConfig([currency1, currency2, ...])
 |  [AssetConfig](./rain-game-sdk.assetconfig.md) | Type of asset's config used for creating new assets |
 |  [AssetDetails](./rain-game-sdk.assetdetails.md) | Type of asset details returned by Rain1155.assets method |
 |  [CurrencyConfig](./rain-game-sdk.currencyconfig.md) | Type for valid currencies config |
+|  [CurrencyDetail](./rain-game-sdk.currencydetail.md) | Type of output of Currencies |
 |  [price](./rain-game-sdk.price.md) | Type for price as a result of Rain1155 contract call |
 |  [token](./rain-game-sdk.token.md) | Type for token used in price type |
 

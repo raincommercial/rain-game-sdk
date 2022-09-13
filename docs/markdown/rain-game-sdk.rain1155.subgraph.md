@@ -7,5 +7,5 @@
 <b>Signature:</b>
 
 ```typescript
-static readonly subgraph = "https://api.thegraph.com/subgraphs/name/vishalkale151071/blocks";
+static readonly subgraph = "https://api.thegraph.com/subgraphs/name/beehive-innovation/vapour-game-1155";
 ```

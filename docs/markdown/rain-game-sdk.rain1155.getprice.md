@@ -7,5 +7,5 @@
 <b>Signature:</b>
 
 ```typescript
-readonly getPrice: (_assetId: BigNumberish, _paymentToken: string, _account: string, _units: BigNumberish) => Promise<price>;
+readonly getPrice: (_assetId: BigNumberish, _paymentTokenIndex: BigNumberish, _account: string, _units: BigNumberish) => Promise<price>;
 ```

@@ -10,14 +10,14 @@ Type of asset details returned by Rain1155.assets method
 
 ```typescript
 export declare type AssetDetails = {
-    lootBoxId: BigNumberish;
-    id: BigNumberish;
+    lootBoxId: BigNumber;
+    id: BigNumber;
     vmStateConfig: StateConfig;
     vmStatePointer: string;
-    currencies: CurrencyConfig;
+    currencies: CurrencyDetail;
     recipient: string;
     tokenURI: string;
 };
 ```
-<b>References:</b> [CurrencyConfig](./rain-game-sdk.currencyconfig.md)
+<b>References:</b> [CurrencyDetail](./rain-game-sdk.currencydetail.md)
 
